@@ -5,4 +5,5 @@ class ImagePath {
   static const String secondOnboardingScreen = "assets/images/secondOnboardingscreen.png";
   static const String thirdonboardingscreen = "assets/images/thirdonboaringscreen.png";
   static const String lastOnboarding = "assets/images/lastonboading.png";
+  static const String logo = "assets/images/logo.png";
 }
