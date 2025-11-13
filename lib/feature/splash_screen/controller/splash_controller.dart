@@ -9,10 +9,10 @@ import 'package:service_connect/feature/splash_screen/screen/second_splash_scree
 class SplashController extends GetxController{
   void onInit(){
     super.onInit();
-    Timer(const Duration(seconds: 5),(){
+    Timer(const Duration(seconds: 3),(){
      Get.to(()=>SecondSplashScreen());
     });
-      Timer(const Duration(seconds: 10), () {
+      Timer(const Duration(seconds: 5), () {
       Get.to(() => const OnboadringScreen());
     });
   
