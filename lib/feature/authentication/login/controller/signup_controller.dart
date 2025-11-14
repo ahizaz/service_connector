@@ -8,12 +8,26 @@ class SignUpController extends GetxController{
   
   var isPasswordVisible = false.obs;
   var isConfirmPasswordVisible = false.obs;
+
+  var isSignUpEnabled = false.obs;
+
+  @override
+  void onInit() {
+
+    super.onInit();
+    emailController.addListener(_validateFields);
+    passwordController.addListener(_validateFields);
+    confimPasswordController.addListener(_validateFields);
+  }
   
   void togglePasswordVisibility() {
     isPasswordVisible.value = !isPasswordVisible.value;
   }
   void toggleConfirmPasswordVisibility(){
     isConfirmPasswordVisible.value = !isConfirmPasswordVisible.value;
+  }
+  void _validateFields(){
+    isSignUpEnabled.value = emailController.text.isNotEmpty && passwordController.text.isNotEmpty && confimPasswordController.text.isNotEmpty;
   }
   
   @override
