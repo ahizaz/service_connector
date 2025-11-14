@@ -47,6 +47,17 @@ class VerifyScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xffF5F5F5),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Color(0xff313131),
+          ),
+          onPressed: () => Get.back(),
+        ),
+      ),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),

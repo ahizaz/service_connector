@@ -6,7 +6,7 @@ import 'package:service_connect/core/common/widgets/custom_button.dart';
 import 'package:service_connect/core/common/widgets/custom_textField.dart';
 import 'package:service_connect/core/common/widgets/custom_password_field.dart';
 import 'package:service_connect/core/utils/constants/image_path.dart';
-import 'package:service_connect/feature/authentication/login/controller/signup_controller.dart';
+import 'package:service_connect/feature/authentication/sign_up/controller/signup_controller.dart';
 import 'package:service_connect/feature/authentication/verify_account/screen/verify_screen.dart';
 
 class SignUp extends StatelessWidget {

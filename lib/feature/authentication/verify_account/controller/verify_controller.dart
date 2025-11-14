@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:service_connect/feature/authentication/finish_page/screen/finish_page.dart';
 
 class VerifyController extends GetxController {
   final TextEditingController otpController = TextEditingController();
@@ -59,14 +60,8 @@ class VerifyController extends GetxController {
 
     isLoading.value = false;
 
-    // For now, just show success message
-    Get.snackbar(
-      'Success',
-      'OTP Verified Successfully',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-    );
+    // For now, navigate to finish page
+    Get.to(() => const FinishPage());
   }
 
   void resendOtp() async {
