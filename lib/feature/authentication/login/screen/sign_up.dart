@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:service_connect/core/common/styles/global_text_style.dart';
 import 'package:service_connect/core/common/widgets/custom_textField.dart';
 import 'package:service_connect/core/common/widgets/custom_password_field.dart';
 import 'package:service_connect/core/utils/constants/image_path.dart';
-import 'package:service_connect/feature/login/controller/logincontroller.dart';
-class Login extends StatelessWidget {
-  const Login({super.key});
+import 'package:service_connect/feature/authentication/login/controller/signup_controller.dart';
+class SignUp extends StatelessWidget {
+  const SignUp({super.key});
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(Logincontroller());
+    final controller = Get.put(SignUpController());
     return Scaffold(
       backgroundColor: const Color(0xffF5F5F5),
       body: Padding(
@@ -69,6 +70,27 @@ class Login extends StatelessWidget {
               ), ),
        SizedBox(height: 8.h),
        Obx(()=>CustomPasswordField(hintText: "Re-type your password", controller: controller.confimPasswordController, obscureText: !controller.isConfirmPasswordVisible.value, onToggle: controller.toggleConfirmPasswordVisibility)),
+       SizedBox(height: 32.h,),
+       InkWell(
+        onTap: (){
+          
+        },
+         child: Container(
+          width: double.infinity,
+          height: 46.h,
+          decoration: BoxDecoration(
+            color: Color(0xffCC0000),
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: Center(
+            child: Text("SignUp",style: GoogleFonts.roboto( 
+              color: Color(0xffFFFFFF),
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w500
+            ),),
+          ),
+         ),
+       )
 
           ],
         ),

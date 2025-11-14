@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
-class Logincontroller extends GetxController{
+class SignUpController extends GetxController{
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confimPasswordController = TextEditingController();
