@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:service_connect/core/utils/constants/image_path.dart';
+import 'package:service_connect/feature/authentication/login/screen/login_screen.dart';
 import 'package:service_connect/feature/authentication/sign_up/screen/sign_up.dart';
 
 class LastOnboardingScreen extends StatelessWidget {
@@ -40,7 +41,7 @@ class LastOnboardingScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                     Get.to(()=>SignUp());
+                     Get.to(()=>LoginScreen());
                       },
                       child: const Text(
                         "Join Now",
@@ -64,7 +65,7 @@ class LastOnboardingScreen extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () {
-                         
+                         Get.to(()=>SignUp());
                         },
                         child: const Text(
                           "Sign Up",

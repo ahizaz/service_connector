@@ -5,6 +5,7 @@ import 'package:get/get_navigation/get_navigation.dart';
 import 'package:service_connect/core/common/styles/global_text_style.dart';
 import 'package:service_connect/core/common/widgets/custom_button.dart';
 import 'package:service_connect/core/utils/constants/image_path.dart';
+import 'package:service_connect/feature/authentication/login/screen/login_screen.dart';
 
 class FinishPage extends StatelessWidget {
   const FinishPage({super.key});
@@ -66,6 +67,7 @@ class FinishPage extends StatelessWidget {
                 ),)),
                 SizedBox(height: 55.h,),
                 CustomButton(text: "Continue", onTap:(){
+                  Get.to(()=>LoginScreen());
      
                 } )
 
