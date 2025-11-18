@@ -8,4 +8,5 @@ class ImagePath {
   static const String logo = "assets/images/logo.png";
   static const String applogo = "assets/images/applogo.png";
   static const String homesheet = "assets/images/home_sheet.png";
+  static const String userpicRepairing = "assets/images/userpicreparing.png";
 }

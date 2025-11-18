@@ -6,10 +6,10 @@ import 'package:service_connect/core/utils/constants/icon_path.dart';
 import 'package:service_connect/feature/home/controller/home_controller.dart';
 import 'package:service_connect/feature/home/widget/home_header_widget.dart';
 import 'package:service_connect/feature/home/screen/all_categories_screen.dart';
-
+import 'package:service_connect/feature/home/screen/all_professionals_screen.dart';
+import 'package:service_connect/feature/home/widget/professional_card_widget.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(HomeController());
@@ -103,20 +103,18 @@ class HomeScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(height: 26.h),
-                  Text("All Catagories",style: GoogleFonts.roboto ( 
+                  Text("Top Rated Professional",style: GoogleFonts.roboto ( 
                     fontWeight: FontWeight.w500,
                     fontSize: 18,
                     color: Color(0xff252525),
                   ),),
-                  Spacer(),
                   GestureDetector(
-                    onTap: () => Get.to(() => AllCategoriesScreen()),
+                    onTap: () => Get.to(() => AllProfessionalsScreen()),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          "See All",
+                          "See all",
                           style: GoogleFonts.roboto(
                             color: Color(0xffCC0000),
                           ),
@@ -133,6 +131,35 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
+            SizedBox(height: 16.h,),
+            SizedBox(
+              height: 240.h,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                itemCount: controller.topRatedProfessionals.length,
+                itemBuilder: (context, index) {
+                  final professional = controller.topRatedProfessionals[index];
+                  return Padding(
+                    padding: EdgeInsets.only(right: 16.w),
+                    child: ProfessionalCardWidget(
+                      name: professional['name'],
+                      professional: professional['professional'],
+                      rating: professional['rating'].toDouble(),
+                      price: professional['price'],
+                      image: professional['image'],
+                      category: professional['category'],
+                      onBookNow: () {
+                        // Handle book now action
+                        print('Book now: ${professional['name']}');
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+            SizedBox(height: 20.h,),
+
         
           ],
         ),

@@ -21,6 +21,58 @@ class HomeController extends GetxController {
     {'name': 'Repairing', 'icon': 'assets/icons/repairing.png'},
   ];
 
+  // Top Rated Professionals
+  final List<Map<String, dynamic>> topRatedProfessionals = [
+    {
+      'name': 'Computer Repair',
+      'professional': 'Abdur Rahman',
+      'rating': 4.5,
+      'price': 23,
+      'image': 'assets/images/userpicreparing.png',
+      'category': 'Repairing'
+    },
+    {
+      'name': 'Washing Machine...',
+      'professional': 'Abdur Rahman',
+      'rating': 4.5,
+      'price': 23,
+      'image': 'assets/images/userpicreparing.png',
+      'category': 'Repairing'
+    },
+    {
+      'name': 'Computer Repair',
+      'professional': 'Abdur Rahman',
+      'rating': 4.5,
+      'price': 23,
+      'image': 'assets/images/userpicreparing.png',
+      'category': 'Repairing'
+    },
+    {
+      'name': 'Washing Machine...',
+      'professional': 'Abdur Rahman',
+      'rating': 4.5,
+      'price': 23,
+      'image': 'assets/images/userpicreparing.png',
+      'category': 'Repairing'
+    },
+    {
+      'name': 'Computer Repair',
+      'professional': 'Abdur Rahman',
+      'rating': 4.5,
+      'price': 23,
+      'image': 'assets/images/userpicreparing.png',
+      'category': 'Repairing'
+    },
+    {
+      'name': 'Washing Machine...',
+      'professional': 'Abdur Rahman',
+      'rating': 4.5,
+      'price': 23,
+      'image': 'assets/images/userpicreparing.png',
+      'category': 'Repairing'
+    },
+  ];
+
   @override
   void onClose() {
     searchController.dispose();
