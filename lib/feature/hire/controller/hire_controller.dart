@@ -15,7 +15,10 @@ class HireController extends GetxController with GetSingleTickerProviderStateMix
   final List<Map<String, dynamic>> allOrders = [
     {
       'title': 'Pipe Plumbing',
+      'subtitle': 'Pipe Plumbing',
+      'professional': 'Abdur Rahman - Plumber',
       'description': 'As an AC service technician, I specialize in the installation, maintenance, and repair of air c...',
+      'fullDescription': 'As an AC service technician, I specialize in the installation, maintenance, and repair of air conditioning systems. My work involves diagnosing issues, performing routine check-ups, and ensuring optimal performance of cooling units. I also provide recommendations for energy efficiency and help customers understand how to operate their systems effectively. My goal is to ensure that every client enjoys a comfortable indoor environment.',
       'price': 215.00,
       'date': '09/January',
       'time': '10:00 AM',
@@ -24,7 +27,10 @@ class HireController extends GetxController with GetSingleTickerProviderStateMix
     },
     {
       'title': 'Electricity mechanic',
+      'subtitle': 'Electricity mechanic',
+      'professional': 'Abdur Rahman - Electrician',
       'description': 'As an AC service technician, I specialize in the installation, maintenance, and repair of air c...',
+      'fullDescription': 'As an AC service technician, I specialize in the installation, maintenance, and repair of air conditioning systems. My work involves diagnosing issues, performing routine check-ups, and ensuring optimal performance of cooling units. I also provide recommendations for energy efficiency and help customers understand how to operate their systems effectively. My goal is to ensure that every client enjoys a comfortable indoor environment.',
       'price': 526.00,
       'date': '09/March',
       'time': '12:00 AM',
@@ -33,7 +39,10 @@ class HireController extends GetxController with GetSingleTickerProviderStateMix
     },
     {
       'title': 'HVAC Specialist',
+      'subtitle': 'HVAC Specialist',
+      'professional': 'Abdur Rahman - HVAC Technician',
       'description': 'As an HVAC specialist, I focus on the integration of heating, ventilation, and air co...',
+      'fullDescription': 'As an HVAC specialist, I focus on the integration of heating, ventilation, and air conditioning systems to create optimal indoor environments. My expertise includes system design, installation, and maintenance, ensuring energy efficiency and comfort for residential and commercial clients.',
       'price': 320.00,
       'date': '09/March',
       'time': '12:00 AM',
@@ -42,7 +51,10 @@ class HireController extends GetxController with GetSingleTickerProviderStateMix
     },
     {
       'title': 'Bathroom Fittings',
+      'subtitle': 'Bathroom Fittings',
+      'professional': 'Abdur Rahman - Plumber',
       'description': 'And Balcony Plumber',
+      'fullDescription': 'As an AC service technician, I specialize in the installation, maintenance, and repair of air conditioning systems. My work involves diagnosing issues, performing routine check-ups, and ensuring optimal performance of cooling units. I also provide recommendations for energy efficiency and help customers understand how to operate their systems effectively. My goal is to ensure that every client enjoys a comfortable indoor environment.',
       'price': 215.00,
       'date': '09/January',
       'time': '10:00 AM',
@@ -59,7 +71,10 @@ class HireController extends GetxController with GetSingleTickerProviderStateMix
   final List<Map<String, dynamic>> completedOrders = [
     {
       'title': 'Pipe Plumbing',
+      'subtitle': 'Pipe Plumbing',
+      'professional': 'Abdur Rahman - Plumber',
       'description': 'As an AC service technician, I specialize in the installation, maintenance, and repair of air c...',
+      'fullDescription': 'As an AC service technician, I specialize in the installation, maintenance, and repair of air conditioning systems. My work involves diagnosing issues, performing routine check-ups, and ensuring optimal performance of cooling units. I also provide recommendations for energy efficiency and help customers understand how to operate their systems effectively. My goal is to ensure that every client enjoys a comfortable indoor environment.',
       'price': 215.00,
       'date': '09/January',
       'time': '10:00 AM',
@@ -68,7 +83,10 @@ class HireController extends GetxController with GetSingleTickerProviderStateMix
     },
     {
       'title': 'Electricity mechanic',
+      'subtitle': 'Electricity mechanic',
+      'professional': 'Abdur Rahman - Electrician',
       'description': 'As an AC service technician, I specialize in the installation, maintenance, and repair of air c...',
+      'fullDescription': 'As an AC service technician, I specialize in the installation, maintenance, and repair of air conditioning systems. My work involves diagnosing issues, performing routine check-ups, and ensuring optimal performance of cooling units. I also provide recommendations for energy efficiency and help customers understand how to operate their systems effectively. My goal is to ensure that every client enjoys a comfortable indoor environment.',
       'price': 526.00,
       'date': '09/March',
       'time': '12:00 AM',
@@ -77,7 +95,10 @@ class HireController extends GetxController with GetSingleTickerProviderStateMix
     },
     {
       'title': 'HVAC Specialist',
+      'subtitle': 'HVAC Specialist',
+      'professional': 'Abdur Rahman - HVAC Technician',
       'description': 'As an HVAC specialist, I focus on the integration of heating, ventilation, and air co...',
+      'fullDescription': 'As an HVAC specialist, I focus on the integration of heating, ventilation, and air conditioning systems to create optimal indoor environments. My expertise includes system design, installation, and maintenance, ensuring energy efficiency and comfort for residential and commercial clients.',
       'price': 320.00,
       'date': '09/March',
       'time': '12:00 AM',

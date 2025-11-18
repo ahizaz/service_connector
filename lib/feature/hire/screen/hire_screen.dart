@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:service_connect/feature/hire/controller/hire_controller.dart';
+import 'package:service_connect/feature/hire/screen/order_details.dart';
 
 class HireScreen extends StatelessWidget {
   const HireScreen({super.key});
@@ -46,42 +47,55 @@ class HireScreen extends StatelessWidget {
           
           // Tab Bar
           Container(
-            color: Colors.white,
-            child: TabBar(
-              controller: controller.tabController,
-              labelColor: const Color(0xff1C59D2),
-              unselectedLabelColor: Colors.grey,
-              indicatorColor: const Color(0xff1C59D2),
-              labelStyle: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-              unselectedLabelStyle: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-              ),
-              tabs: const [
-                Tab(text: 'All'),
-                Tab(text: 'Active'),
-                Tab(text: 'Complete'),
-                Tab(text: 'Cancelled'),
-              ],
+            padding: const EdgeInsets.all(4),
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: const Color(0xffE8E8E8),
+              borderRadius: BorderRadius.circular(8),
             ),
+            child: Obx(() => Row(
+              children: [
+                _buildTab(controller, 0, 'All'),
+                _buildTab(controller, 1, 'Active'),
+                _buildTab(controller, 2, 'Complete'),
+                _buildTab(controller, 3, 'Cancelled'),
+              ],
+            )),
           ),
           
           // Tab View
           Expanded(
-            child: TabBarView(
-              controller: controller.tabController,
-              children: [
-                _buildOrderList(controller, 0),
-                _buildOrderList(controller, 1),
-                _buildOrderList(controller, 2),
-                _buildOrderList(controller, 3),
-              ],
-            ),
+            child: Obx(() => _buildOrderList(controller, controller.selectedTab.value)),
           ),
         ],
+      ),
+    );
+  }
+  
+  Widget _buildTab(HireController controller, int index, String label) {
+    final isSelected = controller.selectedTab.value == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          controller.selectedTab.value = index;
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+          decoration: BoxDecoration(
+            color: isSelected ? Colors.white : Colors.transparent,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.black : Colors.grey[500],
+                fontSize: 14,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -164,109 +178,114 @@ class HireScreen extends StatelessWidget {
         statusColor = Colors.grey;
     }
     
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                order['title'],
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: statusColor,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      order['status'],
-                      style: TextStyle(
-                        color: statusColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            order['description'],
-            style: const TextStyle(
-              fontSize: 13,
-              color: Colors.grey,
-              height: 1.4,
+    return GestureDetector(
+      onTap: () {
+        Get.to(() => OrderDetailsScreen(order: order));
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Icon(
-                Icons.attach_money,
-                size: 18,
-                color: Colors.grey[700],
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  order['title'],
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: statusColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: statusColor,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        order['status'],
+                        style: TextStyle(
+                          color: statusColor,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              order['description'],
+              style: const TextStyle(
+                fontSize: 13,
+                color: Colors.grey,
+                height: 1.4,
               ),
-              const SizedBox(width: 4),
-              Text(
-                '\$${order['price'].toStringAsFixed(2)}',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Icon(
+                  Icons.attach_money,
+                  size: 18,
                   color: Colors.grey[700],
                 ),
-              ),
-              const SizedBox(width: 20),
-              Icon(
-                Icons.calendar_today,
-                size: 16,
-                color: Colors.grey[700],
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '${order['date']} ${order['time']}',
-                style: TextStyle(
-                  fontSize: 13,
+                const SizedBox(width: 4),
+                Text(
+                  '\$${order['price'].toStringAsFixed(2)}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey[700],
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Icon(
+                  Icons.calendar_today,
+                  size: 16,
                   color: Colors.grey[700],
                 ),
-              ),
-            ],
-          ),
-        ],
+                const SizedBox(width: 4),
+                Text(
+                  '${order['date']} ${order['time']}',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey[700],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
