@@ -7,4 +7,5 @@ class ImagePath {
   static const String lastOnboarding = "assets/images/lastonboading.png";
   static const String logo = "assets/images/logo.png";
   static const String applogo = "assets/images/applogo.png";
+  static const String homesheet = "assets/images/home_sheet.png";
 }

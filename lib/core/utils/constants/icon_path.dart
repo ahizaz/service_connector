@@ -9,5 +9,14 @@ class IconPath {
     static const hireinactive = "assets/icons/hireinactive.png";
     static const chatactive = "assets/icons/chatactive.png";
     static const chatinactive = "assets/icons/chatinactive.png";
+    static const menu = "assets/icons/menu.png";
+    static const plumber = "assets/icons/plumber.png";
+    static const painting = "assets/icons/painting.png";
+    static const cleaning = "assets/icons/cleaning.png";
+    static const carpenter = "assets/icons/carpainter.png";
+    static const photographer = "assets/icons/photographer.png";
+    static const electrician = "assets/icons/electrician.png";
+    static const installation = "assets/icons/installation.png";
+    static const repairing = "assets/icons/repairing.png";
 
 }
