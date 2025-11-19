@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -105,9 +106,11 @@ class ChatDetailScreen extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
-                      icon: Icon(Icons.attach_file, size: 20.sp),
+                      icon: Icon(Icons.image, size: 20.sp),
                       color: Color(0xFF757575),
-                      onPressed: () {},
+                      onPressed: () {
+                        controller.pickImageFromGallery();
+                      },
                       padding: EdgeInsets.zero,
                     ),
                   ),
@@ -205,6 +208,10 @@ class ChatDetailScreen extends StatelessWidget {
   Widget _buildMessageBubble(ChatMessage message) {
     if (message.type == MessageType.voice) {
       return _buildVoiceMessage(message);
+    }
+    
+    if (message.type == MessageType.image) {
+      return _buildImageMessage(message);
     }
 
     return Align(
@@ -316,6 +323,44 @@ class ChatDetailScreen extends StatelessWidget {
                 color: message.isMe
                     ? Colors.white.withOpacity(0.7)
                     : Color(0xFF9E9E9E),
+                fontSize: 11.sp,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  
+  Widget _buildImageMessage(ChatMessage message) {
+    return Align(
+      alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: EdgeInsets.only(bottom: 12.h),
+        constraints: BoxConstraints(maxWidth: 280.w),
+        child: Column(
+          crossAxisAlignment: message.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12.r),
+              child: message.filePath != null
+                  ? Image.file(
+                      File(message.filePath!),
+                      width: 280.w,
+                      fit: BoxFit.cover,
+                    )
+                  : Container(
+                      width: 280.w,
+                      height: 200.h,
+                      color: Color(0xFFF5F5F5),
+                      child: Icon(Icons.image, size: 50.sp),
+                    ),
+            ),
+            SizedBox(height: 4.h),
+            Text(
+              message.time,
+              style: TextStyle(
+                color: Color(0xFF9E9E9E),
                 fontSize: 11.sp,
               ),
             ),

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:record/record.dart';
+import 'package:path_provider/path_provider.dart';
 import '../model/chat_message_model.dart';
 
 class ChatController extends GetxController {
@@ -20,6 +23,10 @@ class ChatController extends GetxController {
 
   // Voice recording
   final RxBool isRecording = false.obs;
+  final AudioRecorder _audioRecorder = AudioRecorder();
+  
+  // Image picker
+  final ImagePicker _imagePicker = ImagePicker();
 
   @override
   void onInit() {
@@ -37,6 +44,7 @@ class ChatController extends GetxController {
   void onClose() {
     searchController.dispose();
     messageController.dispose();
+    _audioRecorder.dispose();
     super.onClose();
   }
 
@@ -198,16 +206,36 @@ class ChatController extends GetxController {
   }
 
   // Toggle voice recording
-  void toggleRecording() {
-    isRecording.value = !isRecording.value;
-    if (!isRecording.value) {
-      // Save voice message
-      _sendVoiceMessage();
+  Future<void> toggleRecording() async {
+    if (isRecording.value) {
+      // Stop recording
+      final path = await _audioRecorder.stop();
+      isRecording.value = false;
+      
+      if (path != null) {
+        _sendVoiceMessage(path);
+      }
+    } else {
+      // Start recording
+      try {
+        if (await _audioRecorder.hasPermission()) {
+          final directory = await getApplicationDocumentsDirectory();
+          final filePath = '${directory.path}/audio_${DateTime.now().millisecondsSinceEpoch}.m4a';
+          
+          await _audioRecorder.start(
+            const RecordConfig(),
+            path: filePath,
+          );
+          isRecording.value = true;
+        }
+      } catch (e) {
+        print('Error starting recording: $e');
+      }
     }
   }
 
   // Send voice message
-  void _sendVoiceMessage() {
+  void _sendVoiceMessage(String audioPath) {
     final voiceMessage = ChatMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       senderId: 'me',
@@ -216,8 +244,40 @@ class ChatController extends GetxController {
       time: _getCurrentTime(),
       isMe: true,
       type: MessageType.voice,
+      filePath: audioPath,
     );
     currentChatMessages.add(voiceMessage);
+  }
+  
+  // Pick image from gallery
+  Future<void> pickImageFromGallery() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+      );
+      
+      if (image != null) {
+        _sendImageMessage(image.path);
+      }
+    } catch (e) {
+      print('Error picking image: $e');
+    }
+  }
+  
+  // Send image message
+  void _sendImageMessage(String imagePath) {
+    final imageMessage = ChatMessage(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      senderId: 'me',
+      senderName: 'Me',
+      message: 'Image',
+      time: _getCurrentTime(),
+      isMe: true,
+      type: MessageType.image,
+      filePath: imagePath,
+    );
+    currentChatMessages.add(imageMessage);
   }
 
   // Get current time formatted

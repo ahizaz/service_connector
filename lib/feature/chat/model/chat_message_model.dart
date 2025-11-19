@@ -7,6 +7,7 @@ class ChatMessage {
   final bool isMe;
   final bool isRead;
   final MessageType type;
+  final String? filePath; // For voice or image files
 
   ChatMessage({
     required this.id,
@@ -17,6 +18,7 @@ class ChatMessage {
     required this.isMe,
     this.isRead = false,
     this.type = MessageType.text,
+    this.filePath,
   });
 }
 
