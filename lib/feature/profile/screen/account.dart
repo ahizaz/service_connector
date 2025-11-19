@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:service_connect/feature/profile/controller/profile_controller.dart';
+import 'package:service_connect/feature/profile/screen/profile_screen.dart';
 
 class Account extends StatelessWidget {
   const Account({super.key});
@@ -182,7 +183,7 @@ class Account extends StatelessWidget {
                     duration: const Duration(seconds: 2),
                   );
 
-                  Get.back();
+                  Get.to(()=>ProfileScreen());
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xffFDDAD1),
