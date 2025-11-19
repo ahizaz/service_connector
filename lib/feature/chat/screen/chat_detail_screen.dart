@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import '../controller/chat_controller.dart';
 import '../model/chat_message_model.dart';
 
@@ -148,7 +149,9 @@ class ChatDetailScreen extends StatelessWidget {
                             icon: Icon(Icons.emoji_emotions_outlined),
                             color: Color(0xFF757575),
                             iconSize: 22.sp,
-                            onPressed: () {},
+                            onPressed: () {
+                              controller.toggleEmojiPicker();
+                            },
                           ),
                         ],
                       ),
@@ -156,23 +159,42 @@ class ChatDetailScreen extends StatelessWidget {
                   ),
                   SizedBox(width: 8.w),
 
-                  // Voice/Send button
+                  // Voice/Send button (dynamic)
                   Obx(() {
-                    final hasText = controller.messageController.text.isNotEmpty;
+                    final hasText = controller.messageText.value.trim().isNotEmpty;
+                    if (hasText) {
+                      return GestureDetector(
+                        onTap: controller.sendMessage,
+                        child: Container(
+                          width: 40.w,
+                          height: 40.h,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF6B4CE6), Color(0xFF9B6FFF)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.send,
+                            color: Colors.white,
+                            size: 20.sp,
+                          ),
+                        ),
+                      );
+                    }
+
                     return GestureDetector(
-                      onTap: () {
-                        if (hasText) {
-                          controller.sendMessage();
-                        }
+                      onTap: () async {
+                        await controller.toggleRecording();
                       },
-                      onLongPress: () {
-                        if (!hasText) {
-                          controller.toggleRecording();
-                        }
+                      onLongPress: () async {
+                        await controller.toggleRecording();
                       },
-                      onLongPressUp: () {
+                      onLongPressUp: () async {
                         if (controller.isRecording.value) {
-                          controller.toggleRecording();
+                          await controller.toggleRecording();
                         }
                       },
                       child: Container(
@@ -187,9 +209,7 @@ class ChatDetailScreen extends StatelessWidget {
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
-                          controller.isRecording.value
-                              ? Icons.stop
-                              : (hasText ? Icons.send : Icons.mic),
+                          controller.isRecording.value ? Icons.stop : Icons.mic,
                           color: Colors.white,
                           size: 20.sp,
                         ),
@@ -200,6 +220,39 @@ class ChatDetailScreen extends StatelessWidget {
               ),
             ),
           ),
+          
+          // Emoji Picker
+          Obx(() {
+            return Offstage(
+              offstage: !controller.showEmojiPicker.value,
+              child: SizedBox(
+                height: 250.h,
+                child: EmojiPicker(
+                  onEmojiSelected: (category, emoji) {
+                    controller.addEmoji(emoji.emoji);
+                  },
+                  config: Config(
+                    height: 256,
+                    emojiViewConfig: EmojiViewConfig(
+                      emojiSizeMax: 28,
+                      backgroundColor: Colors.white,
+                    ),
+                    categoryViewConfig: CategoryViewConfig(
+                      backgroundColor: Colors.white,
+                      iconColor: Colors.grey,
+                      iconColorSelected: Color(0xFF6B4CE6),
+                      indicatorColor: Color(0xFF6B4CE6),
+                    ),
+                    bottomActionBarConfig: BottomActionBarConfig(
+                      backgroundColor: Colors.white,
+                      buttonColor: Colors.white,
+                      buttonIconColor: Colors.grey,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }),
         ],
       ),
     );
@@ -212,6 +265,10 @@ class ChatDetailScreen extends StatelessWidget {
     
     if (message.type == MessageType.image) {
       return _buildImageMessage(message);
+    }
+
+    if (message.type == MessageType.offer) {
+      return _buildOfferMessage(message);
     }
 
     return Align(
@@ -271,6 +328,11 @@ class ChatDetailScreen extends StatelessWidget {
   }
 
   Widget _buildVoiceMessage(ChatMessage message) {
+    final duration = message.duration ?? 0;
+    final minutes = duration ~/ 60;
+    final seconds = duration % 60;
+    final durationText = '${minutes}:${seconds.toString().padLeft(2, '0')}';
+    
     return Align(
       alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -292,7 +354,7 @@ class ChatDetailScreen extends StatelessWidget {
             // Play button
             Icon(
               Icons.play_arrow,
-              color: message.isMe ? Colors.white : Colors.black,
+              color: message.isMe ? Colors.white : Color(0xFF6B4CE6),
               size: 24.sp,
             ),
             SizedBox(width: 8.w),
@@ -316,6 +378,18 @@ class ChatDetailScreen extends StatelessWidget {
               ),
             ),
             SizedBox(width: 8.w),
+            // Duration
+            Text(
+              durationText,
+              style: TextStyle(
+                color: message.isMe
+                    ? Colors.white.withOpacity(0.9)
+                    : Color(0xFF424242),
+                fontSize: 12.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            SizedBox(width: 4.w),
             // Time
             Text(
               message.time,
@@ -363,6 +437,149 @@ class ChatDetailScreen extends StatelessWidget {
                 color: Color(0xFF9E9E9E),
                 fontSize: 11.sp,
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOfferMessage(ChatMessage message) {
+    final offer = message.offerDetails;
+    if (offer == null) return SizedBox.shrink();
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        width: double.infinity,
+        margin: EdgeInsets.only(bottom: 12.h),
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(color: Color(0xFFE0E0E0)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 10,
+              offset: Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              offer.title,
+              style: TextStyle(
+                fontSize: 16.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              offer.workDetails,
+              style: TextStyle(
+                fontSize: 13.sp,
+                color: Color(0xFF616161),
+                height: 1.4,
+              ),
+            ),
+            SizedBox(height: 14.h),
+            Column(
+              children: offer.slots.map((slot) {
+                return Container(
+                  margin: EdgeInsets.only(bottom: 8.h),
+                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12.r),
+                    border: Border.all(
+                      color: slot.isSelected ? Color(0xFF6B4CE6) : Color(0xFFE0E0E0),
+                      width: slot.isSelected ? 1.5 : 1,
+                    ),
+                    color: slot.isSelected ? Color(0xFFF3EDFF) : Colors.white,
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        slot.isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
+                        color: slot.isSelected ? Color(0xFF6B4CE6) : Color(0xFFBDBDBD),
+                        size: 18.sp,
+                      ),
+                      SizedBox(width: 10.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              slot.dayLabel,
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            Text(
+                              slot.timeLabel,
+                              style: TextStyle(
+                                fontSize: 13.sp,
+                                color: Color(0xFF616161),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+            SizedBox(height: 12.h),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 12.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                      side: BorderSide(color: Color(0xFFE0E0E0)),
+                    ),
+                    onPressed: () {},
+                    child: Text(
+                      offer.secondaryCtaText,
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFE53935),
+                      padding: EdgeInsets.symmetric(vertical: 12.h),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r),
+                      ),
+                    ),
+                    onPressed: () {},
+                    child: Text(
+                      offer.primaryCtaText,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

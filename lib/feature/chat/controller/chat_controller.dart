@@ -12,6 +12,7 @@ class ChatController extends GetxController {
 
   // Message input controller
   final messageController = TextEditingController();
+  final RxString messageText = ''.obs;
 
   // Observable lists
   final RxList<ChatUser> allUsers = <ChatUser>[].obs;
@@ -24,9 +25,13 @@ class ChatController extends GetxController {
   // Voice recording
   final RxBool isRecording = false.obs;
   final AudioRecorder _audioRecorder = AudioRecorder();
+  DateTime? _recordingStartTime;
   
   // Image picker
   final ImagePicker _imagePicker = ImagePicker();
+  
+  // Emoji picker
+  final RxBool showEmojiPicker = false.obs;
 
   @override
   void onInit() {
@@ -37,6 +42,10 @@ class ChatController extends GetxController {
     searchController.addListener(() {
       searchQuery.value = searchController.text;
       filterUsers();
+    });
+
+    messageController.addListener(() {
+      messageText.value = messageController.text;
     });
   }
 
@@ -210,10 +219,14 @@ class ChatController extends GetxController {
     if (isRecording.value) {
       // Stop recording
       final path = await _audioRecorder.stop();
+      final duration = _recordingStartTime != null 
+          ? DateTime.now().difference(_recordingStartTime!).inSeconds
+          : 0;
       isRecording.value = false;
+      _recordingStartTime = null;
       
       if (path != null) {
-        _sendVoiceMessage(path);
+        _sendVoiceMessage(path, duration);
       }
     } else {
       // Start recording
@@ -226,6 +239,7 @@ class ChatController extends GetxController {
             const RecordConfig(),
             path: filePath,
           );
+          _recordingStartTime = DateTime.now();
           isRecording.value = true;
         }
       } catch (e) {
@@ -235,7 +249,7 @@ class ChatController extends GetxController {
   }
 
   // Send voice message
-  void _sendVoiceMessage(String audioPath) {
+  void _sendVoiceMessage(String audioPath, int durationInSeconds) {
     final voiceMessage = ChatMessage(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       senderId: 'me',
@@ -245,8 +259,35 @@ class ChatController extends GetxController {
       isMe: true,
       type: MessageType.voice,
       filePath: audioPath,
+      duration: durationInSeconds,
     );
     currentChatMessages.add(voiceMessage);
+    sendOfferMessage();
+  }
+  
+  // Toggle emoji picker
+  void toggleEmojiPicker() {
+    showEmojiPicker.value = !showEmojiPicker.value;
+  }
+  
+  // Add emoji to message
+  void addEmoji(String emoji) {
+    final currentText = messageController.text;
+    final selection = messageController.selection;
+    
+    // Handle invalid selection
+    final cursorPosition = selection.baseOffset >= 0 
+        ? selection.baseOffset 
+        : currentText.length;
+    
+    final newText = currentText.substring(0, cursorPosition) + 
+                    emoji + 
+                    currentText.substring(cursorPosition);
+    
+    messageController.text = newText;
+    messageController.selection = TextSelection.collapsed(
+      offset: cursorPosition + emoji.length,
+    );
   }
   
   // Pick image from gallery
@@ -278,6 +319,43 @@ class ChatController extends GetxController {
       filePath: imagePath,
     );
     currentChatMessages.add(imageMessage);
+  }
+
+  // Send offer style message (as seen in design)
+  void sendOfferMessage({OfferDetails? customDetails}) {
+    final user = currentChatUser.value;
+    final offerDetails = customDetails ??
+        OfferDetails(
+          title: 'Offer',
+          workDetails:
+              'As an AC service technician, I specialize in the installation, maintenance, and repair of air conditioning systems.',
+          slots: [
+            OfferSlot(
+              dayLabel: '08 January',
+              timeLabel: '10:00 AM',
+              isSelected: true,
+            ),
+            OfferSlot(
+              dayLabel: '09 January',
+              timeLabel: '10:00 AM',
+            ),
+          ],
+          secondaryCtaText: 'Cancel Offer',
+          primaryCtaText: 'Accept Offer',
+        );
+
+    final offerMessage = ChatMessage(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      senderId: user?.id ?? 'user',
+      senderName: user?.name ?? 'Service Provider',
+      message: 'Offer',
+      time: _getCurrentTime(),
+      isMe: false,
+      type: MessageType.offer,
+      offerDetails: offerDetails,
+    );
+
+    currentChatMessages.add(offerMessage);
   }
 
   // Get current time formatted

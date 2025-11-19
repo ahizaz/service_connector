@@ -8,6 +8,8 @@ class ChatMessage {
   final bool isRead;
   final MessageType type;
   final String? filePath; // For voice or image files
+  final int? duration; // For voice messages in seconds
+  final OfferDetails? offerDetails;
 
   ChatMessage({
     required this.id,
@@ -19,6 +21,8 @@ class ChatMessage {
     this.isRead = false,
     this.type = MessageType.text,
     this.filePath,
+    this.duration,
+    this.offerDetails,
   });
 }
 
@@ -26,6 +30,7 @@ enum MessageType {
   text,
   voice,
   image,
+  offer,
 }
 
 class ChatUser {
@@ -47,5 +52,33 @@ class ChatUser {
     this.unreadCount = 0,
     this.isOnline = false,
     this.isVerified = false,
+  });
+}
+
+class OfferDetails {
+  final String title;
+  final String workDetails;
+  final List<OfferSlot> slots;
+  final String primaryCtaText;
+  final String secondaryCtaText;
+
+  OfferDetails({
+    required this.title,
+    required this.workDetails,
+    required this.slots,
+    this.primaryCtaText = 'Accept Offer',
+    this.secondaryCtaText = 'Cancel Offer',
+  });
+}
+
+class OfferSlot {
+  final String dayLabel;
+  final String timeLabel;
+  final bool isSelected;
+
+  OfferSlot({
+    required this.dayLabel,
+    required this.timeLabel,
+    this.isSelected = false,
   });
 }
