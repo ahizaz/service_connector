@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:service_connect/core/utils/constants/icon_path.dart';
 
 class HomeController extends GetxController {
   final TextEditingController searchController = TextEditingController();
@@ -11,14 +12,14 @@ class HomeController extends GetxController {
   
   // Categories
   final List<Map<String, String>> categories = [
-    {'name': 'Plumber', 'icon': 'assets/icons/plumber.png'},
-    {'name': 'Painting', 'icon': 'assets/icons/painting.png'},
-    {'name': 'Cleaning', 'icon': 'assets/icons/cleaning.png'},
-    {'name': 'Carpenter', 'icon': 'assets/icons/carpainter.png'},
-    {'name': 'Photographer', 'icon': 'assets/icons/photographer.png'},
-    {'name': 'Electrician', 'icon': 'assets/icons/electrician.png'},
-    {'name': 'Installation', 'icon': 'assets/icons/installation.png'},
-    {'name': 'Repairing', 'icon': 'assets/icons/repairing.png'},
+    {'name': 'Plumber', 'icon': IconPath.plumber},
+    {'name': 'Painting', 'icon': IconPath.painting},
+    {'name': 'Cleaning', 'icon': IconPath.cleaning},
+    {'name': 'Carpenter', 'icon': IconPath.carpenter},
+    {'name': 'Photographer', 'icon': IconPath.photographer},
+    {'name': 'Electrician', 'icon': IconPath.electrician},
+    {'name': 'Installation', 'icon': IconPath.installation},
+    {'name': 'Repairing', 'icon': IconPath.repairing},
   ];
 
   // Top Rated Professionals
