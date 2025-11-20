@@ -13,7 +13,12 @@ class HomeScreen extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(HomeController());
+    final controller = Get.put(HomeController(), permanent: true);
+    
+    // Reload mode when screen becomes visible
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.reloadMode();
+    });
     
     return Scaffold(
       backgroundColor: Color(0xffF5F5F5),

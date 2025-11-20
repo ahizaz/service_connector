@@ -6,23 +6,25 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ProviderRegistrationController extends GetxController {
   // Step 1: Professional Profile Setup
-  final TextEditingController fullNameController = TextEditingController();
-  final TextEditingController professionController = TextEditingController();
-  final TextEditingController bioController = TextEditingController();
+  late TextEditingController fullNameController;
+  late TextEditingController professionController;
+  late TextEditingController bioController;
   final RxList<File> portfolioImages = <File>[].obs;
   final Rx<File?> profileImage = Rx<File?>(null);
   
   // Step 2: Services Offered
-  final TextEditingController serviceCategoryController = TextEditingController();
+  late TextEditingController serviceCategoryController;
   final RxString selectedCategory = ''.obs;
   final RxList<String> selectedCategories = <String>[].obs;
-  final TextEditingController experienceController = TextEditingController();
+  late TextEditingController serviceTitleController;
+  late TextEditingController experienceController;
+  late TextEditingController keywordController;
+  final RxList<String> keywords = <String>[].obs;
   
   // Step 3: Work Location
-  final TextEditingController locationController = TextEditingController();
-  final TextEditingController addressController = TextEditingController();
-  final TextEditingController cityController = TextEditingController();
-  final RxString selectedLocation = ''.obs;
+  late TextEditingController serviceAreaController;
+  final RxString selectedCountry = ''.obs;
+  final RxString selectedCity = ''.obs;
   
   // Step 4: Documents
   final Rx<File?> tradeLicenseDoc = Rx<File?>(null);
@@ -50,46 +52,101 @@ class ProviderRegistrationController extends GetxController {
     'Gardening',
   ];
   
-  final List<String> locations = [
-    'Location',
-    'New York',
-    'Los Angeles',
-    'Chicago',
-    'Houston',
-    'Phoenix',
-    'Philadelphia',
-    'San Antonio',
-    'San Diego',
-  ];
+  final Map<String, String> countries = {
+    'United States': '🇺🇸',
+    'United Kingdom': '🇬🇧',
+    'Canada': '🇨🇦',
+    'Australia': '🇦🇺',
+    'Germany': '🇩🇪',
+    'France': '🇫🇷',
+    'India': '🇮🇳',
+    'Japan': '🇯🇵',
+    'China': '🇨🇳',
+    'Brazil': '🇧🇷',
+    'Mexico': '🇲🇽',
+    'Spain': '🇪🇸',
+    'Italy': '🇮🇹',
+    'Netherlands': '🇳🇱',
+    'Singapore': '🇸🇬',
+    'UAE': '🇦🇪',
+    'Saudi Arabia': '🇸🇦',
+    'South Korea': '🇰🇷',
+    'Bangladesh': '🇧🇩',
+    'Pakistan': '🇵🇰',
+  };
+  
+  final Map<String, List<String>> citiesByCountry = {
+    'United States': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'Miami'],
+    'United Kingdom': ['London', 'Manchester', 'Birmingham', 'Liverpool', 'Leeds', 'Glasgow', 'Edinburgh', 'Bristol', 'Cardiff', 'Belfast'],
+    'Canada': ['Toronto', 'Vancouver', 'Montreal', 'Calgary', 'Ottawa', 'Edmonton', 'Winnipeg', 'Quebec City', 'Hamilton', 'Victoria'],
+    'Australia': ['Sydney', 'Melbourne', 'Brisbane', 'Perth', 'Adelaide', 'Gold Coast', 'Canberra', 'Newcastle', 'Hobart', 'Darwin'],
+    'Germany': ['Berlin', 'Munich', 'Hamburg', 'Frankfurt', 'Cologne', 'Stuttgart', 'Düsseldorf', 'Dortmund', 'Leipzig', 'Dresden'],
+    'France': ['Paris', 'Marseille', 'Lyon', 'Toulouse', 'Nice', 'Nantes', 'Strasbourg', 'Montpellier', 'Bordeaux', 'Lille'],
+    'India': ['Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Chennai', 'Kolkata', 'Pune', 'Ahmedabad', 'Jaipur', 'Surat'],
+    'Japan': ['Tokyo', 'Osaka', 'Yokohama', 'Nagoya', 'Sapporo', 'Fukuoka', 'Kobe', 'Kyoto', 'Hiroshima', 'Sendai'],
+    'China': ['Beijing', 'Shanghai', 'Guangzhou', 'Shenzhen', 'Chengdu', 'Hangzhou', 'Wuhan', 'Xian', 'Chongqing', 'Tianjin'],
+    'Brazil': ['São Paulo', 'Rio de Janeiro', 'Brasília', 'Salvador', 'Fortaleza', 'Belo Horizonte', 'Manaus', 'Curitiba', 'Recife', 'Porto Alegre'],
+    'Mexico': ['Mexico City', 'Guadalajara', 'Monterrey', 'Puebla', 'Tijuana', 'León', 'Juárez', 'Zapopan', 'Mérida', 'Cancún'],
+    'Spain': ['Madrid', 'Barcelona', 'Valencia', 'Seville', 'Zaragoza', 'Málaga', 'Murcia', 'Palma', 'Bilbao', 'Alicante'],
+    'Italy': ['Rome', 'Milan', 'Naples', 'Turin', 'Palermo', 'Genoa', 'Bologna', 'Florence', 'Venice', 'Verona'],
+    'Netherlands': ['Amsterdam', 'Rotterdam', 'The Hague', 'Utrecht', 'Eindhoven', 'Tilburg', 'Groningen', 'Almere', 'Breda', 'Nijmegen'],
+    'Singapore': ['Singapore City', 'Jurong', 'Woodlands', 'Tampines', 'Bedok', 'Sengkang', 'Hougang', 'Punggol', 'Yishun', 'Bukit Batok'],
+    'UAE': ['Dubai', 'Abu Dhabi', 'Sharjah', 'Ajman', 'Ras Al Khaimah', 'Fujairah', 'Umm Al Quwain', 'Al Ain', 'Khor Fakkan', 'Dibba'],
+    'Saudi Arabia': ['Riyadh', 'Jeddah', 'Mecca', 'Medina', 'Dammam', 'Khobar', 'Tabuk', 'Buraidah', 'Khamis Mushait', 'Abha'],
+    'South Korea': ['Seoul', 'Busan', 'Incheon', 'Daegu', 'Daejeon', 'Gwangju', 'Suwon', 'Ulsan', 'Changwon', 'Goyang'],
+    'Bangladesh': ['Dhaka', 'Chittagong', 'Khulna', 'Rajshahi', 'Sylhet', 'Barisal', 'Rangpur', 'Comilla', 'Gazipur', 'Narayanganj'],
+    'Pakistan': ['Karachi', 'Lahore', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta', 'Sialkot', 'Gujranwala'],
+  };
+  
+  List<String> get currentCities {
+    if (selectedCountry.value.isEmpty) {
+      return ['Select your city'];
+    }
+    final cities = citiesByCountry[selectedCountry.value] ?? [];
+    return ['Select your city', ...cities];
+  }
   
   @override
   void onInit() {
     super.onInit();
+    
+    // Initialize TextEditingControllers
+    fullNameController = TextEditingController();
+    professionController = TextEditingController();
+    bioController = TextEditingController();
+    serviceCategoryController = TextEditingController();
+    serviceTitleController = TextEditingController();
+    experienceController = TextEditingController();
+    keywordController = TextEditingController();
+    serviceAreaController = TextEditingController();
+    
+    // Add listeners
     fullNameController.addListener(_validateStep1);
     professionController.addListener(_validateStep1);
-    bioController.addListener(_validateStep1);
     
+    serviceTitleController.addListener(_validateStep2);
     experienceController.addListener(_validateStep2);
     
-    addressController.addListener(_validateStep3);
-    cityController.addListener(_validateStep3);
+    serviceAreaController.addListener(_validateStep3);
   }
   
   void _validateStep1() {
     isStep1Valid.value = fullNameController.text.isNotEmpty &&
         professionController.text.isNotEmpty &&
-        bioController.text.isNotEmpty;
+        profileImage.value != null;
   }
   
   void _validateStep2() {
     isStep2Valid.value = selectedCategories.isNotEmpty &&
-        experienceController.text.isNotEmpty;
+        serviceTitleController.text.isNotEmpty &&
+        experienceController.text.isNotEmpty &&
+        keywords.isNotEmpty;
   }
   
   void _validateStep3() {
-    isStep3Valid.value = selectedLocation.value.isNotEmpty &&
-        addressController.text.isNotEmpty &&
-        cityController.text.isNotEmpty;
+    isStep3Valid.value = selectedCountry.value.isNotEmpty &&
+        selectedCity.value.isNotEmpty &&
+        serviceAreaController.text.isNotEmpty;
   }
   
   void _validateStep4() {
@@ -176,11 +233,30 @@ class ProviderRegistrationController extends GetxController {
     selectedCategories.remove(category);
     _validateStep2();
   }
+
+  void addKeyword() {
+    final keyword = keywordController.text.trim();
+    if (keyword.isNotEmpty && !keywords.contains(keyword)) {
+      keywords.add(keyword);
+      keywordController.clear();
+      _validateStep2();
+    }
+  }
+
+  void removeKeyword(String keyword) {
+    keywords.remove(keyword);
+    _validateStep2();
+  }
   
-  void selectLocation(String location) {
-    if (location != 'Location') {
-      selectedLocation.value = location;
-      locationController.text = location;
+  void selectCountry(String country) {
+    selectedCountry.value = country;
+    selectedCity.value = ''; // Reset city when country changes
+    _validateStep3();
+  }
+  
+  void selectCity(String city) {
+    if (city != 'Select your city') {
+      selectedCity.value = city;
       _validateStep3();
     }
   }
@@ -227,10 +303,10 @@ class ProviderRegistrationController extends GetxController {
     professionController.dispose();
     bioController.dispose();
     serviceCategoryController.dispose();
+    serviceTitleController.dispose();
     experienceController.dispose();
-    locationController.dispose();
-    addressController.dispose();
-    cityController.dispose();
+    keywordController.dispose();
+    serviceAreaController.dispose();
     super.onClose();
   }
 }

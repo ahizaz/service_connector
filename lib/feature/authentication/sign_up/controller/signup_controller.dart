@@ -11,9 +11,6 @@ class SignUpController extends GetxController{
   var isConfirmPasswordVisible = false.obs;
 
   var isSignUpEnabled = false.obs;
-  
-  // Service provider mode
-  var isServiceProvider = false.obs;
 
   @override
   void onInit() {
@@ -31,17 +28,14 @@ class SignUpController extends GetxController{
     isConfirmPasswordVisible.value = !isConfirmPasswordVisible.value;
   }
   
-  void toggleServiceProviderMode(bool value) {
-    isServiceProvider.value = value;
-  }
-  
   void _validateFields(){
     isSignUpEnabled.value = emailController.text.isNotEmpty && passwordController.text.isNotEmpty && confimPasswordController.text.isNotEmpty;
   }
   
-  Future<void> saveServiceProviderMode() async {
+  Future<void> setDefaultServiceReceiverMode() async {
+    // All new users start as service receivers
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('is_service_provider', isServiceProvider.value);
+    await prefs.setBool('is_service_provider', false);
   }
   
   @override

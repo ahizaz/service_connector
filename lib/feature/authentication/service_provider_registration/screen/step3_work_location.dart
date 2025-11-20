@@ -5,6 +5,7 @@ import 'package:service_connect/core/common/styles/global_text_style.dart';
 import 'package:service_connect/core/common/widgets/custom_button.dart';
 import 'package:service_connect/core/common/widgets/custom_textField.dart';
 import 'package:service_connect/feature/authentication/service_provider_registration/controller/provider_registration_controller.dart';
+import 'package:service_connect/feature/authentication/service_provider_registration/widgets/step_progress_indicator.dart';
 
 class Step3WorkLocation extends StatelessWidget {
   const Step3WorkLocation({super.key});
@@ -32,12 +33,21 @@ class Step3WorkLocation extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
+      body: Column(
+        children: [
+          // Step Progress Indicator
+          Container(
+            color: Colors.white,
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+            child: const StepProgressIndicator(currentStep: 3),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
               "Where Do You\nWork?",
               style: AppTextStyles.robotoRegular(
                 fontSize: 28,
@@ -56,9 +66,9 @@ class Step3WorkLocation extends StatelessWidget {
             ),
             SizedBox(height: 32.h),
             
-            // Location Dropdown
+            // Country Dropdown
             Text(
-              "Location",
+              "Country",
               style: AppTextStyles.robotoRegular(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -68,7 +78,7 @@ class Step3WorkLocation extends StatelessWidget {
             SizedBox(height: 8.h),
             Container(
               width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12.r),
@@ -77,17 +87,95 @@ class Step3WorkLocation extends StatelessWidget {
               child: Obx(() => DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   isExpanded: true,
-                  value: controller.selectedLocation.value.isEmpty 
-                      ? 'Location' 
-                      : controller.selectedLocation.value,
-                  items: controller.locations.map((String value) {
+                  hint: Row(
+                    children: [
+                      Text(
+                        '🌍',
+                        style: TextStyle(fontSize: 20.sp),
+                      ),
+                      SizedBox(width: 12.w),
+                      Text(
+                        'Select your country',
+                        style: AppTextStyles.robotoRegular(
+                          fontSize: 14,
+                          color: const Color(0xff878787),
+                        ),
+                      ),
+                    ],
+                  ),
+                  value: controller.selectedCountry.value.isEmpty 
+                      ? null
+                      : controller.selectedCountry.value,
+                  items: controller.countries.entries.map((entry) {
+                    return DropdownMenuItem<String>(
+                      value: entry.key,
+                      child: Row(
+                        children: [
+                          Text(
+                            entry.value,
+                            style: TextStyle(fontSize: 20.sp),
+                          ),
+                          SizedBox(width: 12.w),
+                          Text(
+                            entry.key,
+                            style: AppTextStyles.robotoRegular(
+                              fontSize: 14,
+                              color: const Color(0xff313131),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    if (newValue != null) {
+                      controller.selectCountry(newValue);
+                    }
+                  },
+                ),
+              )),
+            ),
+            SizedBox(height: 20.h),
+            
+            // City
+            Text(
+              "City",
+              style: AppTextStyles.robotoRegular(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xff313131),
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(color: const Color(0xffF5F5F5)),
+              ),
+              child: Obx(() => DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  isExpanded: true,
+                  hint: Text(
+                    'Select your city',
+                    style: AppTextStyles.robotoRegular(
+                      fontSize: 14,
+                      color: const Color(0xff878787),
+                    ),
+                  ),
+                  value: controller.selectedCity.value.isEmpty 
+                      ? null
+                      : controller.selectedCity.value,
+                  items: controller.currentCities.map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
                       child: Text(
                         value,
                         style: AppTextStyles.robotoRegular(
                           fontSize: 14,
-                          color: value == 'Location' 
+                          color: value == 'Select your city' 
                               ? const Color(0xff878787) 
                               : const Color(0xff313131),
                         ),
@@ -96,7 +184,7 @@ class Step3WorkLocation extends StatelessWidget {
                   }).toList(),
                   onChanged: (String? newValue) {
                     if (newValue != null) {
-                      controller.selectLocation(newValue);
+                      controller.selectCity(newValue);
                     }
                   },
                 ),
@@ -104,9 +192,9 @@ class Step3WorkLocation extends StatelessWidget {
             ),
             SizedBox(height: 20.h),
             
-            // Address
+            // Service Area
             Text(
-              "Address Line",
+              "Service Area",
               style: AppTextStyles.robotoRegular(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -115,24 +203,8 @@ class Step3WorkLocation extends StatelessWidget {
             ),
             SizedBox(height: 8.h),
             CustomTextfield(
-              controller: controller.addressController,
-              hintText: "Enter your address",
-            ),
-            SizedBox(height: 20.h),
-            
-            // City
-            Text(
-              "Select Area",
-              style: AppTextStyles.robotoRegular(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xff313131),
-              ),
-            ),
-            SizedBox(height: 8.h),
-            CustomTextfield(
-              controller: controller.cityController,
-              hintText: "Enter your city/area",
+              controller: controller.serviceAreaController,
+              hintText: "Enter areas where you provide service",
             ),
             SizedBox(height: 150.h),
             
@@ -151,8 +223,11 @@ class Step3WorkLocation extends StatelessWidget {
               },
             )),
             SizedBox(height: 20.h),
-          ],
-        ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -115,7 +115,7 @@ class ProfileController extends GetxController {
     // Sync with HomeController if it exists
     try {
       final homeController = Get.find<HomeController>();
-      homeController.isServiceProvider.value = value;
+      homeController.loadServiceProviderMode();
     } catch (e) {
       // HomeController not initialized yet, that's okay
     }

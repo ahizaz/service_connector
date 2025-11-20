@@ -60,8 +60,12 @@ class LoginController extends GetxController{
     if (isloginEnabled.value) {
       await saveCredentials();
       
-      // All users go to home after login
-      // Provider registration will be triggered when they switch modes from profile
+      // Set user as service receiver by default on login
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('is_service_provider', false);
+      
+      // All users go to home after login as service receiver
+      // They can switch to service provider mode from profile
       Get.offAll(() => BottomNavbar());
     }
   }

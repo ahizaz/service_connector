@@ -6,18 +6,19 @@ import 'package:service_connect/core/common/styles/global_text_style.dart';
 import 'package:service_connect/core/common/widgets/custom_button.dart';
 import 'package:service_connect/core/common/widgets/custom_textField.dart';
 import 'package:service_connect/feature/authentication/service_provider_registration/controller/provider_registration_controller.dart';
+import 'package:service_connect/feature/authentication/service_provider_registration/widgets/step_progress_indicator.dart';
 
 class Step1ProfessionalProfile extends StatelessWidget {
   const Step1ProfessionalProfile({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ProviderRegistrationController());
+    final controller = Get.put(ProviderRegistrationController(), permanent: true);
 
     return Scaffold(
-      backgroundColor: const Color(0xffF5F5F5),
+      backgroundColor: const Color(0xffFFFFFF),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+       backgroundColor: const Color(0xffFFFFFF),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0xff313131)),
@@ -33,13 +34,22 @@ class Step1ProfessionalProfile extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Let's set up your\nprofessional profile.",
+      body: Column(
+        children: [
+          // Step Progress Indicator
+          Container(
+            color: Colors.white,
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+            child: const StepProgressIndicator(currentStep: 1),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Let's set up your\nprofessional profile.",
               style: AppTextStyles.robotoRegular(
                 fontSize: 28,
                 fontWeight: FontWeight.w600,
@@ -48,7 +58,7 @@ class Step1ProfessionalProfile extends StatelessWidget {
             ),
             SizedBox(height: 8.h),
             Text(
-              "Tell us about yourself and showcase your work",
+              "Tell us about your skills and experience so we can\nconnect you with clients.",
               style: AppTextStyles.robotoRegular(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
@@ -114,9 +124,9 @@ class Step1ProfessionalProfile extends StatelessWidget {
             ),
             SizedBox(height: 20.h),
             
-            // Profession/Description
+            // Profile Description
             Text(
-              "Profession/Description",
+              "Profile Description",
               style: AppTextStyles.robotoRegular(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -126,13 +136,11 @@ class Step1ProfessionalProfile extends StatelessWidget {
             SizedBox(height: 8.h),
             CustomTextfield(
               controller: controller.professionController,
-              hintText: "e.g., Professional AC Technician",
+              hintText: "Enter your profile description",
             ),
             SizedBox(height: 20.h),
-            
-            // Short Bio
             Text(
-              "Short Bio",
+              "Upload Working Image",
               style: AppTextStyles.robotoRegular(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -140,114 +148,134 @@ class Step1ProfessionalProfile extends StatelessWidget {
               ),
             ),
             SizedBox(height: 8.h),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8.r),
-                border: Border.all(color: const Color(0xffE0E0E0)),
-              ),
-              child: TextField(
-                controller: controller.bioController,
-                maxLines: 4,
-                decoration: InputDecoration(
-                  hintText: "Tell clients about yourself and your expertise...",
-                  hintStyle: AppTextStyles.robotoRegular(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: const Color(0xff9E9E9E),
+            GestureDetector(
+              onTap: controller.pickPortfolioImages,
+              child: Container(
+               width: double.infinity,
+               height: 112.h,
+                decoration: BoxDecoration(
+                  color: const Color(0xffF9F9F9),
+                  borderRadius: BorderRadius.circular(8.r),
+                  border: Border.all(
+                    color: const Color(0xffE0E0E0),
+                    style: BorderStyle.solid,
                   ),
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.all(12.w),
                 ),
-              ),
-            ),
-            SizedBox(height: 24.h),
-            
-            // Portfolio Images
-            Text(
-              "Portfolio Images (Optional)",
-              style: AppTextStyles.robotoRegular(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xff313131),
-              ),
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              "Add up to 4 images of your work",
-              style: AppTextStyles.robotoRegular(
-                fontSize: 12,
-                fontWeight: FontWeight.w400,
-                color: const Color(0xff737373),
-              ),
-            ),
-            SizedBox(height: 12.h),
-            Obx(() => Wrap(
-              spacing: 12.w,
-              runSpacing: 12.h,
-              children: [
-                ...controller.portfolioImages.asMap().entries.map((entry) {
-                  int index = entry.key;
-                  File image = entry.value;
-                  return Stack(
-                    children: [
-                      Container(
-                        width: 80.w,
-                        height: 80.w,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8.r),
-                          image: DecorationImage(
-                            image: FileImage(image),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: -8,
-                        right: -8,
-                        child: IconButton(
-                          icon: Container(
-                            padding: EdgeInsets.all(4.w),
-                            decoration: const BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.close,
-                              size: 16.sp,
-                              color: Colors.white,
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.image_outlined,
+                      size: 48.sp,
+                      color: const Color(0xffBDBDBD),
+                    ),
+                    SizedBox(height: 12.h),
+                    RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: 'Click to upload',
+                            style: AppTextStyles.robotoRegular(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xff2196F3),
                             ),
                           ),
-                          onPressed: () => controller.removePortfolioImage(index),
-                        ),
+                          TextSpan(
+                            text: ' or drag and drop',
+                            style: AppTextStyles.robotoRegular(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              color: const Color(0xff737373),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  );
-                }).toList(),
-                if (controller.portfolioImages.length < 4)
-                  GestureDetector(
-                    onTap: controller.pickPortfolioImages,
-                    child: Container(
-                      width: 80.w,
-                      height: 80.w,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8.r),
-                        border: Border.all(
-                          color: const Color(0xffE0E0E0),
-                          style: BorderStyle.solid,
-                          width: 2,
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.add_photo_alternate_outlined,
-                        size: 32.sp,
+                    ),
+                    SizedBox(height: 4.h),
+                    Text(
+                      "JPG, JPEG, PNG files less than 1MB",
+                      style: AppTextStyles.robotoRegular(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
                         color: const Color(0xff9E9E9E),
                       ),
                     ),
-                  ),
-              ],
-            )),
+                  ],
+                ),
+              ),
+            ),
+           
+            SizedBox(height: 12.h),
+            Obx(() => controller.portfolioImages.isNotEmpty
+                ? Row(
+                    children: [
+                      ...controller.portfolioImages.asMap().entries.map((entry) {
+                        int index = entry.key;
+                        File image = entry.value;
+                        return Padding(
+                          padding: EdgeInsets.only(right: 12.w),
+                          child: Stack(
+                            children: [
+                              Container(
+                                width: 80.w,
+                                height: 80.w,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8.r),
+                                  image: DecorationImage(
+                                    image: FileImage(image),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: -8,
+                                right: -8,
+                                child: IconButton(
+                                  icon: Container(
+                                    padding: EdgeInsets.all(4.w),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.close,
+                                      size: 16.sp,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  onPressed: () => controller.removePortfolioImage(index),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                      if (controller.portfolioImages.length < 4)
+                        GestureDetector(
+                          onTap: controller.pickPortfolioImages,
+                          child: Container(
+                            width: 80.w,
+                            height: 80.w,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8.r),
+                              border: Border.all(
+                                color: const Color(0xffE0E0E0),
+                                style: BorderStyle.solid,
+                                width: 2,
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.add,
+                              size: 32.sp,
+                              color: const Color(0xff9E9E9E),
+                            ),
+                          ),
+                        ),
+                    ],
+                  )
+                : const SizedBox.shrink()),
             SizedBox(height: 40.h),
             
             // Next Button
@@ -265,8 +293,11 @@ class Step1ProfessionalProfile extends StatelessWidget {
               },
             )),
             SizedBox(height: 20.h),
-          ],
-        ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

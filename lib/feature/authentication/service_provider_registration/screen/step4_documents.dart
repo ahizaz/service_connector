@@ -5,6 +5,7 @@ import 'package:service_connect/core/common/styles/global_text_style.dart';
 import 'package:service_connect/core/common/widgets/custom_button.dart';
 import 'package:service_connect/feature/authentication/service_provider_registration/controller/provider_registration_controller.dart';
 import 'package:service_connect/feature/bottom_navbar/screen/bottom_navbar.dart';
+import 'package:service_connect/feature/authentication/service_provider_registration/widgets/step_progress_indicator.dart';
 
 class Step4Documents extends StatelessWidget {
   const Step4Documents({super.key});
@@ -32,12 +33,21 @@ class Step4Documents extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
+      body: Column(
+        children: [
+          // Step Progress Indicator
+          Container(
+            color: Colors.white,
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+            child: const StepProgressIndicator(currentStep: 4),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
               "Add Your\nDocuments",
               style: AppTextStyles.robotoRegular(
                 fontSize: 28,
@@ -318,8 +328,11 @@ class Step4Documents extends StatelessWidget {
               },
             )),
             SizedBox(height: 20.h),
-          ],
-        ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

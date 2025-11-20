@@ -4,8 +4,8 @@ import 'package:service_connect/core/utils/constants/icon_path.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeController extends GetxController {
-  final TextEditingController searchController = TextEditingController();
-  final FocusNode searchFocusNode = FocusNode();
+  late TextEditingController searchController;
+  late FocusNode searchFocusNode;
   
   // Service provider mode
   final RxBool isServiceProvider = false.obs;
@@ -17,10 +17,17 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _loadServiceProviderMode();
+    searchController = TextEditingController();
+    searchFocusNode = FocusNode();
+    loadServiceProviderMode();
   }
   
-  Future<void> _loadServiceProviderMode() async {
+  // Reload mode when screen is revisited
+  void reloadMode() {
+    loadServiceProviderMode();
+  }
+  
+  Future<void> loadServiceProviderMode() async {
     final prefs = await SharedPreferences.getInstance();
     isServiceProvider.value = prefs.getBool('is_service_provider') ?? false;
   }
