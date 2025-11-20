@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:service_connect/feature/bottom_navbar/screen/bottom_navbar.dart';
 
 class LoginController extends GetxController{
     final emailController = TextEditingController();
@@ -55,11 +56,13 @@ class LoginController extends GetxController{
     }
   }
   
-  void handleLogin() {
+  Future<void> handleLogin() async {
     if (isloginEnabled.value) {
-      saveCredentials();
-      // Add your login logic here
-      Get.snackbar('Login', 'Login successful!');
+      await saveCredentials();
+      
+      // All users go to home after login
+      // Provider registration will be triggered when they switch modes from profile
+      Get.offAll(() => BottomNavbar());
     }
   }
   

@@ -1,0 +1,326 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
+import 'package:service_connect/core/common/styles/global_text_style.dart';
+import 'package:service_connect/core/common/widgets/custom_button.dart';
+import 'package:service_connect/feature/authentication/service_provider_registration/controller/provider_registration_controller.dart';
+import 'package:service_connect/feature/bottom_navbar/screen/bottom_navbar.dart';
+
+class Step4Documents extends StatelessWidget {
+  const Step4Documents({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.find<ProviderRegistrationController>();
+
+    return Scaffold(
+      backgroundColor: const Color(0xffF5F5F5),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Color(0xff313131)),
+          onPressed: () => Get.back(),
+        ),
+        title: Text(
+          'Step 4 of 4',
+          style: AppTextStyles.robotoRegular(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: const Color(0xff313131),
+          ),
+        ),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Add Your\nDocuments",
+              style: AppTextStyles.robotoRegular(
+                fontSize: 28,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xff313131),
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              "Upload your business documents for verification",
+              style: AppTextStyles.robotoRegular(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: const Color(0xff737373),
+              ),
+            ),
+            SizedBox(height: 32.h),
+            
+            // Trade License Document
+            Text(
+              "Document Type",
+              style: AppTextStyles.robotoRegular(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xff313131),
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(color: const Color(0xffF5F5F5)),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  isExpanded: true,
+                  value: 'Trade License',
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'Trade License',
+                      child: Text('Trade License'),
+                    ),
+                  ],
+                  onChanged: (value) {},
+                ),
+              ),
+            ),
+            SizedBox(height: 16.h),
+            
+            // Trade License Upload Button
+            Obx(() => GestureDetector(
+              onTap: () => controller.pickDocument('trade'),
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 40.h, horizontal: 20.w),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: const Color(0xffE0E0E0),
+                    style: BorderStyle.solid,
+                    width: 2,
+                  ),
+                ),
+                child: controller.tradeLicenseDoc.value == null
+                    ? Column(
+                        children: [
+                          Icon(
+                            Icons.upload_file_outlined,
+                            size: 48.sp,
+                            color: const Color(0xffD32E28),
+                          ),
+                          SizedBox(height: 12.h),
+                          Text(
+                            "Browse Document",
+                            style: AppTextStyles.robotoRegular(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xffD32E28),
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            "Please upload Business or trade license or ID Card, also it can be less than 25 MB and in PDF format. After uploading all documents",
+                            textAlign: TextAlign.center,
+                            style: AppTextStyles.robotoRegular(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              color: const Color(0xff737373),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Stack(
+                        children: [
+                          Column(
+                            children: [
+                              Icon(
+                                Icons.description,
+                                size: 48.sp,
+                                color: const Color(0xffD32E28),
+                              ),
+                              SizedBox(height: 8.h),
+                              Text(
+                                "Trade License.pdf",
+                                style: AppTextStyles.robotoRegular(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xff313131),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Positioned(
+                            top: -10,
+                            right: -10,
+                            child: IconButton(
+                              icon: Container(
+                                padding: EdgeInsets.all(4.w),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.close,
+                                  size: 16.sp,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              onPressed: () => controller.removeDocument('trade'),
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
+            )),
+            SizedBox(height: 24.h),
+            
+            // Insurance Document
+            Text(
+              "Document Type",
+              style: AppTextStyles.robotoRegular(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xff313131),
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(horizontal: 16.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12.r),
+                border: Border.all(color: const Color(0xffF5F5F5)),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  isExpanded: true,
+                  value: 'Insurance Card',
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'Insurance Card',
+                      child: Text('Insurance Card'),
+                    ),
+                  ],
+                  onChanged: (value) {},
+                ),
+              ),
+            ),
+            SizedBox(height: 16.h),
+            
+            // Insurance Upload Button
+            Obx(() => GestureDetector(
+              onTap: () => controller.pickDocument('insurance'),
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 40.h, horizontal: 20.w),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: const Color(0xffE0E0E0),
+                    style: BorderStyle.solid,
+                    width: 2,
+                  ),
+                ),
+                child: controller.insuranceDoc.value == null
+                    ? Column(
+                        children: [
+                          Icon(
+                            Icons.upload_file_outlined,
+                            size: 48.sp,
+                            color: const Color(0xffD32E28),
+                          ),
+                          SizedBox(height: 12.h),
+                          Text(
+                            "Browse Document",
+                            style: AppTextStyles.robotoRegular(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xffD32E28),
+                            ),
+                          ),
+                          SizedBox(height: 4.h),
+                          Text(
+                            "Please upload Insurance or ID Card, also it can be less than 25 MB and in PDF format.",
+                            textAlign: TextAlign.center,
+                            style: AppTextStyles.robotoRegular(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                              color: const Color(0xff737373),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Stack(
+                        children: [
+                          Column(
+                            children: [
+                              Icon(
+                                Icons.description,
+                                size: 48.sp,
+                                color: const Color(0xffD32E28),
+                              ),
+                              SizedBox(height: 8.h),
+                              Text(
+                                "Insurance Card.pdf",
+                                style: AppTextStyles.robotoRegular(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color(0xff313131),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Positioned(
+                            top: -10,
+                            right: -10,
+                            child: IconButton(
+                              icon: Container(
+                                padding: EdgeInsets.all(4.w),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.close,
+                                  size: 16.sp,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              onPressed: () => controller.removeDocument('insurance'),
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
+            )),
+            SizedBox(height: 40.h),
+            
+            // Submit Button
+            Obx(() => CustomButton(
+              text: "Submit",
+              enabled: controller.isStep4Valid.value,
+              color: controller.isStep4Valid.value
+                  ? const Color(0xffD32E28)
+                  : const Color(0xffE0E0E0),
+              onTap: () async {
+                if (controller.isStep4Valid.value) {
+                  await controller.completeRegistration();
+                  // Navigate to home screen
+                  Get.offAll(() => BottomNavbar());
+                }
+              },
+            )),
+            SizedBox(height: 20.h),
+          ],
+        ),
+      ),
+    );
+  }
+}

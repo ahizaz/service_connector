@@ -60,7 +60,8 @@ class VerifyController extends GetxController {
 
     isLoading.value = false;
 
-    // For now, navigate to finish page
+    // All users go to finish page after verification
+    // Provider registration will be triggered when they switch modes from profile
     Get.to(() => const FinishPage());
   }
 

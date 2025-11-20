@@ -2,12 +2,17 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:service_connect/feature/home/controller/home_controller.dart';
 
 class ProfileController extends GetxController {
   final RxString userName = 'Brooklyn Simmons'.obs;
   final RxString userEmail = 'deanna.curtis@example.com'.obs;
   final Rx<File?> profileImage = Rx<File?>(null);
   final RxBool isEditing = false.obs;
+  
+  // Service Provider Mode Toggle
+  final RxBool isServiceProvider = false.obs;
 
   // Keep TextEditingControllers here so they persist across screens.
   late final TextEditingController nameController;
@@ -15,11 +20,17 @@ class ProfileController extends GetxController {
 
   final ImagePicker _picker = ImagePicker();
 
+  Future<void> _loadServiceProviderMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    isServiceProvider.value = prefs.getBool('is_service_provider') ?? false;
+  }
+
   @override
   void onInit() {
     super.onInit();
     nameController = TextEditingController(text: userName.value);
     emailController = TextEditingController(text: userEmail.value);
+    _loadServiceProviderMode();
 
     // Keep controllers in sync when values change elsewhere.
     ever<String>(userName, (val) {
@@ -78,6 +89,51 @@ class ProfileController extends GetxController {
         colorText: Colors.white,
       );
     }
+  }
+
+  // Toggle service provider mode
+  void toggleServiceProviderMode(bool value) async {
+    // Save to SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('is_service_provider', value);
+    
+    // If switching to service provider mode, check if registration is completed
+    if (value) {
+      final hasCompletedRegistration = prefs.getBool('provider_registration_completed') ?? false;
+      
+      if (!hasCompletedRegistration) {
+        // Navigate to provider registration flow
+        isServiceProvider.value = value;
+        Get.toNamed('/provider-registration-step1');
+        return;
+      }
+    }
+    
+    // Update the mode
+    isServiceProvider.value = value;
+    
+    // Sync with HomeController if it exists
+    try {
+      final homeController = Get.find<HomeController>();
+      homeController.isServiceProvider.value = value;
+    } catch (e) {
+      // HomeController not initialized yet, that's okay
+    }
+    
+    Get.snackbar(
+      'Mode Changed',
+      value 
+          ? 'You are now in Service Provider mode' 
+          : 'You are now in Service Receiver mode',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: const Color(0xffFDDAD1),
+      colorText: Colors.black,
+      duration: const Duration(seconds: 2),
+      icon: Icon(
+        value ? Icons.work_outline : Icons.person_outline,
+        color: Colors.black,
+      ),
+    );
   }
 
   // Profile menu items

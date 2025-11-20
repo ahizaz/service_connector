@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUpController extends GetxController{
   final emailController = TextEditingController();
@@ -10,6 +11,9 @@ class SignUpController extends GetxController{
   var isConfirmPasswordVisible = false.obs;
 
   var isSignUpEnabled = false.obs;
+  
+  // Service provider mode
+  var isServiceProvider = false.obs;
 
   @override
   void onInit() {
@@ -26,8 +30,18 @@ class SignUpController extends GetxController{
   void toggleConfirmPasswordVisibility(){
     isConfirmPasswordVisible.value = !isConfirmPasswordVisible.value;
   }
+  
+  void toggleServiceProviderMode(bool value) {
+    isServiceProvider.value = value;
+  }
+  
   void _validateFields(){
     isSignUpEnabled.value = emailController.text.isNotEmpty && passwordController.text.isNotEmpty && confimPasswordController.text.isNotEmpty;
+  }
+  
+  Future<void> saveServiceProviderMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('is_service_provider', isServiceProvider.value);
   }
   
   @override

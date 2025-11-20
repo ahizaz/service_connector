@@ -1,14 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:service_connect/core/utils/constants/icon_path.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeController extends GetxController {
   final TextEditingController searchController = TextEditingController();
   final FocusNode searchFocusNode = FocusNode();
   
+  // Service provider mode
+  final RxBool isServiceProvider = false.obs;
+  
   // Text data
   final String greetingText = "Hey, Glad You're Here";
   final String userName = "Johnson Mate";
+  
+  @override
+  void onInit() {
+    super.onInit();
+    _loadServiceProviderMode();
+  }
+  
+  Future<void> _loadServiceProviderMode() async {
+    final prefs = await SharedPreferences.getInstance();
+    isServiceProvider.value = prefs.getBool('is_service_provider') ?? false;
+  }
   
   // Categories
   final List<Map<String, String>> categories = [

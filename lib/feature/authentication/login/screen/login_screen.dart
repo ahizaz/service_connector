@@ -10,7 +10,6 @@ import 'package:service_connect/core/utils/constants/image_path.dart';
 import 'package:service_connect/feature/authentication/forgot_password/screen/forgot_password.dart';
 import 'package:service_connect/feature/authentication/login/controller/login_controller.dart';
 import 'package:service_connect/feature/authentication/sign_up/screen/sign_up.dart';
-import 'package:service_connect/feature/bottom_navbar/screen/bottom_navbar.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -160,9 +159,7 @@ class LoginScreen extends StatelessWidget {
                       Obx(
                 () => CustomButton(
                   text: "Sign In",
-                  onTap: (){
-                    Get.to(()=>BottomNavbar());
-                  },
+                  onTap: controller.handleLogin,
                   enabled: controller.isloginEnabled.value,
                 ),
               ),

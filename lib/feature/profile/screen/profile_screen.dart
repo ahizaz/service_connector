@@ -97,7 +97,77 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 )),
                 
-                SizedBox(height: 30.h),
+                SizedBox(height: 24.h),
+                
+                // Service Provider Mode Switch
+                Container(
+                  margin: EdgeInsets.only(bottom: 16.h),
+                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.1),
+                        spreadRadius: 1,
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(8.w),
+                        decoration: BoxDecoration(
+                          color: const Color(0xffF5F5F5),
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Icon(
+                          Icons.work_outline,
+                          color: Colors.black,
+                          size: 24.sp,
+                        ),
+                      ),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Obx(() => Text(
+                              controller.isServiceProvider.value
+                                  ? 'Service Provider Mode'
+                                  : 'Service Receiver Mode',
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                              ),
+                            )),
+                            SizedBox(height: 2.h),
+                            Obx(() => Text(
+                              controller.isServiceProvider.value
+                                  ? 'Offer services'
+                                  : 'Receive services',
+                              style: TextStyle(
+                                fontSize: 12.sp,
+                                color: Colors.grey[600],
+                              ),
+                            )),
+                          ],
+                        ),
+                      ),
+                      Obx(() => Switch(
+                        value: controller.isServiceProvider.value,
+                        onChanged: controller.toggleServiceProviderMode,
+                        activeColor: const Color(0xffFDDAD1),
+                        activeTrackColor: const Color(0xffFDDAD1).withOpacity(0.5),
+                      )),
+                    ],
+                  ),
+                ),
+                
+                SizedBox(height: 14.h),
                 
                 // Menu Items
                 ...controller.menuItems.map((item) => _buildMenuItem(

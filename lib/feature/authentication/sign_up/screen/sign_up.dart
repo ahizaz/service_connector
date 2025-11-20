@@ -95,11 +95,70 @@ class SignUp extends StatelessWidget {
                   onToggle: controller.toggleConfirmPasswordVisibility,
                 ),
               ),
+              SizedBox(height: 24.h),
+              
+              // Service Provider Mode Toggle
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(color: const Color(0xffE0E0E0)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8.w),
+                      decoration: BoxDecoration(
+                        color: const Color(0xffF5F5F5),
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
+                      child: Icon(
+                        Icons.work_outline,
+                        color: Colors.black,
+                        size: 20.sp,
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Service Provider Mode',
+                            style: AppTextStyles.robotoRegular(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: const Color(0xff313131),
+                            ),
+                          ),
+                          SizedBox(height: 2.h),
+                          Obx(() => Text(
+                            controller.isServiceProvider.value
+                                ? 'Offer services'
+                                : 'Receive services',
+                            style: AppTextStyles.robotoRegular(
+                              fontSize: 12,
+                              color: const Color(0xff737373),
+                            ),
+                          )),
+                        ],
+                      ),
+                    ),
+                    Obx(() => Switch(
+                      value: controller.isServiceProvider.value,
+                      onChanged: controller.toggleServiceProviderMode,
+                      activeColor: const Color(0xffD32E28),
+                    )),
+                  ],
+                ),
+              ),
               SizedBox(height: 32.h),
               Obx(
                 () => CustomButton(
                   text: "SignUp",
-                  onTap: () {
+                  onTap: () async {
+                    await controller.saveServiceProviderMode();
                     Get.to(()=>VerifyScreen());
                   },
                   enabled: controller.isSignUpEnabled.value,
