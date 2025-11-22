@@ -7,6 +7,7 @@ import 'package:service_connect/feature/home/widget/home_header_widget.dart';
 import 'package:service_connect/feature/home/screen/all_categories_screen.dart';
 import 'package:service_connect/feature/home/screen/all_professionals_screen.dart';
 import 'package:service_connect/feature/home/screen/category_services_screen.dart';
+import 'package:service_connect/feature/home/screen/professional_details_screen.dart';
 import 'package:service_connect/feature/home/widget/professional_card_widget.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -167,16 +168,24 @@ class HomeScreen extends StatelessWidget {
                 final professional = controller.topRatedProfessionals[index];
                 return Padding(
                   padding: EdgeInsets.only(right: 16.w),
-                  child: ProfessionalCardWidget(
-                    name: professional['name'],
-                    professional: professional['professional'],
-                    rating: professional['rating'].toDouble(),
-                    price: professional['price'],
-                    image: professional['image'],
-                    category: professional['category'],
-                    onBookNow: () {
-                      debugPrint('Book now: ${professional['name']}');
+                  child: GestureDetector(
+                    onTap: () {
+                      // Navigate to professional details
+                      Get.to(() => ProfessionalDetailsScreen(
+                        professionalId: professional['professionalId'],
+                      ));
                     },
+                    child: ProfessionalCardWidget(
+                      name: professional['name'],
+                      professional: professional['professional'],
+                      rating: professional['rating'].toDouble(),
+                      price: professional['price'],
+                      image: professional['image'],
+                      category: professional['category'],
+                      onBookNow: () {
+                        debugPrint('Book now: ${professional['name']}');
+                      },
+                    ),
                   ),
                 );
               },

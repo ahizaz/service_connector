@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:service_connect/feature/home/controller/home_controller.dart';
+import 'package:service_connect/feature/home/screen/professional_details_screen.dart';
 
 class CategoryServicesScreen extends StatelessWidget {
   final String categoryName;
@@ -82,13 +83,21 @@ class CategoryServicesScreen extends StatelessWidget {
                 itemCount: services.length,
                 itemBuilder: (context, index) {
                   final service = services[index];
-                  return _buildServiceCard(
-                    service['name'],
-                    service['professional'],
-                    service['rating'].toDouble(),
-                    service['reviews'],
-                    service['price'],
-                    service['image'],
+                  return GestureDetector(
+                    onTap: () {
+                      // Navigate to professional details
+                      Get.to(() => ProfessionalDetailsScreen(
+                        professionalId: service['professionalId'],
+                      ));
+                    },
+                    child: _buildServiceCard(
+                      service['name'],
+                      service['professional'],
+                      service['rating'].toDouble(),
+                      service['reviews'],
+                      service['price'],
+                      service['image'],
+                    ),
                   );
                 },
               ),

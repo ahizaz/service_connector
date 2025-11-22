@@ -45,11 +45,79 @@ class HomeController extends GetxController {
     {'name': 'Repairing', 'icon': IconPath.repairing},
   ];
 
+  // Professionals Details Data
+  final List<Map<String, dynamic>> professionals = [
+    {
+      'id': 1,
+      'name': 'Ramesh Kumar',
+      'profession': 'Plumber',
+      'experience': '7 years',
+      'workDone': '360+',
+      'rating': 4.0,
+      'reviews': 52,
+      'image': 'assets/images/userpicreparing.png',
+      'location': 'ID: EL2024303',
+      'overview': 'Consequat velit qui adipisicing sunt do reprehenderit ad laborum tempor ullamco exercitation. Ullamco tempor adipisicing et voluptate duis sit esse aliqua esse ex dolore esse. Consequat velit qui adipisicing et voluptate duis sit esse aliqua esse ex dolore esse.',
+      'services': [
+        'Pipe Installation',
+        'Leak Repair',
+        'Water Heater Installation',
+        'Bathroom Fittings'
+      ],
+      'workingDays': 'Monday - Saturday',
+      'language': 'English, Hindi',
+      'internetTechnician': false,
+    },
+    {
+      'id': 2,
+      'name': 'Abdur Rahman',
+      'profession': 'Technician',
+      'experience': '5 years',
+      'workDone': '280+',
+      'rating': 4.5,
+      'reviews': 23,
+      'image': 'assets/images/userpicreparing.png',
+      'location': 'ID: EL2024304',
+      'overview': 'Expert in computer repair and washing machine services. Highly skilled technician with years of experience in electronics and appliance repair.',
+      'services': [
+        'Computer Repair',
+        'Washing Machine Repair',
+        'Laptop Servicing',
+        'Hardware Installation'
+      ],
+      'workingDays': 'Monday - Friday',
+      'language': 'English, Urdu',
+      'internetTechnician': true,
+    },
+    {
+      'id': 3,
+      'name': 'Johnson Mate',
+      'profession': 'Plumber',
+      'experience': '10 years',
+      'workDone': '500+',
+      'rating': 4.8,
+      'reviews': 47,
+      'image': 'assets/images/userpicreparing.png',
+      'location': 'ID: EL2024305',
+      'overview': 'Professional plumber with extensive experience in residential and commercial plumbing. Specialized in pipe installation and water systems.',
+      'services': [
+        'Pipe Installation',
+        'Sewer Line Maintenance',
+        'Water Tank Cleaning',
+        'Emergency Repairs'
+      ],
+      'workingDays': 'All Days',
+      'language': 'English',
+      'internetTechnician': false,
+    },
+  ];
+
   // Top Rated Professionals
   final List<Map<String, dynamic>> topRatedProfessionals = [
     {
       'name': 'Computer Repair',
       'professional': 'Abdur Rahman',
+      'professionalId': 2,
       'rating': 4.5,
       'price': 23,
       'image': 'assets/images/userpicreparing.png',
@@ -58,6 +126,7 @@ class HomeController extends GetxController {
     {
       'name': 'Washing Machine...',
       'professional': 'Abdur Rahman',
+      'professionalId': 2,
       'rating': 4.5,
       'price': 23,
       'image': 'assets/images/userpicreparing.png',
@@ -66,30 +135,34 @@ class HomeController extends GetxController {
     {
       'name': 'Computer Repair',
       'professional': 'Abdur Rahman',
+      'professionalId': 2,
       'rating': 4.5,
       'price': 23,
       'image': 'assets/images/userpicreparing.png',
       'category': 'Repairing'
+    },
+    {
+      'name': 'Pipe Installation',
+      'professional': 'Ramesh Kumar',
+      'professionalId': 1,
+      'rating': 4.0,
+      'price': 20,
+      'image': 'assets/images/userpicreparing.png',
+      'category': 'Plumber'
+    },
+    {
+      'name': 'Bathroom Fittings',
+      'professional': 'Johnson Mate',
+      'professionalId': 3,
+      'rating': 4.8,
+      'price': 25,
+      'image': 'assets/images/userpicreparing.png',
+      'category': 'Plumber'
     },
     {
       'name': 'Washing Machine...',
       'professional': 'Abdur Rahman',
-      'rating': 4.5,
-      'price': 23,
-      'image': 'assets/images/userpicreparing.png',
-      'category': 'Repairing'
-    },
-    {
-      'name': 'Computer Repair',
-      'professional': 'Abdur Rahman',
-      'rating': 4.5,
-      'price': 23,
-      'image': 'assets/images/userpicreparing.png',
-      'category': 'Repairing'
-    },
-    {
-      'name': 'Washing Machine...',
-      'professional': 'Abdur Rahman',
+      'professionalId': 2,
       'rating': 4.5,
       'price': 23,
       'image': 'assets/images/userpicreparing.png',
@@ -103,6 +176,7 @@ class HomeController extends GetxController {
       {
         'name': 'Bathroom Fittings',
         'professional': 'Abdur Rahman - Plumber',
+        'professionalId': 1,
         'rating': 4.9,
         'reviews': 37,
         'price': 13,
@@ -111,6 +185,7 @@ class HomeController extends GetxController {
       {
         'name': 'Pipe Installation',
         'professional': 'Johnson Mate - Plumber',
+        'professionalId': 3,
         'rating': 4.8,
         'reviews': 47,
         'price': 13,
@@ -118,7 +193,8 @@ class HomeController extends GetxController {
       },
       {
         'name': 'Water Heater Installation',
-        'professional': 'Abdur Rahman - Plumber',
+        'professional': 'Ramesh Kumar - Plumber',
+        'professionalId': 1,
         'rating': 4.9,
         'reviews': 47,
         'price': 13,
@@ -126,7 +202,8 @@ class HomeController extends GetxController {
       },
       {
         'name': 'Water Tank Cleaning',
-        'professional': 'Abdur Rahman - Plumber',
+        'professional': 'Johnson Mate - Plumber',
+        'professionalId': 3,
         'rating': 4.9,
         'reviews': 47,
         'price': 13,
@@ -134,7 +211,8 @@ class HomeController extends GetxController {
       },
       {
         'name': 'Bathroom Fittings',
-        'professional': 'Abdur Rahman - Plumber',
+        'professional': 'Ramesh Kumar - Plumber',
+        'professionalId': 1,
         'rating': 4.9,
         'reviews': 47,
         'price': 13,
@@ -142,7 +220,8 @@ class HomeController extends GetxController {
       },
       {
         'name': 'Sewer Line Maintenance',
-        'professional': 'Abdur Rahman - Plumber',
+        'professional': 'Johnson Mate - Plumber',
+        'professionalId': 3,
         'rating': 4.9,
         'reviews': 47,
         'price': 13,
@@ -150,7 +229,8 @@ class HomeController extends GetxController {
       },
       {
         'name': 'Leak Repair',
-        'professional': 'Abdur Rahman - Plumber',
+        'professional': 'Ramesh Kumar - Plumber',
+        'professionalId': 1,
         'rating': 4.9,
         'reviews': 47,
         'price': 13,
@@ -161,6 +241,7 @@ class HomeController extends GetxController {
       {
         'name': 'Wiring Installation',
         'professional': 'John Smith - Electrician',
+        'professionalId': 1,
         'rating': 4.8,
         'reviews': 42,
         'price': 15,
@@ -169,6 +250,7 @@ class HomeController extends GetxController {
       {
         'name': 'Light Fixture Setup',
         'professional': 'Mike Johnson - Electrician',
+        'professionalId': 2,
         'rating': 4.7,
         'reviews': 35,
         'price': 12,
@@ -177,6 +259,7 @@ class HomeController extends GetxController {
       {
         'name': 'Circuit Breaker Repair',
         'professional': 'John Smith - Electrician',
+        'professionalId': 1,
         'rating': 4.9,
         'reviews': 50,
         'price': 18,
@@ -185,6 +268,7 @@ class HomeController extends GetxController {
       {
         'name': 'Socket Installation',
         'professional': 'Mike Johnson - Electrician',
+        'professionalId': 2,
         'rating': 4.6,
         'reviews': 30,
         'price': 10,
@@ -195,6 +279,7 @@ class HomeController extends GetxController {
       {
         'name': 'Interior Painting',
         'professional': 'David Brown - Painter',
+        'professionalId': 1,
         'rating': 4.8,
         'reviews': 45,
         'price': 20,
@@ -203,6 +288,7 @@ class HomeController extends GetxController {
       {
         'name': 'Exterior Painting',
         'professional': 'Robert Wilson - Painter',
+        'professionalId': 3,
         'rating': 4.7,
         'reviews': 38,
         'price': 25,
@@ -211,6 +297,7 @@ class HomeController extends GetxController {
       {
         'name': 'Wall Texture',
         'professional': 'David Brown - Painter',
+        'professionalId': 1,
         'rating': 4.9,
         'reviews': 42,
         'price': 22,
@@ -221,6 +308,7 @@ class HomeController extends GetxController {
       {
         'name': 'House Cleaning',
         'professional': 'Sarah Martinez - Cleaner',
+        'professionalId': 2,
         'rating': 4.9,
         'reviews': 60,
         'price': 15,
@@ -229,6 +317,7 @@ class HomeController extends GetxController {
       {
         'name': 'Deep Cleaning',
         'professional': 'Emma Davis - Cleaner',
+        'professionalId': 3,
         'rating': 4.8,
         'reviews': 55,
         'price': 25,
@@ -237,6 +326,7 @@ class HomeController extends GetxController {
       {
         'name': 'Office Cleaning',
         'professional': 'Sarah Martinez - Cleaner',
+        'professionalId': 2,
         'rating': 4.7,
         'reviews': 40,
         'price': 18,
@@ -247,6 +337,7 @@ class HomeController extends GetxController {
       {
         'name': 'Furniture Assembly',
         'professional': 'James Anderson - Carpenter',
+        'professionalId': 1,
         'rating': 4.8,
         'reviews': 48,
         'price': 20,
@@ -255,6 +346,7 @@ class HomeController extends GetxController {
       {
         'name': 'Cabinet Installation',
         'professional': 'Thomas Taylor - Carpenter',
+        'professionalId': 3,
         'rating': 4.9,
         'reviews': 52,
         'price': 30,
@@ -263,6 +355,7 @@ class HomeController extends GetxController {
       {
         'name': 'Door Repair',
         'professional': 'James Anderson - Carpenter',
+        'professionalId': 1,
         'rating': 4.7,
         'reviews': 35,
         'price': 15,
@@ -273,6 +366,7 @@ class HomeController extends GetxController {
       {
         'name': 'Event Photography',
         'professional': 'Chris Lee - Photographer',
+        'professionalId': 2,
         'rating': 4.9,
         'reviews': 65,
         'price': 50,
@@ -281,6 +375,7 @@ class HomeController extends GetxController {
       {
         'name': 'Portrait Photography',
         'professional': 'Anna White - Photographer',
+        'professionalId': 3,
         'rating': 4.8,
         'reviews': 58,
         'price': 40,
@@ -289,6 +384,7 @@ class HomeController extends GetxController {
       {
         'name': 'Product Photography',
         'professional': 'Chris Lee - Photographer',
+        'professionalId': 2,
         'rating': 4.7,
         'reviews': 45,
         'price': 35,
@@ -299,6 +395,7 @@ class HomeController extends GetxController {
       {
         'name': 'AC Installation',
         'professional': 'Kevin Harris - Technician',
+        'professionalId': 2,
         'rating': 4.8,
         'reviews': 50,
         'price': 40,
@@ -307,6 +404,7 @@ class HomeController extends GetxController {
       {
         'name': 'TV Wall Mount',
         'professional': 'Mark Clark - Technician',
+        'professionalId': 1,
         'rating': 4.7,
         'reviews': 42,
         'price': 25,
@@ -315,6 +413,7 @@ class HomeController extends GetxController {
       {
         'name': 'Washing Machine Setup',
         'professional': 'Kevin Harris - Technician',
+        'professionalId': 2,
         'rating': 4.9,
         'reviews': 55,
         'price': 20,
@@ -325,6 +424,7 @@ class HomeController extends GetxController {
       {
         'name': 'Computer Repair',
         'professional': 'Abdur Rahman - Technician',
+        'professionalId': 2,
         'rating': 4.5,
         'reviews': 23,
         'price': 23,
@@ -333,6 +433,7 @@ class HomeController extends GetxController {
       {
         'name': 'Washing Machine Repair',
         'professional': 'Abdur Rahman - Technician',
+        'professionalId': 2,
         'rating': 4.5,
         'reviews': 23,
         'price': 23,
@@ -341,6 +442,7 @@ class HomeController extends GetxController {
       {
         'name': 'Refrigerator Repair',
         'professional': 'Daniel Moore - Technician',
+        'professionalId': 3,
         'rating': 4.6,
         'reviews': 38,
         'price': 28,
