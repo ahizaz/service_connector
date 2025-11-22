@@ -179,7 +179,8 @@ class HomeScreen extends StatelessWidget {
                       name: professional['name'],
                       professional: professional['professional'],
                       rating: professional['rating'].toDouble(),
-                      price: professional['price'],
+                      experience: professional['experience'],
+                      workDone: professional['workDone'],
                       image: professional['image'],
                       category: professional['category'],
                       onBookNow: () {

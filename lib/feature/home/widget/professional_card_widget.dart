@@ -6,7 +6,8 @@ class ProfessionalCardWidget extends StatelessWidget {
   final String name;
   final String professional;
   final double rating;
-  final int price;
+  final int experience; // Years of experience
+  final int workDone; // Number of work completed
   final String image;
   final String? category;
   final VoidCallback? onBookNow;
@@ -17,7 +18,8 @@ class ProfessionalCardWidget extends StatelessWidget {
     required this.name,
     required this.professional,
     required this.rating,
-    required this.price,
+    required this.experience,
+    required this.workDone,
     required this.image,
     this.category,
     this.onBookNow,
@@ -128,66 +130,30 @@ class ProfessionalCardWidget extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Icon(
-                      Icons.star,
-                      size: 14.sp,
-                      color: Color(0xffFFA500),
-                    ),
-                    SizedBox(width: 2.w),
-                    Text(
-                      rating.toString(),
-                      style: GoogleFonts.roboto(
-                        fontSize: 12.sp,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xff252525),
-                      ),
-                    ),
                   ],
                 ),
-                SizedBox(height: 4.h),
-                // Price and Book Now button
+                SizedBox(height: 8.h),
+                // Experience, Work Done, and Rating
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: '\$$price',
-                            style: GoogleFonts.roboto(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xff252525),
-                            ),
-                          ),
-                          TextSpan(
-                            text: '/hour',
-                            style: GoogleFonts.roboto(
-                              fontSize: 12.sp,
-                              fontWeight: FontWeight.w400,
-                              color: Color(0xff666666),
-                            ),
-                          ),
-                        ],
-                      ),
+                    // Years Experience
+                    _buildStatItem(
+                      icon: Icons.work_outline,
+                      value: '$experience',
+                      label: 'Years\nExperience',
                     ),
-                    GestureDetector(
-                      onTap: onBookNow,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
-                        decoration: BoxDecoration(
-                          color: Color(0xffCC0000),
-                          borderRadius: BorderRadius.circular(6.r),
-                        ),
-                        child: Text(
-                          'Book Now',
-                          style: GoogleFonts.roboto(
-                            fontSize: 10.sp,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
+                    // Work Done
+                    _buildStatItem(
+                      icon: Icons.assignment_turned_in_outlined,
+                      value: '$workDone+',
+                      label: 'Work Done',
+                    ),
+                    // Rating
+                    _buildStatItem(
+                      icon: Icons.star_outline,
+                      value: rating.toString(),
+                      label: 'Rating',
                     ),
                   ],
                 ),
@@ -197,6 +163,41 @@ class ProfessionalCardWidget extends StatelessWidget {
         ],
       ),
     ),
+    );
+  }
+
+  Widget _buildStatItem({
+    required IconData icon,
+    required String value,
+    required String label,
+  }) {
+    return Column(
+      children: [
+        Icon(
+          icon,
+          size: 18.sp,
+          color: Color(0xffCC0000),
+        ),
+        SizedBox(height: 2.h),
+        Text(
+          value,
+          style: GoogleFonts.roboto(
+            fontSize: 14.sp,
+            fontWeight: FontWeight.w600,
+            color: Color(0xff252525),
+          ),
+        ),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.roboto(
+            fontSize: 9.sp,
+            fontWeight: FontWeight.w400,
+            color: Color(0xff666666),
+            height: 1.2,
+          ),
+        ),
+      ],
     );
   }
 }

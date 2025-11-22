@@ -119,7 +119,8 @@ class HomeController extends GetxController {
       'professional': 'Abdur Rahman',
       'professionalId': 2,
       'rating': 4.5,
-      'price': 23,
+      'experience': 5,
+      'workDone': 280,
       'image': 'assets/images/userpicreparing.png',
       'category': 'Repairing'
     },
@@ -128,7 +129,8 @@ class HomeController extends GetxController {
       'professional': 'Abdur Rahman',
       'professionalId': 2,
       'rating': 4.5,
-      'price': 23,
+      'experience': 5,
+      'workDone': 280,
       'image': 'assets/images/userpicreparing.png',
       'category': 'Repairing'
     },
@@ -137,7 +139,8 @@ class HomeController extends GetxController {
       'professional': 'Abdur Rahman',
       'professionalId': 2,
       'rating': 4.5,
-      'price': 23,
+      'experience': 5,
+      'workDone': 280,
       'image': 'assets/images/userpicreparing.png',
       'category': 'Repairing'
     },
@@ -145,8 +148,9 @@ class HomeController extends GetxController {
       'name': 'Pipe Installation',
       'professional': 'Ramesh Kumar',
       'professionalId': 1,
-      'rating': 4.0,
-      'price': 20,
+      'rating': 4.8,
+      'experience': 4,
+      'workDone': 360,
       'image': 'assets/images/userpicreparing.png',
       'category': 'Plumber'
     },
@@ -155,7 +159,8 @@ class HomeController extends GetxController {
       'professional': 'Johnson Mate',
       'professionalId': 3,
       'rating': 4.8,
-      'price': 25,
+      'experience': 6,
+      'workDone': 450,
       'image': 'assets/images/userpicreparing.png',
       'category': 'Plumber'
     },
@@ -164,7 +169,8 @@ class HomeController extends GetxController {
       'professional': 'Abdur Rahman',
       'professionalId': 2,
       'rating': 4.5,
-      'price': 23,
+      'experience': 5,
+      'workDone': 280,
       'image': 'assets/images/userpicreparing.png',
       'category': 'Repairing'
     },
