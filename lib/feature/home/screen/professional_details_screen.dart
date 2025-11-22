@@ -68,7 +68,7 @@ class ProfessionalDetailsScreen extends StatelessWidget {
                         Expanded(
                           child: Center(
                             child: Text(
-                              'Plumber Details',
+                              '${professional['profession'] ?? 'Professional'} Details',
                               style: GoogleFonts.roboto(
                                 fontSize: 18.sp,
                                 fontWeight: FontWeight.w500,
