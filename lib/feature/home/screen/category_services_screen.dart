@@ -18,9 +18,9 @@ class CategoryServicesScreen extends StatelessWidget {
     final services = controller.categoryServices[categoryName] ?? [];
 
     return Scaffold(
-      backgroundColor: const Color(0xffF5F5F5),
+     backgroundColor: Color(0xffF5F5F5),
       appBar: AppBar(
-        backgroundColor: const Color(0xffF5F5F5),
+      backgroundColor: Color(0xffF5F5F5),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0xff252525)),
