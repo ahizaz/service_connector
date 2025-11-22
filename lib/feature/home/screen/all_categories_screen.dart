@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:service_connect/feature/home/controller/home_controller.dart';
+import 'package:service_connect/feature/home/screen/category_services_screen.dart';
 
 class AllCategoriesScreen extends StatelessWidget {
   const AllCategoriesScreen({super.key});
@@ -48,9 +49,16 @@ class AllCategoriesScreen extends StatelessWidget {
           itemCount: controller.categories.length,
           itemBuilder: (context, index) {
             final category = controller.categories[index];
-            return _buildCategoryCard(
-              category['name']!,
-              category['icon']!,
+            return GestureDetector(
+              onTap: () {
+                Get.to(() => CategoryServicesScreen(
+                      categoryName: category['name']!,
+                    ));
+              },
+              child: _buildCategoryCard(
+                category['name']!,
+                category['icon']!,
+              ),
             );
           },
         ),
