@@ -60,12 +60,13 @@ class AllCategoriesScreen extends StatelessWidget {
 
   Widget _buildCategoryCard(String name, String iconPath) {
     return Container(
+       width: 116.w,
       decoration: BoxDecoration(
         color: Color(0xffFFFFFF),
         borderRadius: BorderRadius.circular(19.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: .05),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),
@@ -80,6 +81,20 @@ class AllCategoriesScreen extends StatelessWidget {
             width: 50.w,
             fit: BoxFit.contain,
           ),
+         SizedBox(height: 8.h),
+         Text(
+             name,
+               style: GoogleFonts.roboto(
+                            fontSize: 12.sp,
+                            color: const Color(0xff252525),
+                            fontWeight: FontWeight.w500,
+                          ),
+
+                            textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+         ),
+
         ],
       ),
     );

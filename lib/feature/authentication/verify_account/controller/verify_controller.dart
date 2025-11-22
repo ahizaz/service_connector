@@ -49,19 +49,10 @@ class VerifyController extends GetxController {
     // Simulate API call
     await Future.delayed(const Duration(seconds: 2));
 
-    // TODO: Implement actual OTP verification logic here
-    // Example:
-    // final result = await apiService.verifyOtp(otpController.text);
-    // if (result.success) {
-    //   Get.offAllNamed('/home');
-    // } else {
-    //   Get.snackbar('Error', result.message);
-    // }
 
     isLoading.value = false;
 
-    // All users go to finish page after verification
-    // Provider registration will be triggered when they switch modes from profile
+
     Get.to(() => const FinishPage());
   }
 

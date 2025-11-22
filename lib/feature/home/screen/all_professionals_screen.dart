@@ -15,7 +15,7 @@ class AllProfessionalsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Color(0xffF5F5F5),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+            backgroundColor: Color(0xffF5F5F5),
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios, color: Color(0xff252525)),
@@ -38,13 +38,13 @@ class AllProfessionalsScreen extends StatelessWidget {
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+        padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Search bar
             Container(
-              height: 48.h,
+             
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12.r),
@@ -71,7 +71,7 @@ class AllProfessionalsScreen extends StatelessWidget {
                   crossAxisCount: 2,
                   crossAxisSpacing: 16.w,
                   mainAxisSpacing: 16.h,
-                  childAspectRatio: 164 / 240,
+                  childAspectRatio: 164 / 190,
                 ),
                 itemCount: controller.topRatedProfessionals.length,
                 itemBuilder: (context, index) {
@@ -85,7 +85,7 @@ class AllProfessionalsScreen extends StatelessWidget {
                     category: professional['category'],
                     onBookNow: () {
                       // Handle book now action
-                      print('Book now: ${professional['name']}');
+                      debugPrint('Book now: ${professional['name']}');
                     },
                   );
                 },

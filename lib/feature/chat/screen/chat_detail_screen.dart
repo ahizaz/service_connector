@@ -89,7 +89,7 @@ class ChatDetailScreen extends StatelessWidget {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: .05),
                   blurRadius: 10,
                   offset: Offset(0, -2),
                 ),
@@ -304,7 +304,7 @@ class ChatDetailScreen extends StatelessWidget {
                   message.time,
                   style: TextStyle(
                     color: message.isMe
-                        ? Colors.white.withOpacity(0.7)
+                        ? Colors.white.withValues(alpha: 0.7)
                         : Color(0xFF9E9E9E),
                     fontSize: 11.sp,
                   ),
@@ -315,7 +315,7 @@ class ChatDetailScreen extends StatelessWidget {
                     message.isRead ? Icons.done_all : Icons.done,
                     color: message.isRead
                         ? Color(0xFFFF9800)
-                        : Colors.white.withOpacity(0.7),
+                        : Colors.white.withValues(alpha: .7),
                     size: 14.sp,
                   ),
                 ],
@@ -369,7 +369,7 @@ class ChatDetailScreen extends StatelessWidget {
                     margin: EdgeInsets.symmetric(horizontal: 1.w),
                     decoration: BoxDecoration(
                       color: message.isMe
-                          ? Colors.white.withOpacity(0.7)
+                          ? Colors.white.withValues(alpha: .7)
                           : Color(0xFF9E9E9E),
                       borderRadius: BorderRadius.circular(1.r),
                     ),
@@ -383,7 +383,7 @@ class ChatDetailScreen extends StatelessWidget {
               durationText,
               style: TextStyle(
                 color: message.isMe
-                    ? Colors.white.withOpacity(0.9)
+                    ? Colors.white.withValues(alpha: .9)
                     : Color(0xFF424242),
                 fontSize: 12.sp,
                 fontWeight: FontWeight.w500,
@@ -395,7 +395,7 @@ class ChatDetailScreen extends StatelessWidget {
               message.time,
               style: TextStyle(
                 color: message.isMe
-                    ? Colors.white.withOpacity(0.7)
+                    ? Colors.white.withValues(alpha: .7)
                     : Color(0xFF9E9E9E),
                 fontSize: 11.sp,
               ),
@@ -460,7 +460,7 @@ class ChatDetailScreen extends StatelessWidget {
           border: Border.all(color: Color(0xFFE0E0E0)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: .03),
               blurRadius: 10,
               offset: Offset(0, 5),
             ),

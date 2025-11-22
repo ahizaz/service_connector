@@ -31,11 +31,7 @@ class HomeHeaderWidget extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(
-                    Icons.menu,
-                    color: Colors.white,
-                    size: 28.sp,
-                  ),
+                Spacer(),
                   Container(
                     padding: EdgeInsets.all(8.w),
                     decoration: BoxDecoration(

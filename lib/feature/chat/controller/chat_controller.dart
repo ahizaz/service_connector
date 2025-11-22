@@ -243,7 +243,7 @@ class ChatController extends GetxController {
           isRecording.value = true;
         }
       } catch (e) {
-        print('Error starting recording: $e');
+        debugPrint('Error starting recording: $e');
       }
     }
   }
@@ -302,7 +302,7 @@ class ChatController extends GetxController {
         _sendImageMessage(image.path);
       }
     } catch (e) {
-      print('Error picking image: $e');
+      debugPrint('Error picking image: $e');
     }
   }
   

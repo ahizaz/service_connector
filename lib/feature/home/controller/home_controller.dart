@@ -105,7 +105,7 @@ class HomeController extends GetxController {
 
   void onSearchChanged(String value) {
     // Search logic will go here
-    print('Searching for: $value');
+    debugPrint('Searching for: $value');
   }
 
   void clearSearch() {

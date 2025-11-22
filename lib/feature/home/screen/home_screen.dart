@@ -83,7 +83,7 @@ class HomeScreen extends StatelessWidget {
                 return Padding(
                   padding: EdgeInsets.only(right: index == controller.categories.length - 1 ? 0 : 16.w),
                   child: Container(
-                    width: 90.w,
+                    width: 116.w,
                     decoration: BoxDecoration(
                       color: const Color(0xffFFFFFF),
                       borderRadius: BorderRadius.circular(19.r),
@@ -116,7 +116,7 @@ class HomeScreen extends StatelessWidget {
               },
             ),
           ),
-          SizedBox(height: 37.h),
+          SizedBox(height: 20.h),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w),
             child: Row(
@@ -169,7 +169,7 @@ class HomeScreen extends StatelessWidget {
                     image: professional['image'],
                     category: professional['category'],
                     onBookNow: () {
-                      print('Book now: ${professional['name']}');
+                      debugPrint('Book now: ${professional['name']}');
                     },
                   ),
                 );
@@ -191,6 +191,7 @@ class HomeScreen extends StatelessWidget {
           
           // Dashboard Cards
           Padding(
+            
             padding: EdgeInsets.symmetric(horizontal: 20.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,7 +314,7 @@ class HomeScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: .1),
             spreadRadius: 1,
             blurRadius: 4,
             offset: Offset(0, 2),
@@ -326,7 +327,7 @@ class HomeScreen extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(8.w),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: .1),
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Icon(icon, color: color, size: 24.sp),
@@ -374,7 +375,7 @@ class HomeScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: .1),
             spreadRadius: 1,
             blurRadius: 4,
             offset: Offset(0, 2),
@@ -398,7 +399,7 @@ class HomeScreen extends StatelessWidget {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
+                  color: statusColor.withValues(alpha: .1),
                   borderRadius: BorderRadius.circular(20.r),
                 ),
                 child: Text(

@@ -40,57 +40,60 @@ class ProfessionalCardWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Image with Repairing badge
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(12.r),
-                  topRight: Radius.circular(12.r),
+          // Image with Repairing badge, now with fixed height
+          SizedBox(
+            height: 120.h,  // Adjust this value to match your second picture's proportions
+            child: Stack(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(12.r),
+                    topRight: Radius.circular(12.r),
+                  ),
+                  child: Image.asset(
+                    image,
+                    width: double.infinity,
+                    height: double.infinity,  // Fill the SizedBox height
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        width: double.infinity,
+                        height: double.infinity,
+                        color: Color(0xffF5F5F5),
+                        child: Icon(
+                          Icons.image,
+                          size: 40.sp,
+                          color: Colors.grey,
+                        ),
+                      );
+                    },
+                  ),
                 ),
-                child: Image.asset(
-                  image,
-                  width: double.infinity,
-                  height: 120.h,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: double.infinity,
-                      height: 120.h,
-                      color: Color(0xffF5F5F5),
-                      child: Icon(
-                        Icons.image,
-                        size: 40.sp,
-                        color: Colors.grey,
+                if (category != null)
+                  Positioned(
+                    top: 4.h,
+                    left: 8.w,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                      decoration: BoxDecoration(
+                        color: Color(0xffCC0000),
+                        borderRadius: BorderRadius.circular(4.r),
                       ),
-                    );
-                  },
-                ),
-              ),
-              if (category != null)
-                Positioned(
-                  top: 8.h,
-                  left: 8.w,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                    decoration: BoxDecoration(
-                      color: Color(0xffCC0000),
-                      borderRadius: BorderRadius.circular(4.r),
-                    ),
-                    child: Text(
-                      category!,
-                      style: GoogleFonts.roboto(
-                        fontSize: 10.sp,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
+                      child: Text(
+                        category!,
+                        style: GoogleFonts.roboto(
+                          fontSize: 10.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
           Padding(
-            padding: EdgeInsets.all(8.w),
+            padding: EdgeInsets.fromLTRB(8.w, 4.h, 8.w, 1.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -105,7 +108,7 @@ class ProfessionalCardWidget extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                SizedBox(height: 4.h),
+                SizedBox(height: 2.h),
                 // Professional name and rating
                 Row(
                   children: [
@@ -137,7 +140,7 @@ class ProfessionalCardWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 8.h),
+                SizedBox(height: 4.h),
                 // Price and Book Now button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

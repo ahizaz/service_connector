@@ -108,7 +108,7 @@ class ProfileScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12.r),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
+                        color: Colors.grey.withValues(alpha: .1),
                         spreadRadius: 1,
                         blurRadius: 4,
                         offset: const Offset(0, 2),
@@ -161,7 +161,7 @@ class ProfileScreen extends StatelessWidget {
                         value: controller.isServiceProvider.value,
                         onChanged: controller.toggleServiceProviderMode,
                         activeColor: const Color(0xffFDDAD1),
-                        activeTrackColor: const Color(0xffFDDAD1).withOpacity(0.5),
+                        activeTrackColor: const Color(0xffFDDAD1).withValues(alpha: .5),
                       )),
                     ],
                   ),
@@ -195,7 +195,7 @@ class ProfileScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: .1),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),

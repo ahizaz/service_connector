@@ -109,7 +109,7 @@ class VerifyScreen extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         disabledBackgroundColor:
-                            const Color(0xffD32E28).withOpacity(0.6),
+                            const Color(0xffD32E28).withValues(alpha: .6),
                       ),
                       child: controller.isLoading.value
                           ? SizedBox(

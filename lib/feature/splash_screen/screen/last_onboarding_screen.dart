@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:service_connect/core/utils/constants/image_path.dart';
 import 'package:service_connect/feature/authentication/login/screen/login_screen.dart';
 import 'package:service_connect/feature/authentication/sign_up/screen/sign_up.dart';

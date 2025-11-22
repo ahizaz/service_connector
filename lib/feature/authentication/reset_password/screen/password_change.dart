@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart' show Get;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:service_connect/core/common/widgets/custom_button.dart';
 import 'package:service_connect/core/utils/constants/image_path.dart';

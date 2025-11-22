@@ -45,8 +45,8 @@ class ForgetController extends GetxController{
 
   void sendOtp() {
     if (isEmailValid.value) {
-      // TODO: Implement send OTP API call
-      print('Sending OTP to: ${emailController.text}');
+    
+      debugPrint('Sending OTP to: ${emailController.text}');
       Get.snackbar('Success', 'OTP sent to ${emailController.text}');
       
       // Navigate to verification screen
@@ -57,18 +57,17 @@ class ForgetController extends GetxController{
   void verifyOtp() {
     if (isOtpValid.value) {
       final otpCode = getOtpCode();
-      // TODO: Implement verify OTP API call
-      print('Verifying OTP: $otpCode');
+    
+      debugPrint('Verifying OTP: $otpCode');
       Get.snackbar('Success', 'OTP verified successfully');
       
-      // Navigate to reset password screen
-      // Get.toNamed('/reset-password');
+
     }
   }
   
   void resendOtp() {
-    // TODO: Implement resend OTP API call
-    print('Resending OTP to: ${emailController.text}');
+ 
+    debugPrint('Resending OTP to: ${emailController.text}');
     Get.snackbar('Success', 'OTP resent to ${emailController.text}');
     
     // Clear OTP field

@@ -190,7 +190,7 @@ class HireScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: .05),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -213,7 +213,7 @@ class HireScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
+                    color: statusColor.withValues(alpha: .1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
