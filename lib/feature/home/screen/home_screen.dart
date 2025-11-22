@@ -6,6 +6,7 @@ import 'package:service_connect/feature/home/controller/home_controller.dart';
 import 'package:service_connect/feature/home/widget/home_header_widget.dart';
 import 'package:service_connect/feature/home/screen/all_categories_screen.dart';
 import 'package:service_connect/feature/home/screen/all_professionals_screen.dart';
+import 'package:service_connect/feature/home/screen/category_services_screen.dart';
 import 'package:service_connect/feature/home/widget/professional_card_widget.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -82,34 +83,39 @@ class HomeScreen extends StatelessWidget {
                 final category = controller.categories[index];
                 return Padding(
                   padding: EdgeInsets.only(right: index == controller.categories.length - 1 ? 0 : 16.w),
-                  child: Container(
-                    width: 116.w,
-                    decoration: BoxDecoration(
-                      color: const Color(0xffFFFFFF),
-                      borderRadius: BorderRadius.circular(19.r),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          category['icon']!,
-                          width: 55.w,
-                          height: 55.h,
-                          fit: BoxFit.contain,
-                        ),
-                        SizedBox(height: 8.h),
-                        Text(
-                          category['name']!,
-                          style: GoogleFonts.roboto(
-                            fontSize: 12.sp,
-                            color: const Color(0xff252525),
-                            fontWeight: FontWeight.w500,
+                  child: GestureDetector(
+                    onTap: () => Get.to(() => CategoryServicesScreen(
+                      categoryName: category['name']!,
+                    )),
+                    child: Container(
+                      width: 116.w,
+                      decoration: BoxDecoration(
+                        color: const Color(0xffFFFFFF),
+                        borderRadius: BorderRadius.circular(19.r),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(
+                            category['icon']!,
+                            width: 55.w,
+                            height: 55.h,
+                            fit: BoxFit.contain,
                           ),
-                          textAlign: TextAlign.center,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                          SizedBox(height: 8.h),
+                          Text(
+                            category['name']!,
+                            style: GoogleFonts.roboto(
+                              fontSize: 12.sp,
+                              color: const Color(0xff252525),
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
