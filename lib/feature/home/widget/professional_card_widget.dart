@@ -10,6 +10,7 @@ class ProfessionalCardWidget extends StatelessWidget {
   final String image;
   final String? category;
   final VoidCallback? onBookNow;
+  final VoidCallback? onTap;
 
   const ProfessionalCardWidget({
     super.key,
@@ -20,24 +21,27 @@ class ProfessionalCardWidget extends StatelessWidget {
     required this.image,
     this.category,
     this.onBookNow,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 164.w,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 164.w,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.r),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Image with Repairing badge, now with fixed height
@@ -192,6 +196,7 @@ class ProfessionalCardWidget extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

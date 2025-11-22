@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:service_connect/feature/home/controller/home_controller.dart';
+import 'package:service_connect/feature/home/screen/professional_details_screen.dart';
 import 'package:service_connect/feature/home/widget/professional_card_widget.dart';
 
 class AllProfessionalsScreen extends StatelessWidget {
@@ -83,6 +84,12 @@ class AllProfessionalsScreen extends StatelessWidget {
                     price: professional['price'],
                     image: professional['image'],
                     category: professional['category'],
+                    onTap: () {
+                      // Navigate to professional details screen
+                      Get.to(() => ProfessionalDetailsScreen(
+                        professionalId: professional['professionalId'],
+                      ));
+                    },
                     onBookNow: () {
                       // Handle book now action
                       debugPrint('Book now: ${professional['name']}');
