@@ -14,13 +14,13 @@ class CategoriesListWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(height: 26.h),
+        SizedBox(height: 30.h),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 20.w),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SizedBox(height: 26.h),
+              SizedBox(height: 35.h),
               Text("All Catagories", style: GoogleFonts.roboto(
                 fontWeight: FontWeight.w500,
                 fontSize: 18,
@@ -50,7 +50,7 @@ class CategoriesListWidget extends StatelessWidget {
             ],
           ),
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: 20.h),
         SizedBox(
           height: 120.h,
           child: ListView.builder(

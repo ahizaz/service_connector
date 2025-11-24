@@ -16,6 +16,7 @@ class HomeHeaderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       final isProvider = controller.isServiceProvider.value;
+      final verticalPadding = isProvider ? 16.h : 48.h;
       return Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -27,7 +28,7 @@ class HomeHeaderWidget extends StatelessWidget {
         ),
         child: SafeArea(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
+            padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: verticalPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -175,7 +176,7 @@ class HomeHeaderWidget extends StatelessWidget {
                   ),
                 ] else ...[
                   // Service Receiver: keep existing search widget
-                  SizedBox(height: 4.h),
+                  SizedBox(height: 10.h),
                   SearchWidget(controller: controller),
                 ],
               ],
