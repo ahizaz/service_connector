@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:service_connect/feature/home/controller/home_controller.dart';
+import 'package:service_connect/feature/home/screen/search_screen.dart';
 import 'package:service_connect/feature/home/screen/professional_details_screen.dart';
 import 'package:service_connect/feature/home/widget/professional_card_widget.dart';
 
@@ -43,15 +44,17 @@ class AllProfessionalsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Search bar
+            // Search bar (opens dedicated search screen)
             Container(
-             
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12.r),
                 border: Border.all(color: Color(0xffE0E0E0)),
               ),
               child: TextField(
+                readOnly: true,
+                onTap: () => Get.to(() => const SearchScreen()),
+                textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
                   hintText: 'Search for plumber, electrician...',
                   hintStyle: GoogleFonts.roboto(
@@ -60,7 +63,8 @@ class AllProfessionalsScreen extends StatelessWidget {
                   ),
                   prefixIcon: Icon(Icons.search, color: Color(0xff999999)),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(vertical: 12.h),
+                  isDense: true,
+                  contentPadding: EdgeInsets.symmetric(vertical: 0),
                 ),
               ),
             ),

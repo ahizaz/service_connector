@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:service_connect/feature/home/controller/home_controller.dart';
+import 'package:get/get.dart';
+import 'package:service_connect/feature/home/screen/search_screen.dart';
 
 class SearchWidget extends StatelessWidget {
   final HomeController controller;
@@ -20,7 +22,12 @@ class SearchWidget extends StatelessWidget {
       child: TextField(
         controller: controller.searchController,
         focusNode: controller.searchFocusNode,
-        onChanged: controller.onSearchChanged,
+        readOnly: true,
+        onTap: () {
+          // Open dedicated search screen
+          Get.to(() => SearchScreen(initialQuery: controller.searchController.text));
+        },
+        textAlignVertical: TextAlignVertical.center,
         decoration: InputDecoration(
           hintText: "Search for plumber, electrician...",
           hintStyle: TextStyle(
@@ -33,9 +40,10 @@ class SearchWidget extends StatelessWidget {
             size: 20.sp,
           ),
           border: InputBorder.none,
+          isDense: true,
           contentPadding: EdgeInsets.symmetric(
             horizontal: 16.w,
-            vertical: 12.h,
+            vertical: 0,
           ),
         ),
       ),

@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:service_connect/feature/home/controller/home_controller.dart';
+import 'package:service_connect/feature/home/screen/search_screen.dart';
 import 'package:service_connect/feature/home/screen/professional_details_screen.dart';
 
 class CategoryServicesScreen extends StatelessWidget {
@@ -50,7 +51,7 @@ class CategoryServicesScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             SizedBox(height: 10.h),
-            // Search bar
+            // Search bar (opens dedicated search screen with category)
             Container(
               height: 50.h,
               decoration: BoxDecoration(
@@ -58,6 +59,9 @@ class CategoryServicesScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12.r),
               ),
               child: TextField(
+                readOnly: true,
+                onTap: () => Get.to(() => SearchScreen(initialCategory: categoryName)),
+                textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
                   hintText: 'Search for $categoryName...',
                   hintStyle: GoogleFonts.roboto(
@@ -69,9 +73,10 @@ class CategoryServicesScreen extends StatelessWidget {
                     color: Color(0xff9E9E9E),
                   ),
                   border: InputBorder.none,
+                  isDense: true,
                   contentPadding: EdgeInsets.symmetric(
                     horizontal: 16.w,
-                    vertical: 14.h,
+                    vertical: 0,
                   ),
                 ),
               ),
