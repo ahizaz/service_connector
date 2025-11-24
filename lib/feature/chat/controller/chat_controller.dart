@@ -262,7 +262,7 @@ class ChatController extends GetxController {
       duration: durationInSeconds,
     );
     currentChatMessages.add(voiceMessage);
-    sendOfferMessage();
+
   }
   
   // Toggle emoji picker

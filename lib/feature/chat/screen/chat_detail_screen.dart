@@ -60,9 +60,20 @@ class ChatDetailScreen extends StatelessWidget {
           );
         }),
         actions: [
-          IconButton(
+          PopupMenuButton<String>(
             icon: Icon(Icons.more_vert, color: Colors.black),
-            onPressed: () {},
+            onSelected: (value) {
+              if (value == 'offer') {
+                controller.sendOfferMessage();
+                Get.snackbar('Offer', 'Offer sent', snackPosition: SnackPosition.BOTTOM);
+              }
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'offer',
+                child: Text('Offer'),
+              ),
+            ],
           ),
         ],
       ),
