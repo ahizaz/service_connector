@@ -43,12 +43,15 @@ class ProfessionalCardWidget extends StatelessWidget {
             ),
           ],
         ),
-        child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
           // Image with Repairing badge, now with fixed height
           SizedBox(
-            height: 120.h,  // Adjust this value to match your second picture's proportions
+            height: 100.h,  // reduced height to avoid vertical overflow
             child: Stack(
               children: [
                 ClipRRect(
@@ -101,6 +104,7 @@ class ProfessionalCardWidget extends StatelessWidget {
           Padding(
             padding: EdgeInsets.fromLTRB(8.w, 4.h, 8.w, 1.w),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Service name
@@ -132,7 +136,7 @@ class ProfessionalCardWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 8.h),
+                SizedBox(height: 6.h),
                 // Experience, Work Done, and Rating
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -161,9 +165,10 @@ class ProfessionalCardWidget extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    ),
-    );
+      ), // end main Column
+    ), // end SingleChildScrollView
+  ), // end Container
+); // end GestureDetector
   }
 
   Widget _buildStatItem({
@@ -175,14 +180,14 @@ class ProfessionalCardWidget extends StatelessWidget {
       children: [
         Icon(
           icon,
-          size: 18.sp,
+          size: 16.sp,
           color: Color(0xffCC0000),
         ),
         SizedBox(height: 2.h),
         Text(
           value,
           style: GoogleFonts.roboto(
-            fontSize: 14.sp,
+            fontSize: 13.sp,
             fontWeight: FontWeight.w600,
             color: Color(0xff252525),
           ),
@@ -191,10 +196,10 @@ class ProfessionalCardWidget extends StatelessWidget {
           label,
           textAlign: TextAlign.center,
           style: GoogleFonts.roboto(
-            fontSize: 9.sp,
+            fontSize: 8.sp,
             fontWeight: FontWeight.w400,
             color: Color(0xff666666),
-            height: 1.2,
+            height: 1.1,
           ),
         ),
       ],
