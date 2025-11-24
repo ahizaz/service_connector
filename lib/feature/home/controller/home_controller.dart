@@ -16,6 +16,11 @@ class HomeController extends GetxController {
   final RxDouble earningInMonth = 0.0.obs;
   final RxInt activeHire = 0.obs;
   final RxInt cancelHire = 0.obs;
+  // Header / profile stats shown in provider header
+  final RxInt totalHire = 0.obs;
+  final RxDouble totalEarning = 0.0.obs;
+  final RxDouble providerRating = 0.0.obs;
+  final RxInt successRate = 0.obs;
   
   // Text data
   final String greetingText = "Hey, Glad You're Here";
@@ -46,6 +51,11 @@ class HomeController extends GetxController {
       earningInMonth.value = 380.0;
       activeHire.value = 2;
       cancelHire.value = 5;
+      // Sample header/profile values (replace with API values)
+      totalHire.value = 23;
+      totalEarning.value = 82012.0;
+      providerRating.value = 4.8;
+      successRate.value = 96;
     } catch (e) {
       debugPrint('Failed to load dashboard data: $e');
     }
