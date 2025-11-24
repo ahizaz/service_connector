@@ -10,6 +10,12 @@ class HomeController extends GetxController {
   
   // Service provider mode
   final RxBool isServiceProvider = false.obs;
+
+  // Dashboard stats (for service providers)
+  final RxDouble availableWithdraw = 0.0.obs;
+  final RxDouble earningInMonth = 0.0.obs;
+  final RxInt activeHire = 0.obs;
+  final RxInt cancelHire = 0.obs;
   
   // Text data
   final String greetingText = "Hey, Glad You're Here";
@@ -21,11 +27,28 @@ class HomeController extends GetxController {
     searchController = TextEditingController();
     searchFocusNode = FocusNode();
     loadServiceProviderMode();
+    loadDashboardData();
   }
   
   // Reload mode when screen is revisited
   void reloadMode() {
     loadServiceProviderMode();
+    // also refresh dashboard data when returning to screen
+    loadDashboardData();
+  }
+
+  /// Load provider dashboard data.
+  /// Currently this sets static/sample values. Replace with API call as needed.
+  Future<void> loadDashboardData() async {
+    try {
+      // TODO: Replace with real data fetch
+      availableWithdraw.value = 250.0;
+      earningInMonth.value = 380.0;
+      activeHire.value = 2;
+      cancelHire.value = 5;
+    } catch (e) {
+      debugPrint('Failed to load dashboard data: $e');
+    }
   }
   
   Future<void> loadServiceProviderMode() async {
