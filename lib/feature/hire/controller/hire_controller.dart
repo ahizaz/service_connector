@@ -1,9 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class HireController extends GetxController with GetSingleTickerProviderStateMixin {
-  late TabController tabController;
-  
+class HireController extends GetxController {
   // Observable for selected tab
   var selectedTab = 0.obs;
   
@@ -113,15 +110,11 @@ class HireController extends GetxController with GetSingleTickerProviderStateMix
   @override
   void onInit() {
     super.onInit();
-    tabController = TabController(length: 4, vsync: this);
-    tabController.addListener(() {
-      selectedTab.value = tabController.index;
-    });
+    // We no longer rely on a TabController; selected tab is managed by `selectedTab`.
   }
-  
+
   @override
   void onClose() {
-    tabController.dispose();
     super.onClose();
   }
   

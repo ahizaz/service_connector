@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:service_connect/feature/hire/controller/hire_controller.dart';
+import 'package:service_connect/feature/home/controller/home_controller.dart';
 import 'package:service_connect/feature/hire/screen/order_details.dart';
 
 class HireScreen extends StatelessWidget {
@@ -9,6 +10,12 @@ class HireScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final HireController controller = Get.put(HireController());
+    HomeController? homeController;
+    try {
+      homeController = Get.find<HomeController>();
+    } catch (e) {
+      homeController = null;
+    }
     
     return Scaffold(
       backgroundColor: const Color(0xffF5F5F5),
@@ -58,14 +65,21 @@ class HireScreen extends StatelessWidget {
                 _buildTab(controller, 0, 'All'),
                 _buildTab(controller, 1, 'Active'),
                 _buildTab(controller, 2, 'Complete'),
-                _buildTab(controller, 3, 'Cancelled'),
+                if (homeController?.isServiceProvider.value ?? false)
+                  _buildTab(controller, 3, 'Cancelled'),
               ],
             )),
           ),
           
           // Tab View
           Expanded(
-            child: Obx(() => _buildOrderList(controller, controller.selectedTab.value)),
+            child: Obx(() {
+              final maxIndex = (homeController?.isServiceProvider.value ?? false) ? 3 : 2;
+              if (controller.selectedTab.value > maxIndex) {
+                controller.selectedTab.value = 0;
+              }
+              return _buildOrderList(controller, controller.selectedTab.value);
+            }),
           ),
         ],
       ),
