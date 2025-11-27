@@ -13,7 +13,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ProfileController());
+    final controller = Get.find<ProfileController>();
     return Scaffold(
       backgroundColor: const Color(0xffF5F5F5),
       body: SafeArea(child: SingleChildScrollView(

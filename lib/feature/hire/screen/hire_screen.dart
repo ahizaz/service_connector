@@ -9,7 +9,7 @@ class HireScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final HireController controller = Get.put(HireController());
+    final HireController controller = Get.find<HireController>();
     HomeController? homeController;
     try {
       homeController = Get.find<HomeController>();

@@ -48,7 +48,7 @@ class ServiceProvideToggle extends StatelessWidget {
        
        ),
        Obx(()=>Switch(value: controller.isServiceProvider.value, onChanged: controller.toggleServiceProviderMode,
-       activeColor: const Color(0xffFDDAD1),
+       activeThumbColor: const Color(0xffFDDAD1),
           activeTrackColor: const Color(0xffFDDAD1).withValues(alpha: .5),
        
        ))

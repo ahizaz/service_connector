@@ -46,7 +46,7 @@ class HomeController extends GetxController {
   /// Currently this sets static/sample values. Replace with API call as needed.
   Future<void> loadDashboardData() async {
     try {
-      // TODO: Replace with real data fetch
+   
       availableWithdraw.value = 250.0;
       earningInMonth.value = 380.0;
       activeHire.value = 2;

@@ -14,7 +14,7 @@ class SignUp extends StatelessWidget {
   const SignUp({super.key});
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(SignUpController());
+    final controller = Get.find<SignUpController>();
     return Scaffold(
       backgroundColor: const Color(0xffF5F5F5),
       body: SingleChildScrollView(

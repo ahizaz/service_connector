@@ -31,7 +31,7 @@ class ResetController extends GetxController{
       return;
     }
     
-    // TODO: Implement reset password API call
+
     Get.snackbar('Success', 'Password reset successfully');
     
     // Navigate to password change page

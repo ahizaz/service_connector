@@ -11,7 +11,7 @@ class VerifyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(VerifyController());
+    final controller = Get.find<VerifyController>();
 
     final defaultPinTheme = PinTheme(
       width: 45.w,

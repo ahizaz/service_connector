@@ -13,7 +13,7 @@ class Step1ProfessionalProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ProviderRegistrationController(), permanent: true);
+    final controller = Get.find<ProviderRegistrationController>();
 
     return Scaffold(
       backgroundColor: const Color(0xffFFFFFF),

@@ -10,7 +10,7 @@ import 'package:service_connect/feature/authentication/login/screen/login_screen
 class ForgotPassword extends StatelessWidget {
   ForgotPassword({super.key});
 
-  final ForgetController controller = Get.put(ForgetController());
+  final ForgetController controller = Get.find<ForgetController>();
 
   @override
   Widget build(BuildContext context) {

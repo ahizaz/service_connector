@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_navigation/get_navigation.dart';
+import 'package:service_connect/core/bindings/app_bindings.dart';
 import 'package:service_connect/core/utils/theme/theme.dart';
 import 'package:service_connect/feature/splash_screen/screen/first_splash_screen.dart';
 import 'package:service_connect/feature/profile/screen/account.dart';
@@ -22,6 +23,7 @@ class ServiceConnector extends StatelessWidget {
       splitScreenMode: true,
       child: GetMaterialApp(
         debugShowCheckedModeBanner: false,
+        initialBinding: AppBindings(),
         title:'Service connect',
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,

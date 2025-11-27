@@ -12,7 +12,7 @@ class HomeScreen extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(HomeController(), permanent: true);
+    final controller = Get.find<HomeController>();
     
     // Reload mode when screen becomes visible
     WidgetsBinding.instance.addPostFrameCallback((_) {
