@@ -55,19 +55,7 @@ class TermsAndConditionsScreen extends StatelessWidget {
               ),
 
               SizedBox(height: 24.h),
-              // Center(
-              //   child: OutlinedButton(
-              //     onPressed: () => Navigator.of(context).pop(),
-              //     style: OutlinedButton.styleFrom(
-              //       padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
-              //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
-              //     ),
-              //     child: Text(
-              //       'Close',
-              //       style: TextStyle(fontSize: 14.sp, color: Colors.black),
-              //     ),
-              //   ),
-              // ),
+            
             ],
           ),
         ),
