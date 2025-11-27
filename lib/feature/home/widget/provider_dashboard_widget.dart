@@ -3,10 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
 import 'package:service_connect/feature/home/controller/home_controller.dart';
-
 class ProviderDashboardWidget extends StatelessWidget {
   const ProviderDashboardWidget({super.key});
-
   @override
   Widget build(BuildContext context) {
     final HomeController controller = Get.find<HomeController>();
@@ -43,7 +41,6 @@ class ProviderDashboardWidget extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 12.h),
-
                   Row(
                     children: [
                       Expanded(
@@ -158,5 +155,3 @@ class ProviderDashboardWidget extends StatelessWidget {
     });
   }
 }
-
-// _StatCard removed — no longer used by ProviderDashboardWidget.

@@ -13,6 +13,8 @@ class Step4Documents extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ProviderRegistrationController>();
+    final documentTypes = ['Trade License', 'Insurance Card', 'Certificate'];
+    final selectedDocType = documentTypes[0].obs;
 
     return Scaffold(
       backgroundColor: const Color(0xffF5F5F5),
@@ -66,7 +68,7 @@ class Step4Documents extends StatelessWidget {
             ),
             SizedBox(height: 32.h),
             
-            // Trade License Document
+            // Document Type (single dropdown for all uploads)
             Text(
               "Document Type",
               style: AppTextStyles.robotoRegular(
@@ -85,17 +87,19 @@ class Step4Documents extends StatelessWidget {
                 border: Border.all(color: const Color(0xffF5F5F5)),
               ),
               child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  value: 'Trade License',
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'Trade License',
-                      child: Text('Trade License'),
-                    ),
-                  ],
-                  onChanged: (value) {},
-                ),
+                child: Obx(() => DropdownButton<String>(
+                      isExpanded: true,
+                      value: selectedDocType.value,
+                      items: documentTypes
+                          .map((d) => DropdownMenuItem(
+                                value: d,
+                                child: Text(d),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        if (value != null) selectedDocType.value = value;
+                      },
+                    )),
               ),
             ),
             SizedBox(height: 16.h),
@@ -189,38 +193,7 @@ class Step4Documents extends StatelessWidget {
             )),
             SizedBox(height: 24.h),
             
-            // Insurance Document
-            Text(
-              "Document Type",
-              style: AppTextStyles.robotoRegular(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xff313131),
-              ),
-            ),
-            SizedBox(height: 8.h),
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(color: const Color(0xffF5F5F5)),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  value: 'Insurance Card',
-                  items: const [
-                    DropdownMenuItem(
-                      value: 'Insurance Card',
-                      child: Text('Insurance Card'),
-                    ),
-                  ],
-                  onChanged: (value) {},
-                ),
-              ),
-            ),
+            // (Removed duplicate Document Type dropdown)
             SizedBox(height: 16.h),
             
             // Insurance Upload Button

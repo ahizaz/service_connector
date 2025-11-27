@@ -7,11 +7,8 @@ import 'package:service_connect/core/utils/constants/icon_path.dart';
 import 'package:service_connect/core/utils/constants/image_path.dart';
 import 'package:service_connect/feature/splash_screen/screen/second_splash_screen.dart';
 import 'package:service_connect/feature/splash_screen/screen/secondonboardingscreen.dart';
-
-
 class OnboadringScreen extends StatelessWidget {
   const OnboadringScreen({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,17 +45,12 @@ class OnboadringScreen extends StatelessWidget {
                   ),
                   child: Center(child: Image.asset(IconPath.right,height: 24.h,width: 24.w,fit: BoxFit.cover,),),
                 ),
-              )
-              
-              
+              ) 
              ], 
-            ),
-            
-            
+            ), 
             )
            ],
           )
-
     );
   }
 }
