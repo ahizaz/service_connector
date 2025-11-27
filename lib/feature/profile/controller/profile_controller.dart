@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:service_connect/feature/home/controller/home_controller.dart';
+import 'package:service_connect/feature/profile/screen/terms_and_conditions_screen.dart';
+import 'package:service_connect/feature/profile/screen/about_screen.dart';
 
 class ProfileController extends GetxController {
   final RxString userName = 'Brooklyn Simmons'.obs;
@@ -144,7 +146,7 @@ class ProfileController extends GetxController {
       'onTap': () => Get.toNamed('/account'),
     },
     {
-      'title': 'Pay Account',
+      'title': 'Connect with stripe',
       'icon': Icons.account_balance_wallet_outlined,
       'onTap': () => Get.toNamed('/pay-account'),
     },
@@ -154,14 +156,14 @@ class ProfileController extends GetxController {
       'onTap': () => Get.toNamed('/saved'),
     },
     {
-      'title': 'Trams & Condition',
+      'title': 'Terms & Conditions',
       'icon': Icons.description_outlined,
-      'onTap': () => Get.toNamed('/terms'),
+      'onTap': () => Get.to(() => const TermsAndConditionsScreen()),
     },
     {
       'title': 'About Us',
       'icon': Icons.info_outline,
-      'onTap': () => Get.toNamed('/about'),
+      'onTap': () => Get.to(() => const AboutScreen()),
     },
   ];
 }

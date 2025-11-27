@@ -4,6 +4,8 @@ import 'package:get/get_navigation/get_navigation.dart';
 import 'package:service_connect/core/utils/theme/theme.dart';
 import 'package:service_connect/feature/splash_screen/screen/first_splash_screen.dart';
 import 'package:service_connect/feature/profile/screen/account.dart';
+import 'package:service_connect/feature/profile/screen/terms_and_conditions_screen.dart';
+import 'package:service_connect/feature/profile/screen/about_screen.dart';
 import 'package:service_connect/feature/authentication/service_provider_registration/screen/step1_professional_profile.dart';
 import 'package:service_connect/feature/authentication/service_provider_registration/screen/step2_services_offered.dart';
 import 'package:service_connect/feature/authentication/service_provider_registration/screen/step3_work_location.dart';
@@ -26,6 +28,8 @@ class ServiceConnector extends StatelessWidget {
         home: FirstSplashScreen(),
         getPages: [
           GetPage(name: '/account', page: () => const Account()),
+          GetPage(name: '/terms', page: () => const TermsAndConditionsScreen()),
+          GetPage(name: '/about', page: () => const AboutScreen()),
           GetPage(name: '/provider-registration-step1', page: () => const Step1ProfessionalProfile()),
           GetPage(name: '/provider-registration-step2', page: () => const Step2ServicesOffered()),
           GetPage(name: '/provider-registration-step3', page: () => const Step3WorkLocation()),

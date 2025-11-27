@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import '../model/chat_message_model.dart';
@@ -304,6 +305,56 @@ class ChatController extends GetxController {
     } catch (e) {
       debugPrint('Error picking image: $e');
     }
+  }
+
+  // Pick image from camera
+  Future<void> pickImageFromCamera() async {
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 80,
+      );
+
+      if (image != null) {
+        _sendImageMessage(image.path);
+      }
+    } catch (e) {
+      debugPrint('Error capturing image: $e');
+    }
+  }
+
+  // Pick generic file (documents)
+  Future<void> pickFile() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        allowMultiple: false,
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        final picked = result.files.first;
+        final path = picked.path;
+        if (path != null) {
+          _sendFileMessage(path, picked.name);
+        }
+      }
+    } catch (e) {
+      debugPrint('Error picking file: $e');
+    }
+  }
+
+  // Send file/document message
+  void _sendFileMessage(String filePath, String fileName) {
+    final fileMessage = ChatMessage(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      senderId: 'me',
+      senderName: 'Me',
+      message: fileName,
+      time: _getCurrentTime(),
+      isMe: true,
+      type: MessageType.file,
+      filePath: filePath,
+    );
+    currentChatMessages.add(fileMessage);
   }
   
   // Send image message

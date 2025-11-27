@@ -109,7 +109,7 @@ class ChatDetailScreen extends StatelessWidget {
             child: SafeArea(
               child: Row(
                 children: [
-                  // Attach button
+                  // Gallery quick access (like the second icon in attachment)
                   Container(
                     width: 40.w,
                     height: 40.h,
@@ -122,6 +122,94 @@ class ChatDetailScreen extends StatelessWidget {
                       color: Color(0xFF757575),
                       onPressed: () {
                         controller.pickImageFromGallery();
+                      },
+                      padding: EdgeInsets.zero,
+                    ),
+                  ),
+                  SizedBox(width: 8.w),
+
+                  // Attach button -> shows bottom sheet with options (no Gallery here)
+                  Container(
+                    width: 40.w,
+                    height: 40.h,
+                    decoration: BoxDecoration(
+                      color: Color(0xFFF5F5F5),
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: Icon(Icons.attach_file, size: 20.sp),
+                      color: Color(0xFF757575),
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          backgroundColor: Colors.transparent,
+                          builder: (ctx) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(16.r),
+                                  topRight: Radius.circular(16.r),
+                                ),
+                              ),
+                              padding: EdgeInsets.symmetric(vertical: 12.h),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      _AttachmentOption(
+                                        icon: Icons.camera_alt,
+                                        label: 'Camera',
+                                        onTap: () {
+                                          Get.back();
+                                          controller.pickImageFromCamera();
+                                        },
+                                      ),
+                                      _AttachmentOption(
+                                        icon: Icons.insert_drive_file,
+                                        label: 'Document',
+                                        onTap: () {
+                                          Get.back();
+                                          controller.pickFile();
+                                        },
+                                      ),
+                                      _AttachmentOption(
+                                        icon: Icons.audiotrack,
+                                        label: 'Audio',
+                                        onTap: () {
+                                          Get.back();
+                                          // Placeholder: audio picking not implemented
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 12.h),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      _AttachmentOption(
+                                        icon: Icons.location_on,
+                                        label: 'Location',
+                                        onTap: () {
+                                          Get.back();
+                                          // Placeholder: location share not implemented
+                                        },
+                                      ),
+                                      _AttachmentOption(
+                                        icon: Icons.close,
+                                        label: 'Cancel',
+                                        onTap: () => Get.back(),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8.h),
+                                ],
+                              ),
+                            );
+                          },
+                        );
                       },
                       padding: EdgeInsets.zero,
                     ),
@@ -276,6 +364,10 @@ class ChatDetailScreen extends StatelessWidget {
     
     if (message.type == MessageType.image) {
       return _buildImageMessage(message);
+    }
+
+    if (message.type == MessageType.file) {
+      return _buildFileMessage(message);
     }
 
     if (message.type == MessageType.offer) {
@@ -594,6 +686,100 @@ class ChatDetailScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildFileMessage(ChatMessage message) {
+    final fileName = message.message;
+    return Align(
+      alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: EdgeInsets.only(bottom: 12.h),
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+        constraints: BoxConstraints(maxWidth: 280.w),
+        decoration: BoxDecoration(
+          color: message.isMe ? Color(0xFF6B4CE6) : Color(0xFFF5F5F5),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(16.r),
+            topRight: Radius.circular(16.r),
+            bottomLeft: message.isMe ? Radius.circular(16.r) : Radius.circular(4.r),
+            bottomRight: message.isMe ? Radius.circular(4.r) : Radius.circular(16.r),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.insert_drive_file,
+              color: message.isMe ? Colors.white : Color(0xFF6B4CE6),
+              size: 28.sp,
+            ),
+            SizedBox(width: 8.w),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    fileName,
+                    style: TextStyle(
+                      color: message.isMe ? Colors.white : Colors.black,
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 6.h),
+                  Text(
+                    message.time,
+                    style: TextStyle(
+                      color: message.isMe ? Colors.white.withValues(alpha: .7) : Color(0xFF9E9E9E),
+                      fontSize: 11.sp,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AttachmentOption extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _AttachmentOption({
+    Key? key,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 60.w,
+            height: 60.w,
+            decoration: BoxDecoration(
+              color: Color(0xFFF5F5F5),
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Icon(icon, size: 28.sp, color: Color(0xFF616161)),
+          ),
+          SizedBox(height: 8.h),
+          Text(
+            label,
+            style: TextStyle(color: Color(0xFF616161), fontSize: 12.sp),
+          ),
+        ],
       ),
     );
   }

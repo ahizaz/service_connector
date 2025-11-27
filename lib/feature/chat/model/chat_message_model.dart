@@ -30,6 +30,7 @@ enum MessageType {
   text,
   voice,
   image,
+  file,
   offer,
 }
 
