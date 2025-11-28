@@ -16,7 +16,7 @@ class HomeHeaderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       final isProvider = controller.isServiceProvider.value;
-      final verticalPadding = isProvider ? 16.h : 48.h;
+      final verticalPadding = isProvider ? 12.h : 40.h;
       return Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -148,29 +148,29 @@ class HomeHeaderWidget extends StatelessWidget {
                             ),
                           ],
                         ),
-                        SizedBox(height: 12.h),
-                        // Average success rate card
-                        Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 14.w),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEE6B6B),
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                'Average Succeed Rate',
-                                style: TextStyle(color: Colors.white, fontSize: 13.sp),
-                              ),
-                              Obx(() => Text(
-                                    '${controller.successRate.value}%',
-                                    style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.bold),
-                                  )),
-                            ],
-                          ),
-                        ),
+                        SizedBox(height: 6.h),
+                        // Average success rate (moved up and slightly shorter)
+                        // Container(
+                        //   width: double.infinity,
+                        //   padding: EdgeInsets.symmetric(vertical: 8.h, horizontal: 12.w),
+                        //   decoration: BoxDecoration(
+                        //     color: const Color(0xFFEE6B6B),
+                        //     borderRadius: BorderRadius.circular(12.r),
+                        //   ),
+                        //   child: Row(
+                        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //     children: [
+                        //       Text(
+                        //         'Average Succeed Rate',
+                        //         style: TextStyle(color: Colors.white, fontSize: 13.sp),
+                        //       ),
+                        //       Obx(() => Text(
+                        //             '${controller.successRate.value}%',
+                        //             style: TextStyle(color: Colors.white, fontSize: 14.sp, fontWeight: FontWeight.bold),
+                        //           )),
+                        //     ],
+                        //   ),
+                        // ),
                       ],
                     ),
                   ),
