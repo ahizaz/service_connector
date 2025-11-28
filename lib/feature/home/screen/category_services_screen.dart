@@ -195,7 +195,7 @@ class CategoryServicesScreen extends StatelessWidget {
             ),
           ),
           SizedBox(width: 8.w),
-          // Price and Book button
+          // Price (booking removed)
           Column(
             children: [
               Text(
@@ -211,29 +211,6 @@ class CategoryServicesScreen extends StatelessWidget {
                 style: GoogleFonts.roboto(
                   fontSize: 10.sp,
                   color: const Color(0xff757575),
-                ),
-              ),
-              SizedBox(height: 8.h),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xffFF3131),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 8.h,
-                  ),
-                  minimumSize: Size(0, 32.h),
-                ),
-                child: Text(
-                  'Book Now',
-                  style: GoogleFonts.roboto(
-                    fontSize: 12.sp,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white,
-                  ),
                 ),
               ),
             ],

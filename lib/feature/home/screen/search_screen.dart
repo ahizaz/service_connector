@@ -231,15 +231,6 @@ class _SearchScreenState extends State<SearchScreen> {
                                       Row(
                                         children: [
                                           Expanded(child: Text(s['professional'] ?? '', style: GoogleFonts.roboto(fontSize: 12.sp, color: Color(0xff757575)))),
-                                          SizedBox(width: 8.w),
-                                          Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-                                            decoration: BoxDecoration(
-                                              color: Color(0xffFF3131),
-                                              borderRadius: BorderRadius.circular(8.r),
-                                            ),
-                                            child: Text('Book Now', style: GoogleFonts.roboto(color: Colors.white, fontSize: 12.sp)),
-                                          ),
                                         ],
                                       ),
                                       SizedBox(height: 6.h),
