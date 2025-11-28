@@ -150,11 +150,7 @@ class ProfileController extends GetxController {
       'icon': Icons.account_balance_wallet_outlined,
       'onTap': () => Get.toNamed('/pay-account'),
     },
-    {
-      'title': 'Saved',
-      'icon': Icons.bookmark_border,
-      'onTap': () => Get.toNamed('/saved'),
-    },
+    // (Removed 'Saved' menu item)
     {
       'title': 'Terms & Conditions',
       'icon': Icons.description_outlined,
