@@ -85,6 +85,7 @@ class AllProfessionalsScreen extends StatelessWidget {
                     name: professional['name'],
                     professional: professional['professional'],
                     rating: professional['rating'].toDouble(),
+                    price: professional['price'] != null ? '\$${professional['price']}/hour' : null,
                     experience: professional['experience'],
                     workDone: professional['workDone'],
                     image: professional['image'],
@@ -96,8 +97,23 @@ class AllProfessionalsScreen extends StatelessWidget {
                       ));
                     },
                     onBookNow: () {
-                      // Handle book now action
-                      debugPrint('Book now: ${professional['name']}');
+                      Get.defaultDialog(
+                        title: 'Confirm Booking',
+                        middleText: 'Do you want to book ${professional['name']}?',
+                        textConfirm: 'Yes',
+                        textCancel: 'No',
+                        onConfirm: () {
+                          Get.back();
+                          Get.snackbar(
+                            'Booked',
+                            '${professional['name']} booked successfully',
+                            snackPosition: SnackPosition.BOTTOM,
+                            backgroundColor: Colors.green.withOpacity(0.9),
+                            colorText: Colors.white,
+                          );
+                          // TODO: integrate real booking API here
+                        },
+                      );
                     },
                   );
                 },

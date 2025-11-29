@@ -96,6 +96,7 @@ class CategoryServicesScreen extends StatelessWidget {
                       ));
                     },
                     child: _buildServiceCard(
+                      service['professionalId'],
                       service['name'],
                       service['professional'],
                       service['rating'].toDouble(),
@@ -114,6 +115,7 @@ class CategoryServicesScreen extends StatelessWidget {
   }
 
   Widget _buildServiceCard(
+    int professionalId,
     String serviceName,
     String professionalName,
     double rating,
@@ -195,22 +197,45 @@ class CategoryServicesScreen extends StatelessWidget {
             ),
           ),
           SizedBox(width: 8.w),
-          // Price (booking removed)
+          // Right column: show only star rating and Book Now button
           Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(
-                '\$$price',
-                style: GoogleFonts.roboto(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                  color: const Color(0xff252525),
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.star,
+                    color: const Color(0xffFFB800),
+                    size: 16.sp,
+                  ),
+                  SizedBox(width: 4.w),
+                  Text(
+                    rating.toStringAsFixed(rating % 1 == 0 ? 0 : 1),
+                    style: GoogleFonts.roboto(
+                      fontSize: 12.sp,
+                      color: const Color(0xff757575),
+                    ),
+                  ),
+                ],
               ),
-              Text(
-                '/hour',
-                style: GoogleFonts.roboto(
-                  fontSize: 10.sp,
-                  color: const Color(0xff757575),
+              SizedBox(height: 8.h),
+              SizedBox(
+                height: 34.h,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Get.to(() => ProfessionalDetailsScreen(professionalId: professionalId));
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xffDE2B2B),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+                    padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 6.h),
+                    elevation: 0,
+                  ),
+                  child: Text(
+                    'Book Now',
+                    style: GoogleFonts.roboto(fontSize: 13.sp, color: Colors.white),
+                  ),
                 ),
               ),
             ],
