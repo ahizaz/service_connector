@@ -11,6 +11,7 @@ import 'package:service_connect/feature/authentication/service_provider_registra
 import 'package:service_connect/feature/authentication/service_provider_registration/screen/step2_services_offered.dart';
 import 'package:service_connect/feature/authentication/service_provider_registration/screen/step3_work_location.dart';
 import 'package:service_connect/feature/authentication/service_provider_registration/screen/step4_documents.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class ServiceConnector extends StatelessWidget {
   const ServiceConnector({super.key});
@@ -37,8 +38,7 @@ class ServiceConnector extends StatelessWidget {
           GetPage(name: '/provider-registration-step3', page: () => const Step3WorkLocation()),
           GetPage(name: '/provider-registration-step4', page: () => const Step4Documents()),
         ],
-
-        
+        builder: EasyLoading.init(),
       )
     );
   }

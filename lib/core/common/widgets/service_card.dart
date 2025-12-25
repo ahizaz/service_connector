@@ -10,7 +10,7 @@ class ServiceCard extends StatelessWidget {
   final VoidCallback? onBook;
 
   const ServiceCard({
-    Key? key,
+    super.key,
     required this.imageUrl,
     this.badgeText = '',
     required this.title,
@@ -18,7 +18,7 @@ class ServiceCard extends StatelessWidget {
     this.rating = 0.0,
     required this.price,
     this.onBook,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +137,7 @@ class ServiceCard extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                // Price only on a separate line
+                // Price only on a separate line with styled suffix
                 Builder(builder: (context) {
                   final parts = price.split('/');
                   final amount = parts.isNotEmpty ? parts[0] : price;
@@ -149,10 +149,11 @@ class ServiceCard extends StatelessWidget {
                           text: amount,
                           style: const TextStyle(color: Colors.black, fontSize: 14, fontWeight: FontWeight.w700),
                         ),
-                        TextSpan(
-                          text: suffix,
-                          style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                        ),
+                        if (suffix.isNotEmpty)
+                          TextSpan(
+                            text: suffix,
+                            style: const TextStyle(color: Color(0xFFDE2B2B), fontSize: 12, fontWeight: FontWeight.w600),
+                          ),
                       ],
                     ),
                   );
