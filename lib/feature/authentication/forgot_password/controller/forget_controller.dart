@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:service_connect/feature/authentication/forgot_password/screen/forget_verification.dart';
+import 'package:service_connect/feature/authentication/verify_account/controller/verify_controller.dart';
 
 class ForgetController extends GetxController{
   final TextEditingController emailController = TextEditingController();
@@ -43,14 +44,19 @@ class ForgetController extends GetxController{
     return pinController.text;
   }
 
-  void sendOtp() {
+  void sendOtp() async {
     if (isEmailValid.value) {
-    
-      debugPrint('Sending OTP to: ${emailController.text}');
-      Get.snackbar('Success', 'OTP sent to ${emailController.text}');
-      
-      // Navigate to verification screen
-      Get.to(() => ForgetVerification());
+      final email = emailController.text.trim();
+      debugPrint('Sending OTP to: $email');
+
+      final verifyController = Get.put(VerifyController());
+      final success = await verifyController.forgetPassword(email);
+
+      if (success) {
+        // clear the email field before navigating to verification
+        emailController.clear();
+        Get.to(() => ForgetVerification());
+      }
     }
   }
   

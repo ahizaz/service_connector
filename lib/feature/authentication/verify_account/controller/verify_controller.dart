@@ -136,6 +136,49 @@ class VerifyController extends GetxController {
     }
   }
 
+  Future<bool> forgetPassword(String email) async {
+    isLoading.value = true;
+    EasyLoading.show(status: 'Sending...');
+
+    try {
+      final body = jsonEncode({'email': email});
+      debugPrint('ForgetPassword request body: $body');
+
+      final uri = Uri.parse(Url.forgetPassword);
+      final res = await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: body,
+      );
+
+      debugPrint('ForgetPassword response status: ${res.statusCode}');
+      debugPrint('ForgetPassword response body: ${res.body}');
+
+      EasyLoading.dismiss();
+      isLoading.value = false;
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        Get.snackbar(
+          'Success',
+          'Password reset link sent to your email',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+        return true;
+      } else {
+        Get.snackbar('Failed', res.body);
+        return false;
+      }
+    } catch (e) {
+      EasyLoading.dismiss();
+      isLoading.value = false;
+      debugPrint('ForgetPassword error: $e');
+      Get.snackbar('Error', e.toString());
+      return false;
+    }
+  }
+
   @override
   void onClose() {
     otpController.dispose();
