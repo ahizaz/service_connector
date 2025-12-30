@@ -3,7 +3,7 @@ class AuthService {
 
   static String? bearerToken;
 
-  static void setToken(String token) {
+  static void setToken(String? token) {
     bearerToken = token;
   }
 

@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:service_connect/core/auth/auth_service.dart';
+import 'package:service_connect/feature/authentication/login/screen/login_screen.dart';
 import 'package:service_connect/feature/home/controller/home_controller.dart';
 import 'package:service_connect/feature/profile/screen/terms_and_conditions_screen.dart';
 import 'package:service_connect/feature/profile/screen/about_screen.dart';
@@ -25,6 +28,30 @@ class ProfileController extends GetxController {
   Future<void> _loadServiceProviderMode() async {
     final prefs = await SharedPreferences.getInstance();
     isServiceProvider.value = prefs.getBool('is_service_provider') ?? false;
+  }
+
+  Future<void> logout() async {
+    EasyLoading.show(status: 'Logging out...');
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('accessToken');
+      await prefs.remove('userId');
+      await prefs.remove('userName');
+      await prefs.remove('userEmail');
+      await prefs.remove('saved_email');
+      await prefs.remove('saved_password');
+      await prefs.setBool('remember_me', false);
+
+      AuthService.setToken(null);
+      debugPrint('User logged out and tokens cleared');
+
+      EasyLoading.dismiss();
+      Get.offAll(() => const LoginScreen());
+    } catch (e) {
+      EasyLoading.dismiss();
+      debugPrint('Logout error: $e');
+      Get.snackbar('Error', 'Failed to logout');
+    }
   }
 
   @override
