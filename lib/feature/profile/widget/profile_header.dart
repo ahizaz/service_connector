@@ -18,6 +18,7 @@ class ProfileHeader extends StatelessWidget {
         children: [
           Obx((){
             final image = controller.profileImage.value;
+            final imageUrl = controller.profileImageUrl.value;
             return Container(
               width: 120.w,
               height: 120.w,
@@ -27,7 +28,19 @@ class ProfileHeader extends StatelessWidget {
                 color: Colors.grey[300],
               ),
               clipBehavior: Clip.antiAlias,
-              child: image!=null?Image.file(image,fit: BoxFit.cover):Icon(Icons.person,size: 60.sp,color: Colors.grey[600],),
+              child: imageUrl.isNotEmpty
+                  ? Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (ctx, err, stack) {
+                        // If network image fails, fallback to local file or icon
+                        if (image != null) return Image.file(image, fit: BoxFit.cover);
+                        return Icon(Icons.person, size: 60.sp, color: Colors.grey[600]);
+                      },
+                    )
+                  : (image != null
+                      ? Image.file(image, fit: BoxFit.cover)
+                      : Icon(Icons.person, size: 60.sp, color: Colors.grey[600])),
             );
           }),
           Positioned(bottom: 0,right: 0,child: InkWell(
