@@ -85,57 +85,6 @@ class Account extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: 20.h),
-
-            // Email Field
-            Text(
-              'E-mail',
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            SizedBox(height: 8.h),
-            TextField(
-              controller: controller.emailController,
-              keyboardType: TextInputType.emailAddress,
-              style: TextStyle(
-                fontSize: 16.sp,
-                color: Colors.black,
-                fontWeight: FontWeight.w500,
-              ),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                  borderSide: BorderSide(
-                    color: Colors.grey[300]!,
-                    width: 1,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                  borderSide: BorderSide(
-                    color: Colors.grey[300]!,
-                    width: 1,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                  borderSide: const BorderSide(
-                    color: Color(0xffFDDAD1),
-                    width: 2,
-                  ),
-                ),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 16.w,
-                  vertical: 14.h,
-                ),
-              ),
-            ),
-
             SizedBox(height: 40.h),
 
             // Save Button
@@ -143,9 +92,8 @@ class Account extends StatelessWidget {
               width: double.infinity,
               height: 50.h,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   final name = controller.nameController.text.trim();
-                  final email = controller.emailController.text.trim();
 
                   if (name.isEmpty) {
                     Get.snackbar(
@@ -159,31 +107,10 @@ class Account extends StatelessWidget {
                     return;
                   }
 
-                  if (email.isEmpty) {
-                    Get.snackbar(
-                      'Error',
-                      'Please enter your email',
-                      snackPosition: SnackPosition.BOTTOM,
-                      backgroundColor: Colors.red,
-                      colorText: Colors.white,
-                      duration: const Duration(seconds: 2),
-                    );
-                    return;
+                  final ok = await controller.updateName(name);
+                  if (ok) {
+                    Get.to(() => ProfileScreen());
                   }
-
-                  controller.userName.value = name;
-                  controller.userEmail.value = email;
-
-                  Get.snackbar(
-                    'Success',
-                    'Profile updated successfully',
-                    snackPosition: SnackPosition.BOTTOM,
-                    backgroundColor: Colors.green,
-                    colorText: Colors.white,
-                    duration: const Duration(seconds: 2),
-                  );
-
-                  Get.to(()=>ProfileScreen());
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xffFDDAD1),

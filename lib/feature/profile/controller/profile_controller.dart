@@ -276,6 +276,54 @@ class ProfileController extends GetxController {
     }
   }
 
+  // Update profile name via PATCH multipart/form-data
+  Future<bool> updateName(String name) async {
+    EasyLoading.show(status: 'Updating profile...');
+    try {
+      final token = AuthService.getToken();
+      if (token == null || token.isEmpty) {
+        EasyLoading.dismiss();
+        debugPrint('No auth token available for profile update');
+        Get.snackbar('Error', 'Not authenticated');
+        return false;
+      }
+
+      final uri = Uri.parse(Url.updateProfile);
+      final request = http.MultipartRequest('PATCH', uri);
+      request.headers['Authorization'] = 'Bearer $token';
+      request.fields['name'] = name;
+
+      debugPrint('Sending profile name update to: ${uri.toString()} with name: $name');
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      debugPrint('Profile name update status: ${response.statusCode}');
+      debugPrint('Profile name update response: ${response.body}');
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        // persist locally
+        userName.value = name;
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('userName', name);
+
+        EasyLoading.dismiss();
+        Get.snackbar('Success', 'Profile updated successfully', snackPosition: SnackPosition.BOTTOM, backgroundColor: Colors.green, colorText: Colors.white);
+        return true;
+      } else {
+        EasyLoading.dismiss();
+        debugPrint('Name update failed with status ${response.statusCode}');
+        Get.snackbar('Error', 'Failed to update profile');
+        return false;
+      }
+    } catch (e) {
+      EasyLoading.dismiss();
+      debugPrint('Update name error: $e');
+      Get.snackbar('Error', 'Failed to update profile: $e');
+      return false;
+    }
+  }
+
   // Toggle service provider mode
   void toggleServiceProviderMode(bool value) async {
     // Save to SharedPreferences
