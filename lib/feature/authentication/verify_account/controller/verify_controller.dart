@@ -91,17 +91,49 @@ class VerifyController extends GetxController {
   void resendOtp() async {
     if (!canResend.value) return;
 
-    
+    isLoading.value = true;
+    EasyLoading.show(status: 'Resending OTP...');
 
-    Get.snackbar(
-      'Success',
-      'OTP sent successfully',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-    );
+    try {
+      final signupController = Get.find<SignUpController>();
+      final email = signupController.emailController.text.trim();
+      final body = jsonEncode({
+        'email': email,
+      });
 
-    startResendTimer();
+      debugPrint('Resend request body: $body');
+
+      final uri = Uri.parse(Url.resendOtp);
+      final res = await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: body,
+      );
+
+      debugPrint('Resend response status: ${res.statusCode}');
+      debugPrint('Resend response body: ${res.body}');
+
+      EasyLoading.dismiss();
+      isLoading.value = false;
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        Get.snackbar(
+          'Success',
+          'OTP sent successfully',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+        startResendTimer();
+      } else {
+        Get.snackbar('Resend failed', res.body);
+      }
+    } catch (e) {
+      EasyLoading.dismiss();
+      isLoading.value = false;
+      debugPrint('Resend error: $e');
+      Get.snackbar('Error', e.toString());
+    }
   }
 
   @override
