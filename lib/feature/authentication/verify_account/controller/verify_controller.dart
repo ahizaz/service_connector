@@ -2,6 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:service_connect/feature/authentication/finish_page/screen/finish_page.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:service_connect/core/urls/urls.dart';
+import 'package:service_connect/feature/authentication/sign_up/controller/signup_controller.dart';
 
 class VerifyController extends GetxController {
   final TextEditingController otpController = TextEditingController();
@@ -45,15 +50,42 @@ class VerifyController extends GetxController {
     }
 
     isLoading.value = true;
+    EasyLoading.show(status: 'Verifying...');
 
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      final signupController = Get.find<SignUpController>();
+      final email = signupController.emailController.text.trim();
+      final body = jsonEncode({
+        'email': email,
+        'otp_code': otpController.text.trim(),
+      });
 
+      debugPrint('Verify request body: $body');
 
-    isLoading.value = false;
+      final uri = Uri.parse(Url.verifyScreen);
+      final res = await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: body,
+      );
 
+      debugPrint('Verify response status: ${res.statusCode}');
+      debugPrint('Verify response body: ${res.body}');
 
-    Get.to(() => const FinishPage());
+      EasyLoading.dismiss();
+      isLoading.value = false;
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        Get.to(() => const FinishPage());
+      } else {
+        Get.snackbar('Verification failed', res.body);
+      }
+    } catch (e) {
+      EasyLoading.dismiss();
+      isLoading.value = false;
+      debugPrint('Verify error: $e');
+      Get.snackbar('Error', e.toString());
+    }
   }
 
   void resendOtp() async {

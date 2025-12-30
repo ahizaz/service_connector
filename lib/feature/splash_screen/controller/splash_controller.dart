@@ -7,6 +7,7 @@ import 'package:service_connect/feature/splash_screen/screen/onboadring_screen.d
 import 'package:service_connect/feature/splash_screen/screen/second_splash_screen.dart';
 
 class SplashController extends GetxController{
+  @override
   void onInit(){
     super.onInit();
     Timer(const Duration(seconds: 3),(){
