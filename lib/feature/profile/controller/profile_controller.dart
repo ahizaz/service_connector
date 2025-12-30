@@ -33,6 +33,7 @@ class ProfileController extends GetxController {
     nameController = TextEditingController(text: userName.value);
     emailController = TextEditingController(text: userEmail.value);
     _loadServiceProviderMode();
+    _loadProfileFromPrefs();
 
     // Keep controllers in sync when values change elsewhere.
     ever<String>(userName, (val) {
@@ -59,6 +60,12 @@ class ProfileController extends GetxController {
       if (name.isNotEmpty) userName.value = name;
       if (email.isNotEmpty) userEmail.value = email;
 
+      // Persist to SharedPreferences
+      SharedPreferences.getInstance().then((prefs) {
+        if (name.isNotEmpty) prefs.setString('userName', name);
+        if (email.isNotEmpty) prefs.setString('userEmail', email);
+      });
+
       Get.snackbar(
         'Success',
         'Profile updated successfully',
@@ -69,6 +76,21 @@ class ProfileController extends GetxController {
       );
     }
     isEditing.value = !isEditing.value;
+  }
+
+  Future<void> _loadProfileFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedName = prefs.getString('userName');
+    final savedEmail = prefs.getString('userEmail');
+
+    if (savedName != null && savedName.isNotEmpty) {
+      userName.value = savedName;
+      if (nameController.text != savedName) nameController.text = savedName;
+    }
+    if (savedEmail != null && savedEmail.isNotEmpty) {
+      userEmail.value = savedEmail;
+      if (emailController.text != savedEmail) emailController.text = savedEmail;
+    }
   }
 
   // Pick image from gallery

@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:service_connect/core/urls/urls.dart';
+import 'package:service_connect/core/auth/auth_service.dart';
 import 'package:service_connect/feature/bottom_navbar/screen/bottom_navbar.dart';
 
 class LoginController extends GetxController{
@@ -58,15 +63,76 @@ class LoginController extends GetxController{
   
   Future<void> handleLogin() async {
     if (isloginEnabled.value) {
-      await saveCredentials();
-      
-      // Set user as service receiver by default on login
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('is_service_provider', false);
-      
-      // All users go to home after login as service receiver
-      // They can switch to service provider mode from profile
-      Get.offAll(() => BottomNavbar());
+      EasyLoading.show(status: 'Logging in...');
+      try {
+        final email = emailController.text.trim();
+        final password = passwordController.text;
+        final body = jsonEncode({'email': email, 'password': password});
+        debugPrint('Login request body: $body');
+
+        final uri = Uri.parse(Url.login);
+        final res = await http.post(
+          uri,
+          headers: {'Content-Type': 'application/json'},
+          body: body,
+        );
+
+        debugPrint('Login response status: ${res.statusCode}');
+        debugPrint('Login response body: ${res.body}');
+
+        if (res.statusCode == 200 || res.statusCode == 201) {
+          final prefs = await SharedPreferences.getInstance();
+          final map = jsonDecode(res.body);
+          String? token;
+          String? userId;
+          if (map is Map && map['data'] != null && map['data'] is Map) {
+            final data = map['data'] as Map;
+            if (data['access'] != null) token = data['access'];
+            if (data['refresh'] != null && token == null) token = data['refresh'];
+            if (data['user'] != null && data['user'] is Map) {
+              final user = data['user'] as Map;
+              if (user['id'] != null) userId = user['id'].toString();
+              if (user['name'] != null) {
+                await prefs.setString('userName', user['name'].toString());
+                debugPrint('Saved userName to SharedPreferences');
+              }
+              if (user['email'] != null) {
+                await prefs.setString('userEmail', user['email'].toString());
+                debugPrint('Saved userEmail to SharedPreferences');
+              }
+            }
+          }
+          if (token != null) {
+            await prefs.setString('accessToken', token);
+            AuthService.setToken(token);
+            debugPrint('Saved access token to SharedPreferences');
+          }
+          if (userId != null) {
+            await prefs.setString('userId', userId);
+            debugPrint('Saved userId to SharedPreferences');
+          }
+
+          // save credentials if rememberMe
+          await saveCredentials();
+
+          // Set user as service receiver by default on login
+          await prefs.setBool('is_service_provider', false);
+
+          // Clear input fields
+          emailController.clear();
+          passwordController.clear();
+
+          EasyLoading.dismiss();
+          Get.offAll(() => BottomNavbar());
+        } else {
+          EasyLoading.dismiss();
+          Get.snackbar('Login failed', res.body);
+        }
+      } catch (e) {
+        EasyLoading.dismiss();
+        debugPrint('Login error: $e');
+        Get.snackbar('Error', e.toString());
+      }
     }
   }
   
