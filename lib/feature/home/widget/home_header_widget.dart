@@ -50,7 +50,7 @@ class HomeHeaderWidget extends StatelessWidget {
                           ),
                           SizedBox(height: 4.h),
                           Text(
-                            controller.userName,
+                            controller.userName.value,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 14.sp,

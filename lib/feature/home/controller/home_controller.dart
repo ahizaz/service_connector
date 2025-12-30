@@ -24,7 +24,17 @@ class HomeController extends GetxController {
   
   // Text data
   final String greetingText = "Hey, Glad You're Here";
-  final String userName = "Johnson Mate";
+  final RxString userName = "Johnson Mate".obs;
+
+  Future<void> _loadUserNameFromPrefs() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final saved = prefs.getString('userName');
+      if (saved != null && saved.isNotEmpty) userName.value = saved;
+    } catch (e) {
+      debugPrint('Failed to load userName from prefs: $e');
+    }
+  }
   
   @override
   void onInit() {
@@ -33,6 +43,7 @@ class HomeController extends GetxController {
     searchFocusNode = FocusNode();
     loadServiceProviderMode();
     loadDashboardData();
+    _loadUserNameFromPrefs();
   }
   
   // Reload mode when screen is revisited
