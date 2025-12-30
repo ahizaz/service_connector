@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:service_connect/core/urls/urls.dart';
 import 'package:service_connect/feature/authentication/sign_up/controller/signup_controller.dart';
+import 'package:service_connect/core/auth/auth_service.dart';
 
 class VerifyController extends GetxController {
   final TextEditingController otpController = TextEditingController();
@@ -76,6 +77,30 @@ class VerifyController extends GetxController {
       isLoading.value = false;
 
       if (res.statusCode == 200 || res.statusCode == 201) {
+        // try to extract token from response
+        try {
+          final map = jsonDecode(res.body);
+          String? token;
+          if (map is Map) {
+            if (map['token'] != null) token = map['token'];
+            if (map['access'] != null) token = map['access'];
+            if (map['access_token'] != null) token = map['access_token'];
+            if (map['data'] != null && map['data'] is Map) {
+              final data = map['data'] as Map;
+              if (data['token'] != null) token = data['token'];
+              if (data['access'] != null) token = data['access'];
+              if (data['access_token'] != null) token = data['access_token'];
+            }
+          }
+          if (token != null) {
+            AuthService.setToken(token);
+            debugPrint('Saved bearer token');
+          } else {
+            debugPrint('No token found in verify response');
+          }
+        } catch (e) {
+          debugPrint('Token parse error: $e');
+        }
         Get.to(() => const FinishPage());
       } else {
         Get.snackbar('Verification failed', res.body);

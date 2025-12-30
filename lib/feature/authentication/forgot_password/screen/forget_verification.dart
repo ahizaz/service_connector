@@ -116,9 +116,7 @@ class ForgetVerification extends StatelessWidget {
             SizedBox(height: 32.h),
             Obx(() => CustomButton(
               text: "Verify",
-              onTap: (){
-                Get.to(()=>ResetPassword());
-              },
+              onTap: controller.verifyOtp,
               enabled: controller.isOtpValid.value,
               color: controller.isOtpValid.value 
                   ? const Color(0xffCC0000) 
