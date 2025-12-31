@@ -84,6 +84,37 @@ class Step1ProfessionalProfile extends StatelessWidget {
               hintText: "Enter your profile description",
             ),
             SizedBox(height: 20.h),
+            // Provider Language (optional)
+            Text(
+              "Provider Language (Optional)",
+              style: AppTextStyles.robotoRegular(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xff313131),
+              ),
+            ),
+            SizedBox(height: 8.h),
+            CustomTextfield(
+              controller: controller.providerLanguageController,
+              hintText: "e.g. English, Spanish (optional)",
+            ),
+            SizedBox(height: 16.h),
+
+            // Provider License Number (optional)
+            Text(
+              "Provider License Number (Optional)",
+              style: AppTextStyles.robotoRegular(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xff313131),
+              ),
+            ),
+            SizedBox(height: 8.h),
+            CustomTextfield(
+              controller: controller.licenseNumberController,
+              hintText: "Enter license number (optional)",
+            ),
+            SizedBox(height: 20.h),
             
             // (Removed duplicate Profile Description field)
             SizedBox(height: 12.h),

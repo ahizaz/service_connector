@@ -7,6 +7,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ProviderRegistrationController extends GetxController {
   // Step 1: Professional Profile Setup
   late TextEditingController bioController;
+  // Optional fields: language and license number
+  late TextEditingController providerLanguageController;
+  late TextEditingController licenseNumberController;
   // portfolio images removed from step1
   
   // Step 2: Services Offered
@@ -113,6 +116,8 @@ class ProviderRegistrationController extends GetxController {
     
     // Initialize TextEditingControllers
     bioController = TextEditingController();
+    providerLanguageController = TextEditingController();
+    licenseNumberController = TextEditingController();
     serviceCategoryController = TextEditingController();
     serviceTitleController = TextEditingController();
     experienceController = TextEditingController();
@@ -122,6 +127,7 @@ class ProviderRegistrationController extends GetxController {
     
     // Add listeners
     bioController.addListener(_validateStep1);
+    // providerLanguageController and licenseNumberController are optional and do not affect validation
     
     serviceTitleController.addListener(_validateStep2);
     experienceController.addListener(_validateStep2);
@@ -133,7 +139,8 @@ class ProviderRegistrationController extends GetxController {
   }
   
   void _validateStep1() {
-    isStep1Valid.value = bioController.text.isNotEmpty;
+    // Profile description is optional now; allow proceeding without it
+    isStep1Valid.value = true;
   }
   
   void _validateStep2() {
@@ -287,6 +294,8 @@ class ProviderRegistrationController extends GetxController {
   @override
   void onClose() {
     bioController.dispose();
+    providerLanguageController.dispose();
+    licenseNumberController.dispose();
     serviceCategoryController.dispose();
     serviceTitleController.dispose();
     experienceController.dispose();
