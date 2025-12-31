@@ -84,6 +84,23 @@ class Step1ProfessionalProfile extends StatelessWidget {
               hintText: "Enter your profile description",
             ),
             SizedBox(height: 20.h),
+
+            // Provider Service Charge (required)
+            Text(
+              "Provider Service Charge",
+              style: AppTextStyles.robotoRegular(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xff313131),
+              ),
+            ),
+            SizedBox(height: 8.h),
+            CustomTextfield(
+              controller: controller.serviceChargeController,
+              hintText: "Enter your service charge",
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
+            ),
+            SizedBox(height: 16.h),
             // Provider Language (optional)
             Text(
               "Provider Language (Optional)",

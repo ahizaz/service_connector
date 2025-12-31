@@ -10,6 +10,8 @@ class ProviderRegistrationController extends GetxController {
   // Optional fields: language and license number
   late TextEditingController providerLanguageController;
   late TextEditingController licenseNumberController;
+  // Required: provider service charge
+  late TextEditingController serviceChargeController;
   // portfolio images removed from step1
   
   // Step 2: Services Offered
@@ -118,6 +120,7 @@ class ProviderRegistrationController extends GetxController {
     bioController = TextEditingController();
     providerLanguageController = TextEditingController();
     licenseNumberController = TextEditingController();
+    serviceChargeController = TextEditingController();
     serviceCategoryController = TextEditingController();
     serviceTitleController = TextEditingController();
     experienceController = TextEditingController();
@@ -127,6 +130,7 @@ class ProviderRegistrationController extends GetxController {
     
     // Add listeners
     bioController.addListener(_validateStep1);
+    serviceChargeController.addListener(_validateStep1);
     // providerLanguageController and licenseNumberController are optional and do not affect validation
     
     serviceTitleController.addListener(_validateStep2);
@@ -139,8 +143,14 @@ class ProviderRegistrationController extends GetxController {
   }
   
   void _validateStep1() {
-    // Profile description is optional now; allow proceeding without it
-    isStep1Valid.value = true;
+    // Profile description is optional now; require a valid service charge to proceed
+    final chargeText = serviceChargeController.text.trim();
+    if (chargeText.isEmpty) {
+      isStep1Valid.value = false;
+      return;
+    }
+    final value = double.tryParse(chargeText.replaceAll(',', '.'));
+    isStep1Valid.value = value != null && value > 0;
   }
   
   void _validateStep2() {
@@ -296,6 +306,7 @@ class ProviderRegistrationController extends GetxController {
     bioController.dispose();
     providerLanguageController.dispose();
     licenseNumberController.dispose();
+    serviceChargeController.dispose();
     serviceCategoryController.dispose();
     serviceTitleController.dispose();
     experienceController.dispose();

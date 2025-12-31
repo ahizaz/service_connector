@@ -7,6 +7,7 @@ class Url{
   static const String resetPassword ="$baseUrl/auth/reset-password/";
   static const String updateProfile ="$baseUrl/auth/profile/";
   static const String login ="$baseUrl/auth/login/";
+  static const String createServiceProvider = "$baseUrl/provider/providers/";
   
 
   
