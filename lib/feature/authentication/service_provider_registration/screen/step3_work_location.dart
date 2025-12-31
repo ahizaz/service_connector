@@ -106,24 +106,15 @@ class Step3WorkLocation extends StatelessWidget {
                   value: controller.selectedCountry.value.isEmpty 
                       ? null
                       : controller.selectedCountry.value,
-                  items: controller.countries.entries.map((entry) {
+                  items: controller.countriesList.map((country) {
                     return DropdownMenuItem<String>(
-                      value: entry.key,
-                      child: Row(
-                        children: [
-                          Text(
-                            entry.value,
-                            style: TextStyle(fontSize: 20.sp),
-                          ),
-                          SizedBox(width: 12.w),
-                          Text(
-                            entry.key,
-                            style: AppTextStyles.robotoRegular(
-                              fontSize: 14,
-                              color: const Color(0xff313131),
-                            ),
-                          ),
-                        ],
+                      value: country,
+                      child: Text(
+                        country,
+                        style: AppTextStyles.robotoRegular(
+                          fontSize: 14,
+                          color: const Color(0xff313131),
+                        ),
                       ),
                     );
                   }).toList(),
@@ -137,7 +128,7 @@ class Step3WorkLocation extends StatelessWidget {
             ),
             SizedBox(height: 20.h),
             
-            // City
+            // City (typed input)
             Text(
               "City",
               style: AppTextStyles.robotoRegular(
@@ -149,46 +140,16 @@ class Step3WorkLocation extends StatelessWidget {
             SizedBox(height: 8.h),
             Container(
               width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
+              padding: EdgeInsets.symmetric(horizontal: 12.w),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12.r),
                 border: Border.all(color: const Color(0xffF5F5F5)),
               ),
-              child: Obx(() => DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  hint: Text(
-                    'Select your city',
-                    style: AppTextStyles.robotoRegular(
-                      fontSize: 14,
-                      color: const Color(0xff878787),
-                    ),
-                  ),
-                  value: controller.selectedCity.value.isEmpty 
-                      ? null
-                      : controller.selectedCity.value,
-                  items: controller.currentCities.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(
-                        value,
-                        style: AppTextStyles.robotoRegular(
-                          fontSize: 14,
-                          color: value == 'Select your city' 
-                              ? const Color(0xff878787) 
-                              : const Color(0xff313131),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      controller.selectCity(newValue);
-                    }
-                  },
-                ),
-              )),
+              child: CustomTextfield(
+                controller: controller.cityController,
+                hintText: 'Type your city',
+              ),
             ),
             SizedBox(height: 20.h),
             

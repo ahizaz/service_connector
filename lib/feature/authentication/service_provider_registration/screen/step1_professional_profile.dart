@@ -67,50 +67,11 @@ class Step1ProfessionalProfile extends StatelessWidget {
             ),
             SizedBox(height: 32.h),
             
-            // Profile Image Upload
-            Center(
-              child: GestureDetector(
-                onTap: controller.pickProfileImage,
-                child: Obx(() => Container(
-                  width: 120.w,
-                  height: 120.w,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: const Color(0xffE0E0E0), width: 2),
-                    image: controller.profileImage.value != null
-                        ? DecorationImage(
-                            image: FileImage(controller.profileImage.value!),
-                            fit: BoxFit.cover,
-                          )
-                        : null,
-                  ),
-                  child: controller.profileImage.value == null
-                      ? Icon(
-                          Icons.add_a_photo,
-                          size: 40.sp,
-                          color: const Color(0xff9E9E9E),
-                        )
-                      : null,
-                )),
-              ),
-            ),
             SizedBox(height: 8.h),
-            Center(
-              child: Text(
-                "Upload Profile Image",
-                style: AppTextStyles.robotoRegular(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: const Color(0xff737373),
-                ),
-              ),
-            ),
-            SizedBox(height: 32.h),
             
-            // Full Name
+            // Profession
             Text(
-              "Full Name",
+              "Profession",
               style: AppTextStyles.robotoRegular(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -119,12 +80,12 @@ class Step1ProfessionalProfile extends StatelessWidget {
             ),
             SizedBox(height: 8.h),
             CustomTextfield(
-              controller: controller.fullNameController,
-              hintText: "Enter your full name",
+              controller: controller.professionController,
+              hintText: "Enter your profession",
             ),
             SizedBox(height: 20.h),
-            
-            // Profile Description
+
+            // Profile Description / Bio
             Text(
               "Profile Description",
               style: AppTextStyles.robotoRegular(
@@ -135,10 +96,12 @@ class Step1ProfessionalProfile extends StatelessWidget {
             ),
             SizedBox(height: 8.h),
             CustomTextfield(
-              controller: controller.professionController,
+              controller: controller.bioController,
               hintText: "Enter your profile description",
             ),
             SizedBox(height: 20.h),
+            
+            // (Removed duplicate Profile Description field)
             Text(
               "Upload Working Image",
               style: AppTextStyles.robotoRegular(

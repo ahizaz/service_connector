@@ -6,11 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ProviderRegistrationController extends GetxController {
   // Step 1: Professional Profile Setup
-  late TextEditingController fullNameController;
   late TextEditingController professionController;
   late TextEditingController bioController;
   final RxList<File> portfolioImages = <File>[].obs;
-  final Rx<File?> profileImage = Rx<File?>(null);
   
   // Step 2: Services Offered
   late TextEditingController serviceCategoryController;
@@ -23,6 +21,7 @@ class ProviderRegistrationController extends GetxController {
   
   // Step 3: Work Location
   late TextEditingController serviceAreaController;
+  late TextEditingController cityController;
   final RxString selectedCountry = ''.obs;
   final RxString selectedCity = ''.obs;
   
@@ -41,39 +40,42 @@ class ProviderRegistrationController extends GetxController {
   final RxInt currentStep = 0.obs;
   
   final List<String> serviceCategories = [
-    'Service Category',
-    'AC Service',
-    'Plumbing',
-    'Electrical',
     'Cleaning',
-    'Carpentry',
-    'Painting',
+    'Concrete',
+    'Electrical',
+    'Handyperson',
     'HVAC',
-    'Gardening',
+    'Landscaping',
+    'Painting',
+    'Plumbing',
+    'Remodeling',
+    'Roofing',
+    'Windows',
   ];
   
-  final Map<String, String> countries = {
-    'United States': '🇺🇸',
-    'United Kingdom': '🇬🇧',
-    'Canada': '🇨🇦',
-    'Australia': '🇦🇺',
-    'Germany': '🇩🇪',
-    'France': '🇫🇷',
-    'India': '🇮🇳',
-    'Japan': '🇯🇵',
-    'China': '🇨🇳',
-    'Brazil': '🇧🇷',
-    'Mexico': '🇲🇽',
-    'Spain': '🇪🇸',
-    'Italy': '🇮🇹',
-    'Netherlands': '🇳🇱',
-    'Singapore': '🇸🇬',
-    'UAE': '🇦🇪',
-    'Saudi Arabia': '🇸🇦',
-    'South Korea': '🇰🇷',
-    'Bangladesh': '🇧🇩',
-    'Pakistan': '🇵🇰',
-  };
+  // Full list of countries (195). Values are country names only; emojis removed for brevity.
+  final List<String> countriesList = [
+    'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina', 'Armenia', 'Australia', 'Austria',
+    'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh', 'Barbados', 'Belarus', 'Belgium', 'Belize', 'Benin', 'Bhutan',
+    'Bolivia', 'Bosnia and Herzegovina', 'Botswana', 'Brazil', 'Brunei', 'Bulgaria', 'Burkina Faso', 'Burundi', 'Cabo Verde', 'Cambodia',
+    'Cameroon', 'Canada', 'Central African Republic', 'Chad', 'Chile', 'China', 'Colombia', 'Comoros', 'Congo (Congo-Brazzaville)', 'Costa Rica',
+    'Côte d’Ivoire', 'Croatia', 'Cuba', 'Cyprus', 'Czechia', 'Democratic Republic of the Congo', 'Denmark', 'Djibouti', 'Dominica', 'Dominican Republic',
+    'Ecuador', 'Egypt', 'El Salvador', 'Equatorial Guinea', 'Eritrea', 'Estonia', 'Eswatini', 'Ethiopia', 'Fiji', 'Finland',
+    'France', 'Gabon', 'Gambia', 'Georgia', 'Germany', 'Ghana', 'Greece', 'Grenada', 'Guatemala', 'Guinea',
+    'Guinea-Bissau', 'Guyana', 'Haiti', 'Honduras', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq',
+    'Ireland', 'Israel', 'Italy', 'Jamaica', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya', 'Kiribati', 'Kuwait',
+    'Kyrgyzstan', 'Laos', 'Latvia', 'Lebanon', 'Lesotho', 'Liberia', 'Libya', 'Liechtenstein', 'Lithuania', 'Luxembourg',
+    'Madagascar', 'Malawi', 'Malaysia', 'Maldives', 'Mali', 'Malta', 'Marshall Islands', 'Mauritania', 'Mauritius', 'Mexico',
+    'Micronesia', 'Moldova', 'Monaco', 'Mongolia', 'Montenegro', 'Morocco', 'Mozambique', 'Myanmar', 'Namibia', 'Nauru',
+    'Nepal', 'Netherlands', 'New Zealand', 'Nicaragua', 'Niger', 'Nigeria', 'North Korea', 'North Macedonia', 'Norway', 'Oman',
+    'Pakistan', 'Palau', 'Panama', 'Papua New Guinea', 'Paraguay', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Qatar',
+    'Romania', 'Russia', 'Rwanda', 'Saint Kitts and Nevis', 'Saint Lucia', 'Saint Vincent and the Grenadines', 'Samoa', 'San Marino', 'Sao Tome and Principe', 'Saudi Arabia',
+    'Senegal', 'Serbia', 'Seychelles', 'Sierra Leone', 'Singapore', 'Slovakia', 'Slovenia', 'Solomon Islands', 'Somalia', 'South Africa',
+    'South Korea', 'South Sudan', 'Spain', 'Sri Lanka', 'Sudan', 'Suriname', 'Sweden', 'Switzerland', 'Syria', 'Taiwan',
+    'Tajikistan', 'Tanzania', 'Thailand', 'Timor-Leste', 'Togo', 'Tonga', 'Trinidad and Tobago', 'Tunisia', 'Turkey', 'Turkmenistan',
+    'Tuvalu', 'Uganda', 'Ukraine', 'United Arab Emirates', 'United Kingdom', 'United States', 'Uruguay', 'Uzbekistan', 'Vanuatu', 'Vatican City',
+    'Venezuela', 'Vietnam', 'Yemen', 'Zambia', 'Zimbabwe'
+  ];
   
   final Map<String, List<String>> citiesByCountry = {
     'United States': ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', 'San Antonio', 'San Diego', 'Dallas', 'Miami'],
@@ -111,7 +113,6 @@ class ProviderRegistrationController extends GetxController {
     super.onInit();
     
     // Initialize TextEditingControllers
-    fullNameController = TextEditingController();
     professionController = TextEditingController();
     bioController = TextEditingController();
     serviceCategoryController = TextEditingController();
@@ -119,21 +120,23 @@ class ProviderRegistrationController extends GetxController {
     experienceController = TextEditingController();
     keywordController = TextEditingController();
     serviceAreaController = TextEditingController();
+    cityController = TextEditingController();
     
     // Add listeners
-    fullNameController.addListener(_validateStep1);
     professionController.addListener(_validateStep1);
     
     serviceTitleController.addListener(_validateStep2);
     experienceController.addListener(_validateStep2);
     
     serviceAreaController.addListener(_validateStep3);
+    cityController.addListener(() {
+      selectCity(cityController.text);
+    });
   }
   
   void _validateStep1() {
-    isStep1Valid.value = fullNameController.text.isNotEmpty &&
-        professionController.text.isNotEmpty &&
-        profileImage.value != null;
+    isStep1Valid.value = professionController.text.isNotEmpty &&
+      bioController.text.isNotEmpty;
   }
   
   void _validateStep2() {
@@ -155,20 +158,7 @@ class ProviderRegistrationController extends GetxController {
   }
   
   // Image picking methods
-  Future<void> pickProfileImage() async {
-    try {
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 80,
-      );
-      if (image != null) {
-        profileImage.value = File(image.path);
-        _validateStep1();
-      }
-    } catch (e) {
-      _showError('Failed to pick image: $e');
-    }
-  }
+  // Profile image has been removed from registration flow.
   
   Future<void> pickPortfolioImages() async {
     try {
@@ -251,12 +241,17 @@ class ProviderRegistrationController extends GetxController {
   void selectCountry(String country) {
     selectedCountry.value = country;
     selectedCity.value = ''; // Reset city when country changes
+    if (cityController.text.isNotEmpty) cityController.clear();
     _validateStep3();
   }
   
   void selectCity(String city) {
-    if (city != 'Select your city') {
-      selectedCity.value = city;
+    // For typed city input, accept any non-empty string
+    if (city.trim().isNotEmpty && city != 'Select your city') {
+      selectedCity.value = city.trim();
+      _validateStep3();
+    } else if (city.trim().isEmpty) {
+      selectedCity.value = '';
       _validateStep3();
     }
   }
@@ -299,7 +294,6 @@ class ProviderRegistrationController extends GetxController {
   
   @override
   void onClose() {
-    fullNameController.dispose();
     professionController.dispose();
     bioController.dispose();
     serviceCategoryController.dispose();
@@ -307,6 +301,25 @@ class ProviderRegistrationController extends GetxController {
     experienceController.dispose();
     keywordController.dispose();
     serviceAreaController.dispose();
+    cityController.dispose();
     super.onClose();
+  }
+
+  // Allow dynamic additions to countries/cities from a form
+  void addCountry(String country) {
+    if (country.isEmpty) return;
+    if (!countriesList.contains(country)) {
+      countriesList.add(country);
+    }
+    citiesByCountry[country] = citiesByCountry[country] ?? <String>[];
+  }
+
+  void addCityToCountry(String country, String city) {
+    if (country.isEmpty || city.isEmpty) return;
+    final list = citiesByCountry[country] ?? <String>[];
+    if (!list.contains(city)) {
+      list.add(city);
+      citiesByCountry[country] = list;
+    }
   }
 }

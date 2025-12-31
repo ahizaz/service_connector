@@ -87,9 +87,16 @@ class Step2ServicesOffered extends StatelessWidget {
               child: Obx(() => DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
                   isExpanded: true,
-                  value: controller.selectedCategory.value.isEmpty 
-                      ? 'Service Category' 
+                  value: controller.selectedCategory.value.isEmpty
+                      ? null
                       : controller.selectedCategory.value,
+                  hint: Text(
+                    'Service Category',
+                    style: AppTextStyles.robotoRegular(
+                      fontSize: 14,
+                      color: const Color(0xff878787),
+                    ),
+                  ),
                   items: controller.serviceCategories.map((String value) {
                     return DropdownMenuItem<String>(
                       value: value,
@@ -97,9 +104,7 @@ class Step2ServicesOffered extends StatelessWidget {
                         value,
                         style: AppTextStyles.robotoRegular(
                           fontSize: 14,
-                          color: value == 'Service Category' 
-                              ? const Color(0xff878787) 
-                              : const Color(0xff313131),
+                          color: const Color(0xff313131),
                         ),
                       ),
                     );
