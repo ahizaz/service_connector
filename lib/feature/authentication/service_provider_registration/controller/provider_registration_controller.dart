@@ -6,9 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ProviderRegistrationController extends GetxController {
   // Step 1: Professional Profile Setup
-  late TextEditingController professionController;
   late TextEditingController bioController;
-  final RxList<File> portfolioImages = <File>[].obs;
+  // portfolio images removed from step1
   
   // Step 2: Services Offered
   late TextEditingController serviceCategoryController;
@@ -113,7 +112,6 @@ class ProviderRegistrationController extends GetxController {
     super.onInit();
     
     // Initialize TextEditingControllers
-    professionController = TextEditingController();
     bioController = TextEditingController();
     serviceCategoryController = TextEditingController();
     serviceTitleController = TextEditingController();
@@ -123,7 +121,7 @@ class ProviderRegistrationController extends GetxController {
     cityController = TextEditingController();
     
     // Add listeners
-    professionController.addListener(_validateStep1);
+    bioController.addListener(_validateStep1);
     
     serviceTitleController.addListener(_validateStep2);
     experienceController.addListener(_validateStep2);
@@ -135,8 +133,7 @@ class ProviderRegistrationController extends GetxController {
   }
   
   void _validateStep1() {
-    isStep1Valid.value = professionController.text.isNotEmpty &&
-      bioController.text.isNotEmpty;
+    isStep1Valid.value = bioController.text.isNotEmpty;
   }
   
   void _validateStep2() {
@@ -161,19 +158,8 @@ class ProviderRegistrationController extends GetxController {
   // Profile image has been removed from registration flow.
   
   Future<void> pickPortfolioImages() async {
-    try {
-      final List<XFile> images = await _picker.pickMultiImage(imageQuality: 80);
-      if (images.isNotEmpty) {
-        for (var image in images) {
-          if (portfolioImages.length < 4) {
-            portfolioImages.add(File(image.path));
-          }
-        }
-        _validateStep1();
-      }
-    } catch (e) {
-      _showError('Failed to pick images: $e');
-    }
+    // portfolio images removed from registration flow
+    return;
   }
   
   Future<void> pickDocument(String docType) async {
@@ -196,8 +182,7 @@ class ProviderRegistrationController extends GetxController {
   }
   
   void removePortfolioImage(int index) {
-    portfolioImages.removeAt(index);
-    _validateStep1();
+    // portfolio images removed from registration flow
   }
   
   void removeDocument(String docType) {
@@ -294,7 +279,6 @@ class ProviderRegistrationController extends GetxController {
   
   @override
   void onClose() {
-    professionController.dispose();
     bioController.dispose();
     serviceCategoryController.dispose();
     serviceTitleController.dispose();

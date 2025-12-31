@@ -1,4 +1,4 @@
-import 'dart:io';
+// 'dart:io' removed: no direct File usage in this screen
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -68,22 +68,6 @@ class Step1ProfessionalProfile extends StatelessWidget {
             SizedBox(height: 32.h),
             
             SizedBox(height: 8.h),
-            
-            // Profession
-            Text(
-              "Profession",
-              style: AppTextStyles.robotoRegular(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xff313131),
-              ),
-            ),
-            SizedBox(height: 8.h),
-            CustomTextfield(
-              controller: controller.professionController,
-              hintText: "Enter your profession",
-            ),
-            SizedBox(height: 20.h),
 
             // Profile Description / Bio
             Text(
@@ -102,143 +86,7 @@ class Step1ProfessionalProfile extends StatelessWidget {
             SizedBox(height: 20.h),
             
             // (Removed duplicate Profile Description field)
-            Text(
-              "Upload Working Image",
-              style: AppTextStyles.robotoRegular(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xff313131),
-              ),
-            ),
-            SizedBox(height: 8.h),
-            GestureDetector(
-              onTap: controller.pickPortfolioImages,
-              child: Container(
-               width: double.infinity,
-               height: 112.h,
-                decoration: BoxDecoration(
-                  color: const Color(0xffF9F9F9),
-                  borderRadius: BorderRadius.circular(8.r),
-                  border: Border.all(
-                    color: const Color(0xffE0E0E0),
-                    style: BorderStyle.solid,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.image_outlined,
-                      size: 48.sp,
-                      color: const Color(0xffBDBDBD),
-                    ),
-                    SizedBox(height: 12.h),
-                    RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: 'Click to upload',
-                            style: AppTextStyles.robotoRegular(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xff2196F3),
-                            ),
-                          ),
-                          TextSpan(
-                            text: ' or drag and drop',
-                            style: AppTextStyles.robotoRegular(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xff737373),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 4.h),
-                    Text(
-                      "JPG, JPEG, PNG files less than 1MB",
-                      style: AppTextStyles.robotoRegular(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: const Color(0xff9E9E9E),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-           
             SizedBox(height: 12.h),
-            Obx(() => controller.portfolioImages.isNotEmpty
-                ? Row(
-                    children: [
-                      ...controller.portfolioImages.asMap().entries.map((entry) {
-                        int index = entry.key;
-                        File image = entry.value;
-                        return Padding(
-                          padding: EdgeInsets.only(right: 12.w),
-                          child: Stack(
-                            children: [
-                              Container(
-                                width: 80.w,
-                                height: 80.w,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8.r),
-                                  image: DecorationImage(
-                                    image: FileImage(image),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: -8,
-                                right: -8,
-                                child: IconButton(
-                                  icon: Container(
-                                    padding: EdgeInsets.all(4.w),
-                                    decoration: const BoxDecoration(
-                                      color: Colors.red,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      Icons.close,
-                                      size: 16.sp,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  onPressed: () => controller.removePortfolioImage(index),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                      if (controller.portfolioImages.length < 4)
-                        GestureDetector(
-                          onTap: controller.pickPortfolioImages,
-                          child: Container(
-                            width: 80.w,
-                            height: 80.w,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8.r),
-                              border: Border.all(
-                                color: const Color(0xffE0E0E0),
-                                style: BorderStyle.solid,
-                                width: 2,
-                              ),
-                            ),
-                            child: Icon(
-                              Icons.add,
-                              size: 32.sp,
-                              color: const Color(0xff9E9E9E),
-                            ),
-                          ),
-                        ),
-                    ],
-                  )
-                : const SizedBox.shrink()),
             SizedBox(height: 40.h),
             
             // Next Button
