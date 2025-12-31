@@ -177,8 +177,9 @@ class ProviderRegistrationController extends GetxController {
   }
   
   void _validateStep4() {
-    isStep4Valid.value = tradeLicenseDoc.value != null &&
-        insuranceDoc.value != null;
+    // Only passport (tradeLicenseDoc) is required to enable Submit.
+    // Insurance/uploaded additional docs are optional in this flow.
+    isStep4Valid.value = tradeLicenseDoc.value != null;
   }
   
   // Image picking methods

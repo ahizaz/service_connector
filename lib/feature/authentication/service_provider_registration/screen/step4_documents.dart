@@ -287,21 +287,50 @@ class Step4Documents extends StatelessWidget {
             */
             SizedBox(height: 40.h),
             
-            // Submit Button
-            Obx(() => CustomButton(
-              text: "Submit",
-              enabled: controller.isStep4Valid.value,
-              color: controller.isStep4Valid.value
-                  ? const Color(0xffD32E28)
-                  : const Color(0xffE0E0E0),
-              onTap: () async {
-                if (controller.isStep4Valid.value) {
-                  await controller.completeRegistration();
-                  // Navigate to home screen
-                  Get.offAll(() => BottomNavbar());
-                }
-              },
-            )),
+            // Action Buttons: Submit (enabled when passport uploaded) and Skip
+            Obx(() => Row(
+                  children: [
+                    Expanded(
+                      child: CustomButton(
+                        text: "Submit",
+                        enabled: controller.isStep4Valid.value,
+                        color: controller.isStep4Valid.value
+                            ? const Color(0xffD32E28)
+                            : const Color(0xffE0E0E0),
+                        onTap: () async {
+                          if (controller.isStep4Valid.value) {
+                            await controller.completeRegistration();
+                            Get.offAll(() => BottomNavbar());
+                          }
+                        },
+                      ),
+                    ),
+                    SizedBox(width: 12.w),
+                    SizedBox(
+                      height: 48.h,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Color(0xffD32E28)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                        ),
+                        onPressed: () {
+                          // Allow user to skip document upload
+                          Get.offAll(() => BottomNavbar());
+                        },
+                        child: Text(
+                          'Skip',
+                          style: AppTextStyles.robotoRegular(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xffD32E28),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )),
             SizedBox(height: 20.h),
                 ],
               ),
