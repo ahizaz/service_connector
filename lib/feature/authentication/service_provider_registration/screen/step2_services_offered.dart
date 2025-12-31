@@ -57,7 +57,7 @@ class Step2ServicesOffered extends StatelessWidget {
             ),
             SizedBox(height: 8.h),
             Text(
-              "Tell us about services you can provide. You can select multiple.",
+              "Tell us about services you can provide. Select one service category.",
               style: AppTextStyles.robotoRegular(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,

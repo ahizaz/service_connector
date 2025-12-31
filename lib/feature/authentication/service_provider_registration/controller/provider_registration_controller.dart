@@ -196,9 +196,15 @@ class ProviderRegistrationController extends GetxController {
   
   void selectCategory(String category) {
     if (category != 'Service Category') {
-      selectedCategory.value = category;
-      if (!selectedCategories.contains(category)) {
+      // Enforce single selection: if the category is already selected, deselect it;
+      // otherwise clear previous selections and keep only the new one.
+      if (selectedCategories.contains(category)) {
+        selectedCategories.remove(category);
+        selectedCategory.value = '';
+      } else {
+        selectedCategories.clear();
         selectedCategories.add(category);
+        selectedCategory.value = category;
       }
       _validateStep2();
     }
@@ -206,6 +212,7 @@ class ProviderRegistrationController extends GetxController {
   
   void removeCategory(String category) {
     selectedCategories.remove(category);
+    if (selectedCategory.value == category) selectedCategory.value = '';
     _validateStep2();
   }
 
