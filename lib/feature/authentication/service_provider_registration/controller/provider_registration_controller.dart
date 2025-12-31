@@ -1,8 +1,13 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:service_connect/core/auth/auth_service.dart';
+import 'package:service_connect/core/urls/urls.dart';
 
 class ProviderRegistrationController extends GetxController {
   // Step 1: Professional Profile Setup
@@ -56,6 +61,10 @@ class ProviderRegistrationController extends GetxController {
     'Roofing',
     'Windows',
   ];
+
+  // Use central `Url` definitions for API endpoints
+  final String createServiceProvider = Url.createServiceProvider;
+
   
   // Full list of countries (195). Values are country names only; emojis removed for brevity.
   final List<String> countriesList = [
@@ -288,17 +297,120 @@ class ProviderRegistrationController extends GetxController {
   }
   
   Future<void> completeRegistration() async {
-    // Save registration completion status
+    // Attempt to read user id and token from SharedPreferences (fallback)
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('provider_registration_completed', true);
-    
-    Get.snackbar(
-      'Success',
-      'Registration completed successfully!',
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green,
-      colorText: Colors.white,
-    );
+    // Try multiple possible keys for user id and token
+    String? userId = prefs.getString('userId') ?? prefs.getString('user_id') ?? prefs.getString('id');
+    String? token = AuthService.getToken() ?? prefs.getString('accessToken') ?? prefs.getString('auth_token') ?? prefs.getString('token') ?? prefs.getString('access_token');
+
+    debugPrint('completeRegistration: resolved userId=${userId ?? 'null'} tokenPresent=${token != null}');
+
+    if (userId == null || userId.isEmpty) {
+      _showError('User ID not found. Please login again.');
+      debugPrint('completeRegistration aborted: missing user id (checked keys: userId,user_id,id)');
+      return;
+    }
+    if (token == null || token.isEmpty) {
+      _showError('Authorization token not found. Please login again.');
+      debugPrint('completeRegistration aborted: missing token (checked AuthService and prefs keys)');
+      return;
+    }
+
+    // Build request body
+    final int categoryId = _mapCategoryToId();
+
+    final body = _buildRequestBody(userId, categoryId);
+
+    try {
+      EasyLoading.show(status: 'Creating provider...');
+
+      debugPrint('POST $createServiceProvider');
+      final headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      };
+      debugPrint('Request headers: $headers');
+      debugPrint('Request body: ${jsonEncode(body)}');
+
+      final response = await http.post(
+        Uri.parse(createServiceProvider),
+        headers: headers,
+        body: jsonEncode(body),
+      );
+
+      debugPrint('Response status: ${response.statusCode}');
+      debugPrint('Response body: ${response.body}');
+
+      EasyLoading.dismiss();
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        await prefs.setBool('provider_registration_completed', true);
+        Get.snackbar(
+          'Success',
+          'Registration completed successfully!',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } else {
+        String message = 'Failed to create provider. (${response.statusCode})';
+        try {
+          final Map<String, dynamic> resp = jsonDecode(response.body);
+          if (resp.containsKey('detail')) message = resp['detail'].toString();
+          if (resp.containsKey('message')) message = resp['message'].toString();
+        } catch (_) {}
+        _showError(message);
+      }
+    } catch (e) {
+      EasyLoading.dismiss();
+      _showError('Network error: $e');
+      debugPrint('Network error: $e');
+    }
+  }
+
+  int _mapCategoryToId() {
+    String cat = selectedCategory.value;
+    if (cat.isEmpty && selectedCategories.isNotEmpty) {
+      cat = selectedCategories.first;
+    }
+    final idx = serviceCategories.indexOf(cat);
+    if (idx >= 0) return idx + 1; // 1-based ids as requested
+    return 0;
+  }
+
+  Map<String, dynamic> _buildRequestBody(String userId, int categoryId) {
+    final title = serviceTitleController.text.trim();
+    final description = bioController.text.trim();
+    final experience = int.tryParse(experienceController.text.trim()) ?? 0;
+    final charge = double.tryParse(serviceChargeController.text.trim().replaceAll(',', '.')) ?? 0;
+    final lang = providerLanguageController.text.trim();
+    final licenceRaw = licenseNumberController.text.trim();
+    dynamic licence;
+    if (licenceRaw.isNotEmpty) {
+      final tryInt = int.tryParse(licenceRaw);
+      licence = tryInt ?? licenceRaw;
+    }
+
+    final country = selectedCountry.value.isNotEmpty ? selectedCountry.value : serviceAreaController.text.trim();
+    final city = selectedCity.value.isNotEmpty ? selectedCity.value : cityController.text.trim();
+
+    final Map<String, dynamic> body = {
+      'user': userId,
+      'service_title': title,
+      'service_category': categoryId,
+      'provider_description': description,
+      'provider_experience': experience,
+      'provider_service_charge': charge,
+      'provider_service_area': serviceAreaController.text.trim(),
+      'provider_city': city,
+      'provider_country': country,
+      'keywords': keywords.toList(),
+    };
+
+    if (lang.isNotEmpty) body['provider_language'] = lang;
+    if (licence != null) body['provider_licence_number'] = licence;
+
+    return body;
   }
   
   @override

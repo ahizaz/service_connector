@@ -169,7 +169,7 @@ class Step3WorkLocation extends StatelessWidget {
             ),
             SizedBox(height: 150.h),
             
-            // Next Button
+            // Create Button — calls API when valid
             Obx(() => CustomButton(
               text: "Create User",
               enabled: controller.isStep3Valid.value,
@@ -178,8 +178,13 @@ class Step3WorkLocation extends StatelessWidget {
                   : const Color(0xffE0E0E0),
               onTap: () {
                 if (controller.isStep3Valid.value) {
-                  controller.nextStep();
-                  Get.toNamed('/provider-registration-step4');
+                  debugPrint('Create User pressed — Step 3 values:');
+                  debugPrint('Country: ${controller.selectedCountry.value}');
+                  debugPrint('City (typed): ${controller.cityController.text}');
+                  debugPrint('Selected City: ${controller.selectedCity.value}');
+                  debugPrint('Service Area: ${controller.serviceAreaController.text}');
+                  debugPrint('isStep3Valid: ${controller.isStep3Valid.value}');
+                  controller.completeRegistration();
                 }
               },
             )),
