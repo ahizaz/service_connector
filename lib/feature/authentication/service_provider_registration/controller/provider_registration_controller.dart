@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:service_connect/core/auth/auth_service.dart';
 import 'package:service_connect/core/urls/urls.dart';
+import 'package:service_connect/feature/authentication/service_provider_registration/screen/step4_documents.dart';
 
 class ProviderRegistrationController extends GetxController {
   // Step 1: Professional Profile Setup
@@ -344,7 +345,12 @@ class ProviderRegistrationController extends GetxController {
       EasyLoading.dismiss();
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        await prefs.setBool('provider_registration_completed', true);
+          await prefs.setBool('provider_registration_completed', true);
+          _resetFormFields();
+          // Navigate to Step 4 (Documents) so user can upload documents after creation
+          try {
+            Get.to(() => const Step4Documents());
+          } catch (_) {}
         Get.snackbar(
           'Success',
           'Registration completed successfully!',
@@ -411,6 +417,37 @@ class ProviderRegistrationController extends GetxController {
     if (licence != null) body['provider_licence_number'] = licence;
 
     return body;
+  }
+  
+  void _resetFormFields() {
+    bioController.clear();
+    providerLanguageController.clear();
+    licenseNumberController.clear();
+    serviceChargeController.clear();
+    serviceCategoryController.clear();
+    serviceTitleController.clear();
+    experienceController.clear();
+    keywordController.clear();
+    serviceAreaController.clear();
+    cityController.clear();
+
+    selectedCategories.clear();
+    selectedCategory.value = '';
+    keywords.clear();
+
+    selectedCountry.value = '';
+    selectedCity.value = '';
+
+    tradeLicenseDoc.value = null;
+    insuranceDoc.value = null;
+
+    isStep1Valid.value = false;
+    isStep2Valid.value = false;
+    isStep3Valid.value = false;
+    isStep4Valid.value = false;
+
+    // Move user to step 4 (index 3)
+    currentStep.value = 3;
   }
   
   @override
