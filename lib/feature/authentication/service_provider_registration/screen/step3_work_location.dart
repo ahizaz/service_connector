@@ -184,7 +184,7 @@ class Step3WorkLocation extends StatelessWidget {
                   debugPrint('Selected City: ${controller.selectedCity.value}');
                   debugPrint('Service Area: ${controller.serviceAreaController.text}');
                   debugPrint('isStep3Valid: ${controller.isStep3Valid.value}');
-                  controller.completeRegistration();
+                  controller.completeRegistration(navigateToDocuments: true);
                 }
               },
             )),

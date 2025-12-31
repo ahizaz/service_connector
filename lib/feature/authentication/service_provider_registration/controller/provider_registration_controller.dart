@@ -38,6 +38,8 @@ class ProviderRegistrationController extends GetxController {
   // Step 4: Documents
   final Rx<File?> tradeLicenseDoc = Rx<File?>(null);
   final Rx<File?> insuranceDoc = Rx<File?>(null);
+  // Step 5: Work Images (portfolio)
+  final RxList<File> portfolioImages = <File>[].obs;
   
   final ImagePicker _picker = ImagePicker();
   
@@ -46,6 +48,7 @@ class ProviderRegistrationController extends GetxController {
   final RxBool isStep2Valid = false.obs;
   final RxBool isStep3Valid = false.obs;
   final RxBool isStep4Valid = false.obs;
+  final RxBool isStep5Valid = false.obs;
   
   final RxInt currentStep = 0.obs;
   
@@ -186,8 +189,17 @@ class ProviderRegistrationController extends GetxController {
   // Profile image has been removed from registration flow.
   
   Future<void> pickPortfolioImages() async {
-    // portfolio images removed from registration flow
-    return;
+    try {
+      final List<XFile>? images = await _picker.pickMultiImage(imageQuality: 80);
+      if (images != null && images.isNotEmpty) {
+        for (final img in images) {
+          portfolioImages.add(File(img.path));
+        }
+        _validateStep5();
+      }
+    } catch (e) {
+      _showError('Failed to pick images: $e');
+    }
   }
   
   Future<void> pickDocument(String docType) async {
@@ -210,7 +222,14 @@ class ProviderRegistrationController extends GetxController {
   }
   
   void removePortfolioImage(int index) {
-    // portfolio images removed from registration flow
+    if (index >= 0 && index < portfolioImages.length) {
+      portfolioImages.removeAt(index);
+      _validateStep5();
+    }
+  }
+
+  void _validateStep5() {
+    isStep5Valid.value = portfolioImages.isNotEmpty;
   }
   
   void removeDocument(String docType) {
@@ -298,7 +317,7 @@ class ProviderRegistrationController extends GetxController {
     );
   }
   
-  Future<void> completeRegistration() async {
+  Future<void> completeRegistration({bool navigateToDocuments = false}) async {
     // Attempt to read user id and token from SharedPreferences (fallback)
     final prefs = await SharedPreferences.getInstance();
     // Try multiple possible keys for user id and token
@@ -346,12 +365,17 @@ class ProviderRegistrationController extends GetxController {
       EasyLoading.dismiss();
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-          await prefs.setBool('provider_registration_completed', true);
+        await prefs.setBool('provider_registration_completed', true);
+        // If caller wants to navigate to documents (Step 4) immediately,
+        // reset fields and push the Step4 screen.
+        if (navigateToDocuments) {
           _resetFormFields();
-          // Navigate to Step 4 (Documents) so user can upload documents after creation
           try {
             Get.to(() => const Step4Documents());
           } catch (_) {}
+        } else {
+          _resetFormFields();
+        }
         Get.snackbar(
           'Success',
           'Registration completed successfully!',
@@ -447,8 +471,10 @@ class ProviderRegistrationController extends GetxController {
     isStep3Valid.value = false;
     isStep4Valid.value = false;
 
-    // Move user to step 4 (index 3)
-    currentStep.value = 3;
+    // Reset to first step after clearing; navigation handled by UI.
+    currentStep.value = 0;
+    portfolioImages.clear();
+    isStep5Valid.value = false;
   }
   
   @override

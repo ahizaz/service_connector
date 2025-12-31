@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:service_connect/core/common/styles/global_text_style.dart';
 import 'package:service_connect/core/common/widgets/custom_button.dart';
 import 'package:service_connect/feature/authentication/service_provider_registration/controller/provider_registration_controller.dart';
-import 'package:service_connect/feature/bottom_navbar/screen/bottom_navbar.dart';
+import 'package:service_connect/feature/authentication/service_provider_registration/screen/step5_work_images.dart';
 import 'package:service_connect/feature/authentication/service_provider_registration/widgets/step_progress_indicator.dart';
 
 class Step4Documents extends StatelessWidget {
@@ -298,9 +298,14 @@ class Step4Documents extends StatelessWidget {
                             ? const Color(0xffD32E28)
                             : const Color(0xffE0E0E0),
                         onTap: () async {
+                          // Move to Step 5 (Work Images) to finish registration
                           if (controller.isStep4Valid.value) {
-                            await controller.completeRegistration();
-                            Get.offAll(() => BottomNavbar());
+                            try {
+                              Get.to(() => const Step5WorkImages());
+                            } catch (_) {
+                              // fallback: set step index if using stepper UI
+                              controller.currentStep.value = 4;
+                            }
                           }
                         },
                       ),
@@ -316,8 +321,12 @@ class Step4Documents extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          // Allow user to skip document upload
-                          Get.offAll(() => BottomNavbar());
+                          // Skip documents and continue to Step 5
+                          try {
+                            Get.to(() => const Step5WorkImages());
+                          } catch (_) {
+                            controller.currentStep.value = 4;
+                          }
                         },
                         child: Text(
                           'Skip',
