@@ -13,7 +13,7 @@ class Step4Documents extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ProviderRegistrationController>();
-    final documentTypes = ['Trade License', 'Insurance Card', 'Certificate'];
+    final documentTypes = ['Passport'];
     final selectedDocType = documentTypes[0].obs;
 
     return Scaffold(
@@ -104,7 +104,7 @@ class Step4Documents extends StatelessWidget {
             ),
             SizedBox(height: 16.h),
             
-            // Trade License Upload Button
+            // Passport Upload Button
             Obx(() => GestureDetector(
               onTap: () => controller.pickDocument('trade'),
               child: Container(
@@ -138,7 +138,7 @@ class Step4Documents extends StatelessWidget {
                           ),
                           SizedBox(height: 4.h),
                           Text(
-                            "Please upload Business or trade license or ID Card, also it can be less than 25 MB and in PDF format. After uploading all documents",
+                            "Please upload your passport (photo or PDF). File must be less than 25 MB.",
                             textAlign: TextAlign.center,
                             style: AppTextStyles.robotoRegular(
                               fontSize: 12,
@@ -159,7 +159,7 @@ class Step4Documents extends StatelessWidget {
                               ),
                               SizedBox(height: 8.h),
                               Text(
-                                "Trade License.pdf",
+                                "Passport.pdf",
                                 style: AppTextStyles.robotoRegular(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
@@ -194,9 +194,10 @@ class Step4Documents extends StatelessWidget {
             SizedBox(height: 24.h),
             
             // (Removed duplicate Document Type dropdown)
+            /*
             SizedBox(height: 16.h),
-            
-            // Insurance Upload Button
+
+            // Insurance Upload Button (commented out per request)
             Obx(() => GestureDetector(
               onTap: () => controller.pickDocument('insurance'),
               child: Container(
@@ -283,6 +284,7 @@ class Step4Documents extends StatelessWidget {
                       ),
               ),
             )),
+            */
             SizedBox(height: 40.h),
             
             // Submit Button
