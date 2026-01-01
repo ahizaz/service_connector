@@ -50,151 +50,159 @@ class Step4Documents extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-              "Add Your\nDocuments",
-              style: AppTextStyles.robotoRegular(
-                fontSize: 28,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xff313131),
-              ),
-            ),
-            SizedBox(height: 8.h),
-            Text(
-              "Upload your business documents for verification",
-              style: AppTextStyles.robotoRegular(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: const Color(0xff737373),
-              ),
-            ),
-            SizedBox(height: 32.h),
-            
-            // Document Type (single dropdown for all uploads)
-            Text(
-              "Document Type",
-              style: AppTextStyles.robotoRegular(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xff313131),
-              ),
-            ),
-            SizedBox(height: 8.h),
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 16.w),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(color: const Color(0xffF5F5F5)),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: Obx(() => DropdownButton<String>(
-                      isExpanded: true,
-                      value: selectedDocType.value,
-                      items: documentTypes
-                          .map((d) => DropdownMenuItem(
-                                value: d,
-                                child: Text(d),
-                              ))
-                          .toList(),
-                      onChanged: (value) {
-                        if (value != null) selectedDocType.value = value;
-                      },
-                    )),
-              ),
-            ),
-            SizedBox(height: 16.h),
-            
-            // Passport Upload Button
-            Obx(() => GestureDetector(
-              onTap: () => controller.pickDocument('trade'),
-              child: Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(vertical: 40.h, horizontal: 20.w),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(
-                    color: const Color(0xffE0E0E0),
-                    style: BorderStyle.solid,
-                    width: 2,
+                    "Add Your\nDocuments",
+                    style: AppTextStyles.robotoRegular(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xff313131),
+                    ),
                   ),
-                ),
-                child: controller.tradeLicenseDoc.value == null
-                    ? Column(
-                        children: [
-                          Icon(
-                            Icons.upload_file_outlined,
-                            size: 48.sp,
-                            color: const Color(0xffD32E28),
-                          ),
-                          SizedBox(height: 12.h),
-                          Text(
-                            "Browse Document",
-                            style: AppTextStyles.robotoRegular(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: const Color(0xffD32E28),
-                            ),
-                          ),
-                          SizedBox(height: 4.h),
-                          Text(
-                            "Please upload your passport (photo or PDF). File must be less than 25 MB.",
-                            textAlign: TextAlign.center,
-                            style: AppTextStyles.robotoRegular(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xff737373),
-                            ),
-                          ),
-                        ],
-                      )
-                    : Stack(
-                        children: [
-                          Column(
-                            children: [
-                              Icon(
-                                Icons.description,
-                                size: 48.sp,
-                                color: const Color(0xffD32E28),
-                              ),
-                              SizedBox(height: 8.h),
-                              Text(
-                                "Passport.pdf",
-                                style: AppTextStyles.robotoRegular(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: const Color(0xff313131),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Positioned(
-                            top: -10,
-                            right: -10,
-                            child: IconButton(
-                              icon: Container(
-                                padding: EdgeInsets.all(4.w),
-                                decoration: const BoxDecoration(
-                                  color: Colors.red,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.close,
-                                  size: 16.sp,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              onPressed: () => controller.removeDocument('trade'),
-                            ),
-                          ),
-                        ],
+                  SizedBox(height: 8.h),
+                  Text(
+                    "Upload your business documents for verification",
+                    style: AppTextStyles.robotoRegular(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xff737373),
+                    ),
+                  ),
+                  SizedBox(height: 32.h),
+
+                  // Document Type (single dropdown for all uploads)
+                  Text(
+                    "Document Type",
+                    style: AppTextStyles.robotoRegular(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xff313131),
+                    ),
+                  ),
+                  SizedBox(height: 8.h),
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(color: const Color(0xffF5F5F5)),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: Obx(
+                        () => DropdownButton<String>(
+                          isExpanded: true,
+                          value: selectedDocType.value,
+                          items: documentTypes
+                              .map(
+                                (d) =>
+                                    DropdownMenuItem(value: d, child: Text(d)),
+                              )
+                              .toList(),
+                          onChanged: (value) {
+                            if (value != null) selectedDocType.value = value;
+                          },
+                        ),
                       ),
-              ),
-            )),
-            SizedBox(height: 24.h),
-            
-            // (Removed duplicate Document Type dropdown)
-            /*
+                    ),
+                  ),
+                  SizedBox(height: 16.h),
+
+                  // Passport Upload Button
+                  Obx(
+                    () => GestureDetector(
+                      onTap: () => controller.pickDocument('trade'),
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(
+                          vertical: 40.h,
+                          horizontal: 20.w,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12.r),
+                          border: Border.all(
+                            color: const Color(0xffE0E0E0),
+                            style: BorderStyle.solid,
+                            width: 2,
+                          ),
+                        ),
+                        child: controller.tradeLicenseDoc.value == null
+                            ? Column(
+                                children: [
+                                  Icon(
+                                    Icons.upload_file_outlined,
+                                    size: 48.sp,
+                                    color: const Color(0xffD32E28),
+                                  ),
+                                  SizedBox(height: 12.h),
+                                  Text(
+                                    "Browse Document",
+                                    style: AppTextStyles.robotoRegular(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: const Color(0xffD32E28),
+                                    ),
+                                  ),
+                                  SizedBox(height: 4.h),
+                                  Text(
+                                    "Please upload your passport (photo or PDF). File must be less than 25 MB.",
+                                    textAlign: TextAlign.center,
+                                    style: AppTextStyles.robotoRegular(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                      color: const Color(0xff737373),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Stack(
+                                children: [
+                                  Column(
+                                    children: [
+                                      Icon(
+                                        Icons.description,
+                                        size: 48.sp,
+                                        color: const Color(0xffD32E28),
+                                      ),
+                                      SizedBox(height: 8.h),
+                                      Text(
+                                        "Passport.pdf",
+                                        style: AppTextStyles.robotoRegular(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: const Color(0xff313131),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Positioned(
+                                    top: -10,
+                                    right: -10,
+                                    child: IconButton(
+                                      icon: Container(
+                                        padding: EdgeInsets.all(4.w),
+                                        decoration: const BoxDecoration(
+                                          color: Colors.red,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.close,
+                                          size: 16.sp,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      onPressed: () =>
+                                          controller.removeDocument('trade'),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 24.h),
+
+                  // (Removed duplicate Document Type dropdown)
+                  /*
             SizedBox(height: 16.h),
 
             // Insurance Upload Button (commented out per request)
@@ -285,62 +293,66 @@ class Step4Documents extends StatelessWidget {
               ),
             )),
             */
-            SizedBox(height: 40.h),
-            
-            // Action Buttons: Submit (enabled when passport uploaded) and Skip
-            Obx(() => Row(
-                  children: [
-                    Expanded(
-                      child: CustomButton(
-                        text: "Submit",
-                        enabled: controller.isStep4Valid.value,
-                        color: controller.isStep4Valid.value
-                            ? const Color(0xffD32E28)
-                            : const Color(0xffE0E0E0),
-                        onTap: () async {
-                          // Move to Step 5 (Work Images) to finish registration
-                          if (controller.isStep4Valid.value) {
-                            try {
-                              Get.to(() => const Step5WorkImages());
-                            } catch (_) {
-                              // fallback: set step index if using stepper UI
-                              controller.currentStep.value = 4;
-                            }
-                          }
-                        },
-                      ),
-                    ),
-                    SizedBox(width: 12.w),
-                    SizedBox(
-                      height: 48.h,
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Color(0xffD32E28)),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
+                  SizedBox(height: 40.h),
+
+                  // Action Buttons: Submit (enabled when passport uploaded) and Skip
+                  Obx(
+                    () => Row(
+                      children: [
+                        Expanded(
+                          child: CustomButton(
+                            text: "Submit",
+                            enabled: controller.isStep4Valid.value,
+                            color: controller.isStep4Valid.value
+                                ? const Color(0xffD32E28)
+                                : const Color(0xffE0E0E0),
+                            onTap: () async {
+                              // Submit documents using the provider ID
+                              if (controller.isStep4Valid.value) {
+                                await controller.submitDocuments();
+                                // Move to Step 5 (Work Images) after successful submission
+                                try {
+                                  Get.to(() => const Step5WorkImages());
+                                } catch (_) {
+                                  // fallback: set step index if using stepper UI
+                                  controller.currentStep.value = 4;
+                                }
+                              }
+                            },
                           ),
                         ),
-                        onPressed: () {
-                          // Skip documents and continue to Step 5
-                          try {
-                            Get.to(() => const Step5WorkImages());
-                          } catch (_) {
-                            controller.currentStep.value = 4;
-                          }
-                        },
-                        child: Text(
-                          'Skip',
-                          style: AppTextStyles.robotoRegular(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xffD32E28),
+                        SizedBox(width: 12.w),
+                        SizedBox(
+                          height: 48.h,
+                          child: OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Color(0xffD32E28)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                            ),
+                            onPressed: () {
+                              // Skip documents and continue to Step 5
+                              try {
+                                Get.to(() => const Step5WorkImages());
+                              } catch (_) {
+                                controller.currentStep.value = 4;
+                              }
+                            },
+                            child: Text(
+                              'Skip',
+                              style: AppTextStyles.robotoRegular(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xffD32E28),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                )),
-            SizedBox(height: 20.h),
+                  ),
+                  SizedBox(height: 20.h),
                 ],
               ),
             ),

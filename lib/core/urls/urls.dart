@@ -8,6 +8,7 @@ class Url{
   static const String updateProfile ="$baseUrl/auth/profile/";
   static const String login ="$baseUrl/auth/login/";
   static const String createServiceProvider = "$baseUrl/provider/providers/";
+  static const String submitDocument = "$baseUrl/provider/providers/7/submit-document/";
   
 
   
