@@ -976,9 +976,8 @@ class ProviderRegistrationController extends GetxController {
       return;
     }
 
-    // Build the dynamic submit document URL
-    final submitUrl =
-        "${Url.baseUrl}/provider/providers/${providerId.value}/submit-document/";
+    // Build the dynamic submit document URL using Url class
+    final submitUrl = Url.submitDocument(providerId.value);
     debugPrint('Submit document URL: $submitUrl');
 
     try {
