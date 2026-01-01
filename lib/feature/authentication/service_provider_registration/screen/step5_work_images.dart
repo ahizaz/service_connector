@@ -198,7 +198,7 @@ class Step5WorkImages extends StatelessWidget {
                                 : const Color(0xffE0E0E0),
                             onTap: () async {
                               if (controller.isStep5Valid.value) {
-                                await controller.completeRegistration();
+                                await controller.uploadWorkImage();
                                 Get.offAll(() => BottomNavbar());
                               }
                             },

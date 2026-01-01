@@ -1051,4 +1051,109 @@ class ProviderRegistrationController extends GetxController {
       debugPrint('Submit documents error: $e');
     }
   }
+ Future<void> uploadWorkImage() async {
+    debugPrint('=== Starting uploadWorkImage ===');
+    
+    // Check if we have images to upload
+    if (portfolioImages.isEmpty) {
+      debugPrint('No portfolio images to upload');
+      _showError('Please select at least one work image');
+      return;
+    }
+    
+    // Check if we have a provider ID
+    if (providerId.value == 0) {
+      debugPrint('Provider ID is 0, checking SharedPreferences...');
+      final prefs = await SharedPreferences.getInstance();
+      final savedId = prefs.getInt('provider_id');
+      if (savedId != null) {
+        providerId.value = savedId;
+        debugPrint('Retrieved provider ID from SharedPreferences: $savedId');
+      } else {
+        debugPrint('Provider ID not found in SharedPreferences');
+        _showError('Provider ID not found. Please complete registration first.');
+        return;
+      }
+    }
+    
+    // Get authorization token
+    debugPrint('Getting authorization token...');
+    final prefs = await SharedPreferences.getInstance();
+    String? token = AuthService.getToken() ?? 
+                   prefs.getString('accessToken') ?? 
+                   prefs.getString('auth_token') ?? 
+                   prefs.getString('token') ?? 
+                   prefs.getString('access_token');
+    
+    if (token == null || token.isEmpty) {
+      debugPrint('Authorization token not found');
+      _showError('Authorization token not found. Please login again.');
+      return;
+    }
+    debugPrint('Authorization token found: ${token.substring(0, 10)}...');
+    
+    // Build the dynamic upload work image URL using Url class
+    final uploadUrl = Url.uploadWorkImage(providerId.value);
+    debugPrint('Upload work image URL: $uploadUrl');
+    
+    try {
+      EasyLoading.show(status: 'Uploading work images...');
+      debugPrint('Starting multipart request...');
+      
+      var request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
+      request.headers['Authorization'] = 'Bearer $token';
+      debugPrint('Authorization header added');
+      
+      // Add all portfolio images as 'image' field (multiple images supported)
+      debugPrint('Adding ${portfolioImages.length} images to request...');
+      for (int i = 0; i < portfolioImages.length; i++) {
+        final file = await http.MultipartFile.fromPath(
+          'image', // Field name according to API requirement
+          portfolioImages[i].path,
+        );
+        request.files.add(file);
+        debugPrint('Added image ${i + 1}: ${portfolioImages[i].path}');
+      }
+      
+      debugPrint('Sending request to server...');
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+      
+      debugPrint('=== Upload Work Image Response ===');
+      debugPrint('Status code: ${response.statusCode}');
+      debugPrint('Response body: $responseBody');
+      debugPrint('=================================');
+      
+      EasyLoading.dismiss();
+      
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint('Work images uploaded successfully!');
+        Get.snackbar(
+          'Success',
+          'Work images uploaded successfully!',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+      } else {
+        debugPrint('Failed to upload work images. Status: ${response.statusCode}');
+        String message = 'Failed to upload work images. (${response.statusCode})';
+        try {
+          final Map<String, dynamic> resp = jsonDecode(responseBody);
+          if (resp.containsKey('detail')) message = resp['detail'].toString();
+          if (resp.containsKey('message')) message = resp['message'].toString();
+          debugPrint('Error message from server: $message');
+        } catch (e) {
+          debugPrint('Error parsing response: $e');
+        }
+        _showError(message);
+      }
+    } catch (e) {
+      debugPrint('=== Upload Work Image Error ===');
+      debugPrint('Error: $e');
+      debugPrint('==============================');
+      EasyLoading.dismiss();
+      _showError('Network error: $e');
+    }
+  }
 }
