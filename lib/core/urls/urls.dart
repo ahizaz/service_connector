@@ -13,4 +13,5 @@ class Url {
   static String submitDocument(int providerId) =>
       "$baseUrl/provider/providers/$providerId/submit-document/";
       static String uploadWorkImage(int providerId)=>"$baseUrl/provider/providers/$providerId/upload-work-image/";
+      static const String getAllcatagories = "$baseUrl/provider/categories/";
 }

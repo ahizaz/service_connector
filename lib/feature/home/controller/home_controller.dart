@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:service_connect/core/utils/constants/icon_path.dart';
 import 'package:service_connect/core/utils/constants/image_path.dart';
+import 'package:service_connect/feature/service_receiver/controller/category_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeController extends GetxController {
@@ -10,6 +11,9 @@ class HomeController extends GetxController {
   
   // Service provider mode
   final RxBool isServiceProvider = false.obs;
+  
+  // Category controller for API data
+  final CategoryController categoryController = Get.put(CategoryController());
 
   // Dashboard stats (for service providers)
   final RxDouble availableWithdraw = 0.0.obs;
