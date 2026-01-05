@@ -54,30 +54,48 @@ class ProfessionalCardWidget extends StatelessWidget {
               height: 100.h,
               child: Stack(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(12.r),
-                      topRight: Radius.circular(12.r),
-                    ),
-                    child: Image.asset(
-                      image,
-                      width: double.infinity,
-                      height: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          width: double.infinity,
-                          height: double.infinity,
-                          color: Color(0xffF5F5F5),
-                          child: Icon(
-                            Icons.image,
-                            size: 40.sp,
-                            color: Colors.grey,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+             ClipRRect(
+  borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
+  child: image.startsWith('http') 
+      ? Image.network(
+          image,
+          width: 164.w,
+          height: 100.h,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            // যদি image load না হয় তাহলে placeholder দেখাবে
+            return Container(
+              width: 164.w,
+              height: 100.h,
+              color: Color(0xffF5F5F5),
+              child: Icon(Icons.person, size: 40.sp, color: Color(0xff999999)),
+            );
+          },
+          loadingBuilder: (context, child, loadingProgress) {
+            // Image load হওয়ার সময় loading indicator দেখাবে
+            if (loadingProgress == null) return child;
+            return Container(
+              width: 164.w,
+              height: 100.h,
+              color: Color(0xffF5F5F5),
+              child: Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                          loadingProgress.expectedTotalBytes!
+                      : null,
+                ),
+              ),
+            );
+          },
+        )
+      : Image.asset(
+          image,
+          width: 164.w,
+          height: 100.h,
+          fit: BoxFit.cover,
+        ),
+),
                   if (category != null)
                     Positioned(
                       top: 6.h,
@@ -165,31 +183,42 @@ class ProfessionalCardWidget extends StatelessWidget {
                   Row(
                     children: [
                       if (price != null) ...[
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.attach_money, size: 16.sp, color: const Color(0xffCC0000)),
-                            SizedBox(width: 2.w),
-                            Text(
-                              price!,
-                              style: GoogleFonts.roboto(
-                                fontSize: 13.sp,
-                                fontWeight: FontWeight.w700,
-                                color: const Color(0xff252525),
+                        Expanded(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.attach_money, size: 16.sp, color: const Color(0xffCC0000)),
+                              SizedBox(width: 2.w),
+                              Flexible(
+                                child: RichText(
+                                  overflow: TextOverflow.ellipsis,
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: price!,
+                                        style: GoogleFonts.roboto(
+                                          fontSize: 13.sp,
+                                          fontWeight: FontWeight.w700,
+                                          color: const Color(0xff252525),
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: '/hour',
+                                        style: GoogleFonts.roboto(
+                                          fontSize: 11.sp,
+                                          color: const Color(0xff757575),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                            SizedBox(width: 4.w),
-                            Text(
-                              '/hour',
-                              style: GoogleFonts.roboto(
-                                fontSize: 11.sp,
-                                color: const Color(0xff757575),
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
+                      ] else ...[
+                        Spacer(),
                       ],
-                      Spacer(),
                       SizedBox(
                         height: 34.h,
                         child: ElevatedButton(

@@ -24,7 +24,7 @@ class AllProfessionalsScreen extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
         title: Text(
-          'Top Rated Professional',
+          'All Professional',
           style: GoogleFonts.roboto(
             fontSize: 18.sp,
             fontWeight: FontWeight.w600,
@@ -111,7 +111,7 @@ class AllProfessionalsScreen extends StatelessWidget {
                             backgroundColor: Colors.green.withOpacity(0.9),
                             colorText: Colors.white,
                           );
-                          // TODO: integrate real booking API here
+                          
                         },
                       );
                     },

@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:service_connect/core/utils/constants/icon_path.dart';
 import 'package:service_connect/core/utils/constants/image_path.dart';
+import 'package:service_connect/feature/home/model/provider_model.dart';
+import 'package:service_connect/feature/home/repository/provider_repositroy.dart';
 import 'package:service_connect/feature/service_receiver/controller/category_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeController extends GetxController {
   late TextEditingController searchController;
   late FocusNode searchFocusNode;
+  final ProviderRepository providerRepository =  ProviderRepository();
+   final RxList<ProviderModel> allProviders = <ProviderModel>[].obs;
+     final RxBool isLoadingProviders = false.obs;
   
   // Service provider mode
   final RxBool isServiceProvider = false.obs;
@@ -48,8 +54,63 @@ class HomeController extends GetxController {
     loadServiceProviderMode();
     loadDashboardData();
     _loadUserNameFromPrefs();
+    fetchAllProviders();
   }
-  
+  Future<void> fetchAllProviders() async {
+    try {
+      // EasyLoading.show() loading indicator দেখাবে screen এ
+      // status: 'Loading...' message টা show করবে
+      EasyLoading.show(status: 'Loading...');
+      
+      // isLoadingProviders true করে দিলাম, মানে loading শুরু হয়েছে
+      isLoadingProviders.value = true;
+      
+      debugPrint('==========================================');
+      debugPrint('Starting to fetch all providers from API');
+      debugPrint('==========================================');
+      
+      // providerRepository.getAllProviders() call করে API থেকে data নিচ্ছি
+      // await মানে হলো এই line এ wait করবে যতক্ষণ না data আসে
+      final List<ProviderModel> providers = 
+          await providerRepository.getAllProviders();
+      
+      debugPrint('==========================================');
+      debugPrint('Successfully fetched ${providers.length} providers');
+      debugPrint('==========================================');
+      
+      // allProviders list এ নতুন data assign করছি
+      // .value দিয়ে RxList এর value change করা হয়
+      allProviders.value = providers;
+      
+      // যদি data না আসে তাহলে empty message দেখাচ্ছি
+      if (providers.isEmpty) {
+        debugPrint('No providers found in the response');
+      } else {
+        // প্রথম provider এর info print করছি check করার জন্য
+        debugPrint('First provider: ${providers[0].userName}');
+      }
+      
+      // EasyLoading.dismiss() loading indicator hide করবে
+      EasyLoading.dismiss();
+      
+    } catch (e) {
+      // যদি কোনো error হয় তাহলে এখানে আসবে
+      debugPrint('==========================================');
+      debugPrint('Error in fetchAllProviders: $e');
+      debugPrint('==========================================');
+      
+      // Loading dismiss করছি
+      EasyLoading.dismiss();
+      
+      // Error message show করছি user কে
+      EasyLoading.showError('Failed to load providers');
+      
+    } finally {
+      // finally block সবসময় execute হবে, error হোক বা না হোক
+      // Loading state false করে দিচ্ছি
+      isLoadingProviders.value = false;
+    }
+  }
   // Reload mode when screen is revisited
   void reloadMode() {
     loadServiceProviderMode();
