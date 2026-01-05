@@ -7,8 +7,23 @@ import 'package:service_connect/feature/home/screen/search_screen.dart';
 import 'package:service_connect/feature/home/screen/professional_details_screen.dart';
 import 'package:service_connect/feature/home/widget/professional_card_widget.dart';
 
-class AllProfessionalsScreen extends StatelessWidget {
+class AllProfessionalsScreen extends StatefulWidget {
   const AllProfessionalsScreen({super.key});
+
+  @override
+  State<AllProfessionalsScreen> createState() => _AllProfessionalsScreenState();
+}
+
+class _AllProfessionalsScreenState extends State<AllProfessionalsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    final controller = Get.find<HomeController>();
+    // Fetch all providers when screen loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.fetchAllProviders();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,53 +86,78 @@ class AllProfessionalsScreen extends StatelessWidget {
             SizedBox(height: 24.h),
             // Grid of professionals
             Expanded(
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16.w,
-                  mainAxisSpacing: 16.h,
-                  childAspectRatio: 164 / 190,
-                ),
-                itemCount: controller.topRatedProfessionals.length,
-                itemBuilder: (context, index) {
-                  final professional = controller.topRatedProfessionals[index];
-                  return ProfessionalCardWidget(
-                    name: professional['name'],
-                    professional: professional['professional'],
-                    rating: professional['rating'].toDouble(),
-                    price: professional['price'] != null ? '\$${professional['price']}/hour' : null,
-                    experience: professional['experience'],
-                    workDone: professional['workDone'],
-                    image: professional['image'],
-                    category: professional['category'],
-                    onTap: () {
-                      // Navigate to professional details screen
-                      Get.to(() => ProfessionalDetailsScreen(
-                        professionalId: professional['professionalId'],
-                      ));
-                    },
-                    onBookNow: () {
-                      Get.defaultDialog(
-                        title: 'Confirm Booking',
-                        middleText: 'Do you want to book ${professional['name']}?',
-                        textConfirm: 'Yes',
-                        textCancel: 'No',
-                        onConfirm: () {
-                          Get.back();
-                          Get.snackbar(
-                            'Booked',
-                            '${professional['name']} booked successfully',
-                            snackPosition: SnackPosition.BOTTOM,
-                            backgroundColor: Colors.green.withOpacity(0.9),
-                            colorText: Colors.white,
-                          );
-                          
-                        },
-                      );
-                    },
+              child: Obx(() {
+                if (controller.isLoadingProviders.value) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: Color(0xff252525),
+                    ),
                   );
-                },
-              ),
+                }
+
+                if (controller.allProviders.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'No professionals found',
+                      style: GoogleFonts.roboto(
+                        fontSize: 16.sp,
+                        color: Color(0xff999999),
+                      ),
+                    ),
+                  );
+                }
+
+                return GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16.w,
+                    mainAxisSpacing: 16.h,
+                    childAspectRatio: 164 / 190,
+                  ),
+                  itemCount: controller.allProviders.length,
+                  itemBuilder: (context, index) {
+                    final provider = controller.allProviders[index];
+                    debugPrint('Displaying provider: ${provider.userName}');
+                    
+                    return ProfessionalCardWidget(
+                      name: provider.userName,
+                      professional: provider.categoryName,
+                      rating: double.tryParse(provider.providerRating) ?? 0.0,
+                      price: '\$${provider.providerServiceCharge}/hour',
+                      experience: provider.providerExperience,
+                      workDone: provider.providerDoneWork,
+                      image: provider.userImage ?? provider.categoryImage,
+                      category: provider.categoryName,
+                      onTap: () {
+                        debugPrint('Tapped on provider: ${provider.userName} (ID: ${provider.id})');
+                        // Navigate to professional details screen
+                        Get.to(() => ProfessionalDetailsScreen(
+                          professionalId: provider.id,
+                        ));
+                      },
+                      onBookNow: () {
+                        debugPrint('Book now clicked for provider: ${provider.userName}');
+                        Get.defaultDialog(
+                          title: 'Confirm Booking',
+                          middleText: 'Do you want to book ${provider.userName}?',
+                          textConfirm: 'Yes',
+                          textCancel: 'No',
+                          onConfirm: () {
+                            Get.back();
+                            Get.snackbar(
+                              'Booked',
+                              '${provider.userName} booked successfully',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.green.withOpacity(0.9),
+                              colorText: Colors.white,
+                            );
+                          },
+                        );
+                      },
+                    );
+                  },
+                );
+              }),
             ),
           ],
         ),

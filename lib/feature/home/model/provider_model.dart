@@ -5,6 +5,7 @@ class ProviderModel {
   final String userId;
   final String userName;
   final String userEmail;
+  final String? userImage;
   final String categoryName;
   final String categoryImage;
   final String serviceTitle;
@@ -24,6 +25,7 @@ class ProviderModel {
     required this.userId,
     required this.userName,
     required this.userEmail,
+    this.userImage,
     required this.categoryName,
     required this.categoryImage,
     required this.serviceTitle,
@@ -43,6 +45,7 @@ class ProviderModel {
       userId: json['user_id']?.toString() ?? '',
       userName: json['user_name'] ?? '',
       userEmail: json['user_email'] ?? '',
+      userImage: json['user_image'],
       categoryName: json['category_name'] ?? '',
       categoryImage: json['category_image'] ?? '',
       serviceTitle: json['service_title'] ?? '',
@@ -64,6 +67,7 @@ class ProviderModel {
       'user_id': userId,
       'user_name': userName,
       'user_email': userEmail,
+      'user_image': userImage,
       'category_name': categoryName,
       'category_image': categoryImage,
       'service_title': serviceTitle,
