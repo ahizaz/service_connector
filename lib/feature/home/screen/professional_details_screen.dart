@@ -205,16 +205,31 @@ class _ProfessionalDetailsScreenState extends State<ProfessionalDetailsScreen> {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 4.w),
-                      image: professional.serviceCategory.categoryImage.isNotEmpty
-                          ? DecorationImage(
-                              image: NetworkImage(professional.serviceCategory.categoryImage),
-                              fit: BoxFit.cover,
-                            )
-                          : null,
+                      color: Colors.grey[300],
                     ),
-                    child: professional.serviceCategory.categoryImage.isEmpty
-                        ? Icon(Icons.person, size: 50.sp, color: Colors.white)
-                        : null,
+                    child: ClipOval(
+                      child: professional.user.image != null
+                          ? Image.network(
+                              professional.user.image!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return _buildNoImagePlaceholder();
+                              },
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    value: loadingProgress.expectedTotalBytes != null
+                                        ? loadingProgress.cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                        : null,
+                                  ),
+                                );
+                              },
+                            )
+                          : _buildNoImagePlaceholder(),
+                    ),
                   ),
                   SizedBox(height: 12.h),
                   // Name
@@ -905,6 +920,27 @@ class _ProfessionalDetailsScreenState extends State<ProfessionalDetailsScreen> {
                 color: const Color(0xff6B6B6B),
               ),
               overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNoImagePlaceholder() {
+    return Container(
+      color: Colors.grey[400],
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.person, size: 40.sp, color: Colors.white),
+          SizedBox(height: 4.h),
+          Text(
+            'No Image',
+            style: GoogleFonts.roboto(
+              fontSize: 10.sp,
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],

@@ -110,11 +110,13 @@ class User {
   final String id;
   final String name;
   final String email;
+  final String? image;
 
   User({
     required this.id,
     required this.name,
     required this.email,
+    this.image,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -122,6 +124,7 @@ class User {
       id: json['id']?.toString() ?? '',
       name: json['name'] ?? '',
       email: json['email'] ?? '',
+      image: json['image'],
     );
   }
 
@@ -130,6 +133,7 @@ class User {
       'id': id,
       'name': name,
       'email': email,
+      'image': image,
     };
   }
 }
