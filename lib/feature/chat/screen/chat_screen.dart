@@ -65,19 +65,52 @@ class ChatScreen extends StatelessWidget {
           // Messages list
           Expanded(
             child: Obx(() {
-              if (controller.filteredUsers.isEmpty) {
+              // Show loading indicator
+              if (controller.isLoadingConversations.value) {
                 return Center(
-                  child: Text(
-                    'No messages found',
-                    style: TextStyle(
-                      color: Color(0xFF9E9E9E),
-                      fontSize: 16.sp,
-                    ),
+                  child: CircularProgressIndicator(
+                    color: Color(0xFFCC0000),
                   ),
                 );
               }
 
-              return ListView.builder(
+              // Show empty state
+              if (controller.filteredUsers.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.chat_bubble_outline,
+                        size: 64.sp,
+                        color: Color(0xFF9E9E9E),
+                      ),
+                      SizedBox(height: 16.h),
+                      Text(
+                        'No conversations yet',
+                        style: TextStyle(
+                          color: Color(0xFF252525),
+                          fontSize: 18.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      Text(
+                        'Start a conversation by\nbooking a professional',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Color(0xFF9E9E9E),
+                          fontSize: 14.sp,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              return RefreshIndicator(
+                onRefresh: () => controller.fetchAllConversations(),
+                child: ListView.builder(
                 itemCount: controller.filteredUsers.length,
                 padding: EdgeInsets.zero,
                 itemBuilder: (context, index) {
@@ -220,7 +253,8 @@ class ChatScreen extends StatelessWidget {
                     ),
                   );
                 },
-              );
+              ),
+            );
             }),
           ),
         ],

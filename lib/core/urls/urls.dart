@@ -18,5 +18,9 @@ class Url {
       
       // Dynamic provider details URL based on provider ID
       static String getProviderDetails(int providerId) => "$baseUrl/provider/providers/$providerId/";
+      static String createConversation= "$baseUrl/message/conversations/";
+      static String getAllConversation = "$baseUrl/message/conversations/";
+
+
 
 }

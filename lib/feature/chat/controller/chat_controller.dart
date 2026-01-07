@@ -4,9 +4,18 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import '../model/chat_message_model.dart';
+import 'package:service_connect/feature/conversation/repository/conversation_repository.dart';
+import 'package:service_connect/feature/conversation/model/conversation_list_response_model.dart';
 
 class ChatController extends GetxController {
+  // Conversation repository
+  final ConversationRepository _conversationRepository = ConversationRepository();
+  
+  // Loading state
+  final RxBool isLoadingConversations = false.obs;
+  
   // Search controller
   final searchController = TextEditingController();
   final RxString searchQuery = ''.obs;
@@ -37,7 +46,8 @@ class ChatController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _loadDummyData();
+    // Load conversations from API instead of dummy data
+    fetchAllConversations();
     
     // Listen to search query changes
     searchController.addListener(() {
@@ -50,6 +60,78 @@ class ChatController extends GetxController {
     });
   }
 
+  /// Fetch all conversations from API
+  Future<void> fetchAllConversations() async {
+    try {
+      isLoadingConversations.value = true;
+      EasyLoading.show(status: 'Loading conversations...');
+      
+      debugPrint('=================================');
+      debugPrint('ChatController: Fetching conversations');
+      debugPrint('=================================');
+      
+      final response = await _conversationRepository.getAllConversations();
+      
+      debugPrint('=================================');
+      debugPrint('ChatController: Got ${response.count} conversations');
+      debugPrint('=================================');
+      
+      // Convert API response to ChatUser list
+      final List<ChatUser> users = response.results.map((conversation) {
+        return ChatUser(
+          id: conversation.otherPerson.id,
+          name: conversation.otherPerson.name,
+          profileImage: conversation.otherPerson.image ?? '',
+          lastMessage: conversation.lastMessage?.messageText ?? 'No messages yet',
+          time: _formatTime(conversation.lastMessage?.createdAt ?? conversation.createdAt),
+          unreadCount: 0, // You can add unread count logic if needed
+          isOnline: false,
+          isVerified: false,
+        );
+      }).toList();
+      
+      allUsers.value = users;
+      filteredUsers.value = users;
+      
+      EasyLoading.dismiss();
+      isLoadingConversations.value = false;
+      
+    } catch (e) {
+      EasyLoading.dismiss();
+      isLoadingConversations.value = false;
+      debugPrint('Error fetching conversations: $e');
+      
+      Get.snackbar(
+        'Error',
+        'Failed to load conversations: ${e.toString().replaceAll('Exception: ', '')}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.9),
+        colorText: Colors.white,
+        duration: Duration(seconds: 3),
+      );
+    }
+  }
+
+  /// Format timestamp to relative time (1h, 2d, etc.)
+  String _formatTime(String timestamp) {
+    try {
+      final DateTime dateTime = DateTime.parse(timestamp);
+      final Duration difference = DateTime.now().difference(dateTime);
+      
+      if (difference.inMinutes < 60) {
+        return '${difference.inMinutes}m';
+      } else if (difference.inHours < 24) {
+        return '${difference.inHours}h';
+      } else if (difference.inDays < 7) {
+        return '${difference.inDays}d';
+      } else {
+        return '${(difference.inDays / 7).floor()}w';
+      }
+    } catch (e) {
+      return 'now';
+    }
+  }
+
   @override
   void onClose() {
     searchController.dispose();
@@ -58,76 +140,14 @@ class ChatController extends GetxController {
     super.onClose();
   }
 
-  // Load dummy data
-  void _loadDummyData() {
-    allUsers.value = [
-      ChatUser(
-        id: '1',
-        name: 'Annette Black',
-        profileImage: 'assets/images/user1.png',
-        lastMessage: 'Thank you! I will see you to...',
-        time: '1h',
-        unreadCount: 0,
-      ),
-      ChatUser(
-        id: '2',
-        name: 'Eleanor Pena',
-        profileImage: 'assets/images/user2.png',
-        lastMessage: "I'm gonna loo som curtos ut io..",
-        time: '3h',
-        unreadCount: 0,
-      ),
-      ChatUser(
-        id: '3',
-        name: 'Annette Black',
-        profileImage: 'assets/images/user3.png',
-        lastMessage: 'Thank you! I will see you to...',
-        time: '4h',
-        unreadCount: 0,
-      ),
-      ChatUser(
-        id: '4',
-        name: 'Eleanor Pena',
-        profileImage: 'assets/images/user4.png',
-        lastMessage: "I'm gonna loo som curtos ut io..",
-        time: '5h',
-        unreadCount: 0,
-      ),
-      ChatUser(
-        id: '5',
-        name: 'Eleanor Pena',
-        profileImage: 'assets/images/user5.png',
-        lastMessage: 'Could you send me a link t...',
-        time: '6h',
-        isVerified: true,
-      ),
-      ChatUser(
-        id: '6',
-        name: 'Annette Black',
-        profileImage: 'assets/images/user6.png',
-        lastMessage: 'Thank you! I will see you to...',
-        time: '7h',
-        unreadCount: 0,
-      ),
-      ChatUser(
-        id: '7',
-        name: 'Marvin McKinney',
-        profileImage: 'assets/images/user7.png',
-        lastMessage: 'Incoming...',
-        time: '10h',
-        unreadCount: 0,
-      ),
-      ChatUser(
-        id: '8',
-        name: 'Annette Black',
-        profileImage: 'assets/images/user8.png',
-        lastMessage: 'Thank you! I will see you to...',
-        time: '4h',
-        unreadCount: 0,
-      ),
-    ];
-    filteredUsers.value = allUsers;
-  }
+  // ❌ OLD: Load dummy data - replaced with fetchAllConversations()
+  // void _loadDummyData() {
+  //   allUsers.value = [
+  //     ChatUser(id: '1', name: 'Annette Black', ...),
+  //     ...
+  //   ];
+  //   filteredUsers.value = allUsers;
+  // }
 
   // Filter users based on search query
   void filterUsers() {

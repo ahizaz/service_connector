@@ -2,10 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:service_connect/feature/home/controller/home_controller.dart';
 import 'package:service_connect/feature/home/screen/search_screen.dart';
 import 'package:service_connect/feature/home/screen/professional_details_screen.dart';
 import 'package:service_connect/feature/home/widget/professional_card_widget.dart';
+import 'package:service_connect/feature/conversation/repository/conversation_repository.dart';
+import 'package:service_connect/feature/chat/screen/chat_detail_screen.dart';
+import 'package:service_connect/feature/chat/controller/chat_controller.dart';
+import 'package:service_connect/feature/chat/model/chat_message_model.dart';
 
 class AllProfessionalsScreen extends StatefulWidget {
   const AllProfessionalsScreen({super.key});
@@ -15,6 +20,8 @@ class AllProfessionalsScreen extends StatefulWidget {
 }
 
 class _AllProfessionalsScreenState extends State<AllProfessionalsScreen> {
+  final ConversationRepository _conversationRepository = ConversationRepository();
+
   @override
   void initState() {
     super.initState();
@@ -23,6 +30,79 @@ class _AllProfessionalsScreenState extends State<AllProfessionalsScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.fetchAllProviders();
     });
+  }
+
+  /// Handle Book Now button click
+  Future<void> _handleBookNow(String providerId, String providerName) async {
+    try {
+      EasyLoading.show(status: 'Creating conversation...');
+      
+      debugPrint('=================================');
+      debugPrint('Book Now clicked');
+      debugPrint('Provider ID: $providerId');
+      debugPrint('Provider Name: $providerName');
+      debugPrint('=================================');
+      
+      // Create conversation via API
+      final response = await _conversationRepository.createConversation(providerId);
+      
+      EasyLoading.dismiss();
+      
+      debugPrint('=================================');
+      debugPrint('Conversation created successfully');
+      debugPrint('Conversation ID: ${response.data.conversationId}');
+      debugPrint('Status: ${response.data.conversationStatus}');
+      debugPrint('=================================');
+      
+      // Get chat controller
+      final chatController = Get.find<ChatController>();
+      
+      // Create ChatUser from conversation data
+      final chatUser = ChatUser(
+        id: response.data.messageReceiver.id,
+        name: response.data.messageReceiver.name,
+        profileImage: '', // You can add profile image if available
+        lastMessage: response.data.messages.isNotEmpty 
+            ? response.data.messages.last.messageText 
+            : 'Start conversation',
+        time: 'now',
+        unreadCount: 0,
+        isOnline: false,
+        isVerified: false,
+      );
+      
+      // Set the current chat user
+      chatController.openChat(chatUser);
+      
+      // Refresh conversations list to show new conversation in inbox
+      chatController.fetchAllConversations();
+      
+      // Navigate to chat details screen
+      Get.to(() => ChatDetailScreen());
+      
+      // Show success message
+      Get.snackbar(
+        'Success',
+        'Conversation started with $providerName',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.withOpacity(0.9),
+        colorText: Colors.white,
+        duration: Duration(seconds: 2),
+      );
+      
+    } catch (e) {
+      EasyLoading.dismiss();
+      debugPrint('Error creating conversation: $e');
+      
+      Get.snackbar(
+        'Error',
+        e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.9),
+        colorText: Colors.white,
+        duration: Duration(seconds: 3),
+      );
+    }
   }
 
   @override
@@ -137,22 +217,8 @@ class _AllProfessionalsScreenState extends State<AllProfessionalsScreen> {
                       },
                       onBookNow: () {
                         debugPrint('Book now clicked for provider: ${provider.userName}');
-                        Get.defaultDialog(
-                          title: 'Confirm Booking',
-                          middleText: 'Do you want to book ${provider.userName}?',
-                          textConfirm: 'Yes',
-                          textCancel: 'No',
-                          onConfirm: () {
-                            Get.back();
-                            Get.snackbar(
-                              'Booked',
-                              '${provider.userName} booked successfully',
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: Colors.green.withOpacity(0.9),
-                              colorText: Colors.white,
-                            );
-                          },
-                        );
+                        // Call the API to create conversation and navigate to chat
+                        _handleBookNow(provider.userId, provider.userName);
                       },
                     );
                   },
