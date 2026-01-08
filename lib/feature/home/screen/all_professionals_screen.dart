@@ -208,7 +208,7 @@ class _AllProfessionalsScreenState extends State<AllProfessionalsScreen> {
                       price: '\$${provider.providerServiceCharge}/hour',
                       experience: provider.providerExperience,
                       workDone: provider.providerDoneWork,
-                      image: provider.userImage ?? provider.categoryImage,
+                      image: provider.userImage ?? '',
                       category: provider.categoryName,
                       onTap: () {
                         debugPrint('Tapped on provider: ${provider.userName} (ID: ${provider.id})');

@@ -231,11 +231,11 @@ class TopRatedProfessionalsWidget extends StatelessWidget {
                       price: '\$${provider.providerServiceCharge}/hour',
                       experience: provider.providerExperience, // provider_experience
                       workDone: provider.providerDoneWork, // provider_done_work
-                      image: provider.categoryImage,
+                      image: provider.userImage ?? '',
                         onBookNow: () {
                         // Call the API to create conversation and navigate to chat
                         _handleBookNow(provider.userId, provider.userName);
-                      }, // category_image - network image URL
+                      }, // user_image - null হলে empty string দিচ্ছি
 
                ),
         ),

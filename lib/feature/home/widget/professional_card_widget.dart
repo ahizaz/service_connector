@@ -56,7 +56,27 @@ class ProfessionalCardWidget extends StatelessWidget {
                 children: [
              ClipRRect(
   borderRadius: BorderRadius.vertical(top: Radius.circular(12.r)),
-  child: image.startsWith('http') 
+  child: (image.isEmpty || image == '') 
+      ? Container(
+          width: 164.w,
+          height: 100.h,
+          color: Color(0xffF5F5F5),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.person, size: 40.sp, color: Color(0xff999999)),
+              SizedBox(height: 4.h),
+              Text(
+                'No Image',
+                style: TextStyle(
+                  fontSize: 10.sp,
+                  color: Color(0xff999999),
+                ),
+              ),
+            ],
+          ),
+        )
+      : image.startsWith('http') 
       ? Image.network(
           image,
           width: 164.w,
@@ -68,7 +88,20 @@ class ProfessionalCardWidget extends StatelessWidget {
               width: 164.w,
               height: 100.h,
               color: Color(0xffF5F5F5),
-              child: Icon(Icons.person, size: 40.sp, color: Color(0xff999999)),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.person, size: 40.sp, color: Color(0xff999999)),
+                  SizedBox(height: 4.h),
+                  Text(
+                    'No Image',
+                    style: TextStyle(
+                      fontSize: 10.sp,
+                      color: Color(0xff999999),
+                    ),
+                  ),
+                ],
+              ),
             );
           },
           loadingBuilder: (context, child, loadingProgress) {
