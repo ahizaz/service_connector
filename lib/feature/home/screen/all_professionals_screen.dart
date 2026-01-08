@@ -69,6 +69,8 @@ class _AllProfessionalsScreenState extends State<AllProfessionalsScreen> {
         unreadCount: 0,
         isOnline: false,
         isVerified: false,
+        conversationId: response.data.conversationId,
+        conversationStatus: response.data.conversationStatus,
       );
       
       // Set the current chat user

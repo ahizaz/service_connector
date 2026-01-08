@@ -110,4 +110,58 @@ class ConversationRepository {
       rethrow;
     }
   }
+
+  /// Accept or decline conversation
+  Future<void> updateConversationStatus(int conversationId, String action) async {
+    try {
+      // Get access token
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('accessToken');
+
+      if (token == null || token.isEmpty) {
+        throw Exception('Authorization token not found. Please login again.');
+      }
+
+      debugPrint('=================================');
+      debugPrint('Updating conversation status');
+      debugPrint('Conversation ID: $conversationId');
+      debugPrint('Action: $action');
+      debugPrint('URL: ${Url.acceptdeclineConversation(conversationId)}');
+      debugPrint('Token: ${token.substring(0, 10)}...');
+      debugPrint('=================================');
+
+      // Create request body
+      final requestBody = jsonEncode({'action': action});
+      debugPrint('Request body: $requestBody');
+
+      // Make API call
+      final response = await http.patch(
+        Uri.parse(Url.acceptdeclineConversation(conversationId)),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: requestBody,
+      );
+
+      debugPrint('=================================');
+      debugPrint('Response status: ${response.statusCode}');
+      debugPrint('Response body: ${response.body}');
+      debugPrint('=================================');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint('Conversation status updated successfully');
+      } else {
+        // Handle error response
+        final Map<String, dynamic>? errorData = jsonDecode(response.body);
+        final errorMessage = errorData?['message'] ?? 
+                           errorData?['detail'] ?? 
+                           'Failed to update conversation status';
+        throw Exception(errorMessage);
+      }
+    } catch (e) {
+      debugPrint('Error updating conversation status: $e');
+      rethrow;
+    }
+  }
 }

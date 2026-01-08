@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -78,6 +79,8 @@ class ChatController extends GetxController {
       
       // Convert API response to ChatUser list
       final List<ChatUser> users = response.results.map((conversation) {
+        debugPrint('>>> Conversation: ID=${conversation.conversationId}, Status="${conversation.conversationStatus}", User=${conversation.otherPerson.name}');
+        
         return ChatUser(
           id: conversation.otherPerson.id,
           name: conversation.otherPerson.name,
@@ -87,8 +90,17 @@ class ChatController extends GetxController {
           unreadCount: 0, // You can add unread count logic if needed
           isOnline: false,
           isVerified: false,
+          conversationId: conversation.conversationId,
+          conversationStatus: conversation.conversationStatus,
         );
       }).toList();
+      
+      debugPrint('=================================');
+      debugPrint('Total users created: ${users.length}');
+      for (var user in users) {
+        debugPrint('User: ${user.name}, ConvID: ${user.conversationId}, Status: "${user.conversationStatus}"');
+      }
+      debugPrint('=================================');
       
       allUsers.value = users;
       filteredUsers.value = users;
@@ -436,6 +448,160 @@ class ChatController extends GetxController {
     final minute = now.minute.toString().padLeft(2, '0');
     final period = now.hour >= 12 ? 'PM' : 'AM';
     return '$hour:$minute $period';
+  }
+
+  // Accept or decline conversation
+  Future<void> updateConversationStatus(int conversationId, String action) async {
+    try {
+      EasyLoading.show(status: '${action == 'accept' ? 'Accepting' : 'Declining'}...');
+      
+      debugPrint('=================================');
+      debugPrint('ChatController: Updating conversation status');
+      debugPrint('Conversation ID: $conversationId');
+      debugPrint('Action: $action');
+      debugPrint('=================================');
+      
+      await _conversationRepository.updateConversationStatus(conversationId, action);
+      
+      EasyLoading.dismiss();
+      
+      debugPrint('=================================');
+      debugPrint('Conversation ${action}ed successfully');
+      debugPrint('=================================');
+      
+      // Refresh conversations list
+      await fetchAllConversations();
+      
+      // Show success message
+      Get.snackbar(
+        'Success',
+        'Conversation ${action}ed successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green.withOpacity(0.9),
+        colorText: Colors.white,
+        duration: Duration(seconds: 2),
+      );
+      
+    } catch (e) {
+      EasyLoading.dismiss();
+      debugPrint('Error updating conversation status: $e');
+      
+      Get.snackbar(
+        'Error',
+        e.toString().replaceAll('Exception: ', ''),
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.9),
+        colorText: Colors.white,
+        duration: Duration(seconds: 3),
+      );
+    }
+  }
+
+  // Show accept/decline dialog for provider
+  void showAcceptDeclineDialog() {
+    final user = currentChatUser.value;
+    if (user == null || user.conversationId == null) {
+      debugPrint('Cannot show dialog: user=$user, conversationId=${user?.conversationId}');
+      return;
+    }
+    
+    // Check if conversation is pending (case-insensitive)
+    if (user.conversationStatus?.toLowerCase() != 'pending') {
+      debugPrint('Cannot show dialog: status is not pending, it is "${user.conversationStatus}"');
+      return;
+    }
+    
+    debugPrint('=================================');
+    debugPrint('Showing accept/decline dialog');
+    debugPrint('Conversation ID: ${user.conversationId}');
+    debugPrint('Status: ${user.conversationStatus}');
+    debugPrint('=================================');
+    
+    Get.dialog(
+      BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            padding: EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Do you want to accept message?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+                SizedBox(height: 32),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Get.back(); // Close dialog
+                          updateConversationStatus(user.conversationId!, 'decline');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Decline',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Get.back(); // Close dialog
+                          updateConversationStatus(user.conversationId!, 'accept');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Accept',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+      barrierColor: Colors.black54,
+    );
   }
 
   // Clear search

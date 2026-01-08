@@ -43,6 +43,8 @@ class ChatUser {
   final int unreadCount;
   final bool isOnline;
   final bool isVerified;
+  final int? conversationId;
+  final String? conversationStatus;
 
   ChatUser({
     required this.id,
@@ -53,6 +55,8 @@ class ChatUser {
     this.unreadCount = 0,
     this.isOnline = false,
     this.isVerified = false,
+    this.conversationId,
+    this.conversationStatus,
   });
 }
 

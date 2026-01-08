@@ -3,11 +3,76 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../controller/chat_controller.dart';
 import '../model/chat_message_model.dart';
 
-class ChatDetailScreen extends StatelessWidget {
+class ChatDetailScreen extends StatefulWidget {
   const ChatDetailScreen({super.key});
+
+  @override
+  State<ChatDetailScreen> createState() => _ChatDetailScreenState();
+}
+
+class _ChatDetailScreenState extends State<ChatDetailScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Show accept/decline dialog after frame is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAndShowDialog();
+    });
+  }
+
+  Future<void> _checkAndShowDialog() async {
+    debugPrint('=================================');
+    debugPrint('ChatDetailScreen: _checkAndShowDialog() called');
+    
+    final controller = Get.find<ChatController>();
+    final user = controller.currentChatUser.value;
+    
+    debugPrint('Current chat user: ${user?.name}');
+    debugPrint('User object is null: ${user == null}');
+    
+    // Check if current logged-in user is a service provider
+    final prefs = await SharedPreferences.getInstance();
+    final isProvider = prefs.getBool('is_service_provider') ?? false;
+    final loggedInUserId = prefs.getString('userId') ?? '';
+    
+    debugPrint('=================================');
+    debugPrint('DIALOG CHECK DETAILS:');
+    debugPrint('Logged-in User ID: $loggedInUserId');
+    debugPrint('Is Provider: $isProvider');
+    debugPrint('Other Person: ${user?.name}');
+    debugPrint('Other Person ID: ${user?.id}');
+    debugPrint('Conversation Status: "${user?.conversationStatus}"');
+    debugPrint('Conversation ID: ${user?.conversationId}');
+    debugPrint('Status lowercase == "pending": ${user?.conversationStatus?.toLowerCase() == 'pending'}');
+    debugPrint('=================================');
+    
+    // Show dialog ONLY if:
+    // 1. User is a service provider
+    // 2. Conversation status is "pending"
+    // 3. Conversation ID exists
+    // Logic: Customer sends request -> Provider accepts/declines
+    if (isProvider && user != null && user.conversationId != null && user.conversationStatus?.toLowerCase() == 'pending') {
+      debugPrint('✅ ✅ ✅ PROVIDER + PENDING STATUS - SHOWING DIALOG ✅ ✅ ✅');
+      debugPrint('Provider needs to accept/decline customer request');
+      await Future.delayed(Duration(milliseconds: 300)); // Small delay to ensure UI is ready
+      controller.showAcceptDeclineDialog();
+    } else {
+      debugPrint('❌ ❌ ❌ CONDITIONS NOT MET - NOT SHOWING DIALOG ❌ ❌ ❌');
+      debugPrint('Conditions breakdown:');
+      debugPrint('  - isProvider: $isProvider (need: true) - Only providers can accept/decline');
+      debugPrint('  - user != null: ${user != null} (need: true)');
+      debugPrint('  - conversationId != null: ${user?.conversationId != null} (need: true)');
+      debugPrint('  - status == pending: ${user?.conversationStatus?.toLowerCase() == 'pending'} (need: true)');
+      if (!isProvider) {
+        debugPrint('  ℹ️  You are a SERVICE RECEIVER (Customer) - cannot accept/decline');
+      }
+    }
+    debugPrint('=================================');
+  }
 
   @override
   Widget build(BuildContext context) {

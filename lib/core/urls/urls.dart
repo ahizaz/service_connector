@@ -20,6 +20,7 @@ class Url {
       static String getProviderDetails(int providerId) => "$baseUrl/provider/providers/$providerId/";
       static String createConversation= "$baseUrl/message/conversations/";
       static String getAllConversation = "$baseUrl/message/conversations/";
+      static String acceptdeclineConversation(int conversationId) => "$baseUrl/message/conversations/$conversationId/update-status/";
 
 
 

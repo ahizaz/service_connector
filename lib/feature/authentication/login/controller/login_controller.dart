@@ -115,8 +115,8 @@ class LoginController extends GetxController{
           // save credentials if rememberMe
           await saveCredentials();
 
-          // Set user as service receiver by default on login
-          await prefs.setBool('is_service_provider', false);
+          // Check if user is a service provider by checking provider API
+          await _checkIfUserIsProvider(userId);
 
           // Clear input fields
           emailController.clear();
@@ -133,6 +133,67 @@ class LoginController extends GetxController{
         debugPrint('Login error: $e');
         Get.snackbar('Error', e.toString());
       }
+    }
+  }
+  
+  // Check if logged-in user has a provider profile
+  Future<void> _checkIfUserIsProvider(String? userId) async {
+    if (userId == null) return;
+    
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('accessToken');
+      
+      debugPrint('=================================');
+      debugPrint('Checking if user is provider...');
+      debugPrint('User ID: $userId');
+      debugPrint('=================================');
+      
+      // Call provider list API to check if this user has provider profile
+      final response = await http.get(
+        Uri.parse(Url.getAllproviders),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+      
+      debugPrint('Provider check response: ${response.statusCode}');
+      
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        bool isProvider = false;
+        
+        // Check if this user ID exists in providers list
+        if (data['results'] != null && data['results'] is List) {
+          final providers = data['results'] as List;
+          for (var provider in providers) {
+            if (provider['user_id'] != null && provider['user_id'].toString() == userId) {
+              isProvider = true;
+              debugPrint('✅ User is a SERVICE PROVIDER');
+              break;
+            }
+          }
+        }
+        
+        if (!isProvider) {
+          debugPrint('❌ User is a SERVICE RECEIVER (Customer)');
+        }
+        
+        await prefs.setBool('is_service_provider', isProvider);
+        debugPrint('Saved is_service_provider: $isProvider');
+        
+      } else {
+        debugPrint('Failed to check provider status, defaulting to receiver');
+        await prefs.setBool('is_service_provider', false);
+      }
+      
+      debugPrint('=================================');
+      
+    } catch (e) {
+      debugPrint('Error checking provider status: $e');
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('is_service_provider', false);
     }
   }
   
