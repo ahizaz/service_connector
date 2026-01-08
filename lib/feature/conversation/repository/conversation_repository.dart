@@ -6,6 +6,7 @@ import 'package:service_connect/core/urls/urls.dart';
 import 'package:service_connect/feature/conversation/model/conversation_create_request_model.dart';
 import 'package:service_connect/feature/conversation/model/conversation_response_model.dart';
 import 'package:service_connect/feature/conversation/model/conversation_list_response_model.dart';
+import 'package:service_connect/feature/conversation/model/message_response_model.dart';
 
 class ConversationRepository {
   /// Get all conversations (inbox)
@@ -161,6 +162,54 @@ class ConversationRepository {
       }
     } catch (e) {
       debugPrint('Error updating conversation status: $e');
+      rethrow;
+    }
+  }
+
+  /// Get messages for a specific conversation
+  Future<MessageResponse> getConversationMessages(int conversationId) async {
+    try {
+      // Get access token
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('accessToken');
+
+      if (token == null || token.isEmpty) {
+        throw Exception('Authorization token not found. Please login again.');
+      }
+
+      debugPrint('=================================');
+      debugPrint('Fetching messages for conversation: $conversationId');
+      debugPrint('URL: ${Url.getSpecificConversation(conversationId)}');
+      debugPrint('Token: ${token.substring(0, 10)}...');
+      debugPrint('=================================');
+
+      // Make API call
+      final response = await http.get(
+        Uri.parse(Url.getSpecificConversation(conversationId)),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      debugPrint('=================================');
+      debugPrint('Response status: ${response.statusCode}');
+      debugPrint('Response body: ${response.body}');
+      debugPrint('=================================');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        return MessageResponse.fromJson(data);
+      } else {
+        // Handle error response
+        final Map<String, dynamic>? errorData = jsonDecode(response.body);
+        final errorMessage = errorData?['message'] ?? 
+                           errorData?['detail'] ?? 
+                           'Failed to fetch messages';
+        throw Exception(errorMessage);
+      }
+    } catch (e) {
+      debugPrint('Error fetching messages: $e');
       rethrow;
     }
   }

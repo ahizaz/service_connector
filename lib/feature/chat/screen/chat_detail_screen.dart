@@ -18,10 +18,21 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // Show accept/decline dialog after frame is built
+    // Show accept/decline dialog and load messages after frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkAndShowDialog();
+      _loadMessages();
     });
+  }
+
+  Future<void> _loadMessages() async {
+    final controller = Get.find<ChatController>();
+    final user = controller.currentChatUser.value;
+    
+    // Load messages if conversation exists
+    if (user != null && user.conversationId != null) {
+      await controller.fetchConversationMessages(user.conversationId!);
+    }
   }
 
   Future<void> _checkAndShowDialog() async {

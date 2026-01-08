@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../model/chat_message_model.dart';
 import 'package:service_connect/feature/conversation/repository/conversation_repository.dart';
 import 'package:service_connect/feature/conversation/model/conversation_list_response_model.dart';
@@ -144,6 +145,21 @@ class ChatController extends GetxController {
     }
   }
 
+  /// Format message timestamp to time (9:41 AM)
+  String _formatMessageTime(String timestamp) {
+    try {
+      final DateTime dateTime = DateTime.parse(timestamp);
+      final int hour = dateTime.hour;
+      final int minute = dateTime.minute;
+      final String period = hour >= 12 ? 'PM' : 'AM';
+      final int displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+      
+      return '${displayHour}:${minute.toString().padLeft(2, '0')} $period';
+    } catch (e) {
+      return 'now';
+    }
+  }
+
   @override
   void onClose() {
     searchController.dispose();
@@ -176,57 +192,84 @@ class ChatController extends GetxController {
   // Open chat with a specific user
   void openChat(ChatUser user) {
     currentChatUser.value = user;
-    _loadChatMessages(user.id);
+    // Load messages if conversation ID exists
+    if (user.conversationId != null) {
+      fetchConversationMessages(user.conversationId!);
+    } else {
+      // No conversation yet, empty messages
+      currentChatMessages.value = [];
+    }
   }
 
-  // Load chat messages for a specific user
+  // Fetch messages from API for a specific conversation
+  Future<void> fetchConversationMessages(int conversationId) async {
+    try {
+      EasyLoading.show(status: 'Loading messages...');
+      
+      debugPrint('=================================');
+      debugPrint('ChatController: Fetching messages for conversation $conversationId');
+      debugPrint('=================================');
+      
+      final response = await _conversationRepository.getConversationMessages(conversationId);
+      
+      // Get current logged-in user ID
+      final prefs = await SharedPreferences.getInstance();
+      final loggedInUserId = prefs.getString('userId') ?? '';
+      
+      debugPrint('=================================');
+      debugPrint('Logged-in User ID: "$loggedInUserId"');
+      debugPrint('Got ${response.count} messages');
+      debugPrint('=================================');
+      
+      // Convert API messages to ChatMessage list
+      final List<ChatMessage> messages = response.results.map((message) {
+        // Check if the message sender is the logged-in user
+        // Compare with trim to ensure no whitespace issues
+        final isMe = message.senderId.trim() == loggedInUserId.trim();
+        
+        debugPrint('-----------------------------------');
+        debugPrint('Message: ${message.messageText}');
+        debugPrint('  Sender ID: "${message.senderId}"');
+        debugPrint('  Logged-in ID: "$loggedInUserId"');
+        debugPrint('  IDs Match: ${message.senderId.trim() == loggedInUserId.trim()}');
+        debugPrint('  Is Me (RIGHT side): $isMe');
+        debugPrint('-----------------------------------');
+        
+        return ChatMessage(
+          id: message.messageId.toString(),
+          senderId: message.senderId,
+          senderName: message.senderName,
+          message: message.messageText ?? '',
+          time: _formatMessageTime(message.createdAt),
+          isMe: isMe,
+          isRead: false, // You can add read status logic if needed
+        );
+      }).toList();
+      
+      currentChatMessages.value = messages;
+      
+      EasyLoading.dismiss();
+      
+    } catch (e) {
+      EasyLoading.dismiss();
+      debugPrint('Error fetching messages: $e');
+      
+      Get.snackbar(
+        'Error',
+        'Failed to load messages: ${e.toString().replaceAll('Exception: ', '')}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.9),
+        colorText: Colors.white,
+        duration: Duration(seconds: 3),
+      );
+    }
+  }
+
+  // Load chat messages for a specific user (OLD - DUMMY DATA)
+  // This method is replaced by fetchConversationMessages
   void _loadChatMessages(String userId) {
-    // Dummy messages for demonstration
-    currentChatMessages.value = [
-      ChatMessage(
-        id: '1',
-        senderId: userId,
-        senderName: currentChatUser.value!.name,
-        message: 'Hey, saw your tbr near the café! Wanna go grab a coffee on friday?',
-        time: '9:41 AM',
-        isMe: false,
-      ),
-      ChatMessage(
-        id: '2',
-        senderId: 'me',
-        senderName: 'Me',
-        message: 'I think that will perfect time',
-        time: '9:42 AM',
-        isMe: true,
-        isRead: true,
-      ),
-      ChatMessage(
-        id: '3',
-        senderId: 'me',
-        senderName: 'Me',
-        message: 'Hey, I came Home sometimes. How about you ?',
-        time: '9:43 AM',
-        isMe: true,
-        isRead: true,
-      ),
-      ChatMessage(
-        id: '4',
-        senderId: userId,
-        senderName: currentChatUser.value!.name,
-        message: 'Same! Want to grab a coffee together?',
-        time: '9:45 AM',
-        isMe: false,
-      ),
-      ChatMessage(
-        id: '5',
-        senderId: 'me',
-        senderName: 'Me',
-        message: 'Sure, this weekend?',
-        time: '9:46 AM',
-        isMe: true,
-        isRead: true,
-      ),
-    ];
+    // This is now handled by fetchConversationMessages
+    currentChatMessages.value = [];
   }
 
   // Send text message
