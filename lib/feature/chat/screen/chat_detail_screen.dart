@@ -410,65 +410,27 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   ),
                   SizedBox(width: 8.w),
 
-                  // Voice/Send button (dynamic)
-                  Obx(() {
-                    final hasText = controller.messageText.value
-                        .trim()
-                        .isNotEmpty;
-                    if (hasText) {
-                      return GestureDetector(
-                        onTap: controller.sendMessage,
-                        child: Container(
-                          width: 40.w,
-                          height: 40.h,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Color(0xFF6B4CE6), Color(0xFF9B6FFF)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.send,
-                            color: Colors.white,
-                            size: 20.sp,
-                          ),
+                  // Send button
+                  GestureDetector(
+                    onTap: controller.sendMessage,
+                    child: Container(
+                      width: 40.w,
+                      height: 40.h,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Color(0xFF6B4CE6), Color(0xFF9B6FFF)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                      );
-                    }
-
-                    return GestureDetector(
-                      onTap: () async {
-                        await controller.toggleRecording();
-                      },
-                      onLongPress: () async {
-                        await controller.toggleRecording();
-                      },
-                      onLongPressUp: () async {
-                        if (controller.isRecording.value) {
-                          await controller.toggleRecording();
-                        }
-                      },
-                      child: Container(
-                        width: 40.w,
-                        height: 40.h,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Color(0xFF6B4CE6), Color(0xFF9B6FFF)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          controller.isRecording.value ? Icons.stop : Icons.mic,
-                          color: Colors.white,
-                          size: 20.sp,
-                        ),
+                        shape: BoxShape.circle,
                       ),
-                    );
-                  }),
+                      child: Icon(
+                        Icons.send,
+                        color: Colors.white,
+                        size: 20.sp,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

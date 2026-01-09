@@ -220,14 +220,42 @@ class ChatScreen extends StatelessWidget {
                                   Row(
                                     children: [
                                       Expanded(
-                                        child: Text(
-                                          user.lastMessage,
-                                          style: TextStyle(
-                                            fontSize: 14.sp,
-                                            color: Color(0xFF757575),
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
+                                        child: Row(
+                                          children: [
+                                            if (user.lastMessageType == 'image') ...[
+                                              Icon(
+                                                Icons.image,
+                                                size: 16.sp,
+                                                color: Color(0xFF757575),
+                                              ),
+                                              SizedBox(width: 4.w),
+                                            ] else if (user.lastMessageType == 'voice') ...[
+                                              Icon(
+                                                Icons.mic,
+                                                size: 16.sp,
+                                                color: Color(0xFF757575),
+                                              ),
+                                              SizedBox(width: 4.w),
+                                            ] else if (user.lastMessageType == 'file') ...[
+                                              Icon(
+                                                Icons.attach_file,
+                                                size: 16.sp,
+                                                color: Color(0xFF757575),
+                                              ),
+                                              SizedBox(width: 4.w),
+                                            ],
+                                            Flexible(
+                                              child: Text(
+                                                user.lastMessage,
+                                                style: TextStyle(
+                                                  fontSize: 14.sp,
+                                                  color: Color(0xFF757575),
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                       if (user.unreadCount > 0)

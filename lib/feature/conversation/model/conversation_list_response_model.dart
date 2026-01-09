@@ -86,12 +86,16 @@ class LastMessage {
   final String senderId;
   final String messageText;
   final String createdAt;
+  final String? messageType;
+  final String? filePath;
 
   LastMessage({
     required this.messageId,
     required this.senderId,
     required this.messageText,
     required this.createdAt,
+    this.messageType,
+    this.filePath,
   });
 
   factory LastMessage.fromJson(Map<String, dynamic> json) {
@@ -100,6 +104,8 @@ class LastMessage {
       senderId: json['sender_id'] ?? '',
       messageText: json['message_text'] ?? '',
       createdAt: json['created_at'] ?? '',
+      messageType: json['message_type'],
+      filePath: json['file_path'],
     );
   }
 }

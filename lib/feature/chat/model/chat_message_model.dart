@@ -45,6 +45,8 @@ class ChatUser {
   final bool isVerified;
   final int? conversationId;
   final String? conversationStatus;
+  final String? lastMessageType;
+  final String? lastMessageFilePath;
 
   ChatUser({
     required this.id,
@@ -57,6 +59,8 @@ class ChatUser {
     this.isVerified = false,
     this.conversationId,
     this.conversationStatus,
+    this.lastMessageType,
+    this.lastMessageFilePath,
   });
 }
 

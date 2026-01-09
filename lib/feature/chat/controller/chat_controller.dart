@@ -86,12 +86,26 @@ class ChatController extends GetxController {
           '>>> Conversation: ID=${conversation.conversationId}, Status="${conversation.conversationStatus}", User=${conversation.otherPerson.name}',
         );
 
+        // Determine last message display text based on type
+        String lastMessageDisplay = 'No messages yet';
+        if (conversation.lastMessage != null) {
+          final messageType = conversation.lastMessage!.messageType;
+          if (messageType == 'image') {
+            lastMessageDisplay = '📷 Photo';
+          } else if (messageType == 'voice') {
+            lastMessageDisplay = '🎤 Voice message';
+          } else if (messageType == 'file') {
+            lastMessageDisplay = '📎 File';
+          } else {
+            lastMessageDisplay = conversation.lastMessage!.messageText;
+          }
+        }
+
         return ChatUser(
           id: conversation.otherPerson.id,
           name: conversation.otherPerson.name,
           profileImage: conversation.otherPerson.image ?? '',
-          lastMessage:
-              conversation.lastMessage?.messageText ?? 'No messages yet',
+          lastMessage: lastMessageDisplay,
           time: _formatTime(
             conversation.lastMessage?.createdAt ?? conversation.createdAt,
           ),
@@ -100,6 +114,8 @@ class ChatController extends GetxController {
           isVerified: false,
           conversationId: conversation.conversationId,
           conversationStatus: conversation.conversationStatus,
+          lastMessageType: conversation.lastMessage?.messageType,
+          lastMessageFilePath: conversation.lastMessage?.filePath,
         );
       }).toList();
 
