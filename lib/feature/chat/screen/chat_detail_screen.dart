@@ -28,7 +28,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   Future<void> _loadMessages() async {
     final controller = Get.find<ChatController>();
     final user = controller.currentChatUser.value;
-    
+
     // Load messages if conversation exists
     if (user != null && user.conversationId != null) {
       await controller.fetchConversationMessages(user.conversationId!);
@@ -38,18 +38,18 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   Future<void> _checkAndShowDialog() async {
     debugPrint('=================================');
     debugPrint('ChatDetailScreen: _checkAndShowDialog() called');
-    
+
     final controller = Get.find<ChatController>();
     final user = controller.currentChatUser.value;
-    
+
     debugPrint('Current chat user: ${user?.name}');
     debugPrint('User object is null: ${user == null}');
-    
+
     // Check if current logged-in user is a service provider
     final prefs = await SharedPreferences.getInstance();
     final isProvider = prefs.getBool('is_service_provider') ?? false;
     final loggedInUserId = prefs.getString('userId') ?? '';
-    
+
     debugPrint('=================================');
     debugPrint('DIALOG CHECK DETAILS:');
     debugPrint('Logged-in User ID: $loggedInUserId');
@@ -58,28 +58,43 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     debugPrint('Other Person ID: ${user?.id}');
     debugPrint('Conversation Status: "${user?.conversationStatus}"');
     debugPrint('Conversation ID: ${user?.conversationId}');
-    debugPrint('Status lowercase == "pending": ${user?.conversationStatus?.toLowerCase() == 'pending'}');
+    debugPrint(
+      'Status lowercase == "pending": ${user?.conversationStatus?.toLowerCase() == 'pending'}',
+    );
     debugPrint('=================================');
-    
+
     // Show dialog ONLY if:
     // 1. User is a service provider
     // 2. Conversation status is "pending"
     // 3. Conversation ID exists
     // Logic: Customer sends request -> Provider accepts/declines
-    if (isProvider && user != null && user.conversationId != null && user.conversationStatus?.toLowerCase() == 'pending') {
+    if (isProvider &&
+        user != null &&
+        user.conversationId != null &&
+        user.conversationStatus?.toLowerCase() == 'pending') {
       debugPrint('✅ ✅ ✅ PROVIDER + PENDING STATUS - SHOWING DIALOG ✅ ✅ ✅');
       debugPrint('Provider needs to accept/decline customer request');
-      await Future.delayed(Duration(milliseconds: 300)); // Small delay to ensure UI is ready
+      await Future.delayed(
+        Duration(milliseconds: 300),
+      ); // Small delay to ensure UI is ready
       controller.showAcceptDeclineDialog();
     } else {
       debugPrint('❌ ❌ ❌ CONDITIONS NOT MET - NOT SHOWING DIALOG ❌ ❌ ❌');
       debugPrint('Conditions breakdown:');
-      debugPrint('  - isProvider: $isProvider (need: true) - Only providers can accept/decline');
+      debugPrint(
+        '  - isProvider: $isProvider (need: true) - Only providers can accept/decline',
+      );
       debugPrint('  - user != null: ${user != null} (need: true)');
-      debugPrint('  - conversationId != null: ${user?.conversationId != null} (need: true)');
-      debugPrint('  - status == pending: ${user?.conversationStatus?.toLowerCase() == 'pending'} (need: true)');
+      debugPrint(
+        '  - conversationId != null: ${user?.conversationId != null} (need: true)',
+      );
+      debugPrint(
+        '  - status == pending: ${user?.conversationStatus?.toLowerCase() == 'pending'} (need: true)',
+      );
       if (!isProvider) {
-        debugPrint('  ℹ️  You are a SERVICE RECEIVER (Customer) - cannot accept/decline');
+        debugPrint(
+          '  ℹ️  You are a SERVICE RECEIVER (Customer) - cannot accept/decline',
+        );
       }
     }
     debugPrint('=================================');
@@ -107,7 +122,16 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               CircleAvatar(
                 radius: 20.r,
                 backgroundColor: Color(0xFFE0E0E0),
-                child: Icon(Icons.person, color: Colors.white, size: 20.sp),
+                backgroundImage: user.profileImage.isNotEmpty
+                    ? NetworkImage(
+                        user.profileImage.startsWith('http')
+                            ? user.profileImage
+                            : 'https://6zpmb4x8-8009.inc1.devtunnels.ms${user.profileImage}',
+                      )
+                    : null,
+                child: user.profileImage.isEmpty
+                    ? Icon(Icons.person, color: Colors.white, size: 20.sp)
+                    : null,
               ),
               SizedBox(width: 12.w),
               Expanded(
@@ -141,14 +165,15 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             onSelected: (value) {
               if (value == 'offer') {
                 controller.sendOfferMessage();
-                Get.snackbar('Offer', 'Offer sent', snackPosition: SnackPosition.BOTTOM);
+                Get.snackbar(
+                  'Offer',
+                  'Offer sent',
+                  snackPosition: SnackPosition.BOTTOM,
+                );
               }
             },
             itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'offer',
-                child: Text('Offer'),
-              ),
+              PopupMenuItem(value: 'offer', child: Text('Offer')),
             ],
           ),
         ],
@@ -233,7 +258,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
                                     children: [
                                       _AttachmentOption(
                                         icon: Icons.camera_alt,
@@ -263,7 +289,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                                   ),
                                   SizedBox(height: 12.h),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
                                     children: [
                                       _AttachmentOption(
                                         icon: Icons.location_on,
@@ -336,7 +363,9 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
                   // Voice/Send button (dynamic)
                   Obx(() {
-                    final hasText = controller.messageText.value.trim().isNotEmpty;
+                    final hasText = controller.messageText.value
+                        .trim()
+                        .isNotEmpty;
                     if (hasText) {
                       return GestureDetector(
                         onTap: controller.sendMessage,
@@ -395,7 +424,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               ),
             ),
           ),
-          
+
           // Emoji Picker
           Obx(() {
             return Offstage(
@@ -437,7 +466,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     if (message.type == MessageType.voice) {
       return _buildVoiceMessage(message);
     }
-    
+
     if (message.type == MessageType.image) {
       return _buildImageMessage(message);
     }
@@ -461,8 +490,12 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(16.r),
             topRight: Radius.circular(16.r),
-            bottomLeft: message.isMe ? Radius.circular(16.r) : Radius.circular(4.r),
-            bottomRight: message.isMe ? Radius.circular(4.r) : Radius.circular(16.r),
+            bottomLeft: message.isMe
+                ? Radius.circular(16.r)
+                : Radius.circular(4.r),
+            bottomRight: message.isMe
+                ? Radius.circular(4.r)
+                : Radius.circular(16.r),
           ),
         ),
         child: Column(
@@ -511,7 +544,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     final minutes = duration ~/ 60;
     final seconds = duration % 60;
     final durationText = '${minutes}:${seconds.toString().padLeft(2, '0')}';
-    
+
     return Align(
       alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -523,8 +556,12 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(16.r),
             topRight: Radius.circular(16.r),
-            bottomLeft: message.isMe ? Radius.circular(16.r) : Radius.circular(4.r),
-            bottomRight: message.isMe ? Radius.circular(4.r) : Radius.circular(16.r),
+            bottomLeft: message.isMe
+                ? Radius.circular(16.r)
+                : Radius.circular(4.r),
+            bottomRight: message.isMe
+                ? Radius.circular(4.r)
+                : Radius.circular(16.r),
           ),
         ),
         child: Row(
@@ -544,7 +581,13 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   20,
                   (index) => Container(
                     width: 2.w,
-                    height: (index % 3 == 0 ? 16 : index % 2 == 0 ? 12 : 8).h,
+                    height:
+                        (index % 3 == 0
+                                ? 16
+                                : index % 2 == 0
+                                ? 12
+                                : 8)
+                            .h,
                     margin: EdgeInsets.symmetric(horizontal: 1.w),
                     decoration: BoxDecoration(
                       color: message.isMe
@@ -584,7 +627,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       ),
     );
   }
-  
+
   Widget _buildImageMessage(ChatMessage message) {
     return Align(
       alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
@@ -592,7 +635,9 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         margin: EdgeInsets.only(bottom: 12.h),
         constraints: BoxConstraints(maxWidth: 280.w),
         child: Column(
-          crossAxisAlignment: message.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          crossAxisAlignment: message.isMe
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(12.r),
@@ -612,10 +657,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             SizedBox(height: 4.h),
             Text(
               message.time,
-              style: TextStyle(
-                color: Color(0xFF9E9E9E),
-                fontSize: 11.sp,
-              ),
+              style: TextStyle(color: Color(0xFF9E9E9E), fontSize: 11.sp),
             ),
           ],
         ),
@@ -670,11 +712,16 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               children: offer.slots.map((slot) {
                 return Container(
                   margin: EdgeInsets.only(bottom: 8.h),
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 10.h,
+                  ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12.r),
                     border: Border.all(
-                      color: slot.isSelected ? Color(0xFF6B4CE6) : Color(0xFFE0E0E0),
+                      color: slot.isSelected
+                          ? Color(0xFF6B4CE6)
+                          : Color(0xFFE0E0E0),
                       width: slot.isSelected ? 1.5 : 1,
                     ),
                     color: slot.isSelected ? Color(0xFFF3EDFF) : Colors.white,
@@ -682,8 +729,12 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   child: Row(
                     children: [
                       Icon(
-                        slot.isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-                        color: slot.isSelected ? Color(0xFF6B4CE6) : Color(0xFFBDBDBD),
+                        slot.isSelected
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_off,
+                        color: slot.isSelected
+                            ? Color(0xFF6B4CE6)
+                            : Color(0xFFBDBDBD),
                         size: 18.sp,
                       ),
                       SizedBox(width: 10.w),
@@ -779,8 +830,12 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(16.r),
             topRight: Radius.circular(16.r),
-            bottomLeft: message.isMe ? Radius.circular(16.r) : Radius.circular(4.r),
-            bottomRight: message.isMe ? Radius.circular(4.r) : Radius.circular(16.r),
+            bottomLeft: message.isMe
+                ? Radius.circular(16.r)
+                : Radius.circular(4.r),
+            bottomRight: message.isMe
+                ? Radius.circular(4.r)
+                : Radius.circular(16.r),
           ),
         ),
         child: Row(
@@ -809,7 +864,9 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   Text(
                     message.time,
                     style: TextStyle(
-                      color: message.isMe ? Colors.white.withValues(alpha: .7) : Color(0xFF9E9E9E),
+                      color: message.isMe
+                          ? Colors.white.withValues(alpha: .7)
+                          : Color(0xFF9E9E9E),
                       fontSize: 11.sp,
                     ),
                   ),

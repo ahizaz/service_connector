@@ -16,7 +16,7 @@ class ChatScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-     
+
         title: Text(
           'Messages',
           style: TextStyle(
@@ -68,9 +68,7 @@ class ChatScreen extends StatelessWidget {
               // Show loading indicator
               if (controller.isLoadingConversations.value) {
                 return Center(
-                  child: CircularProgressIndicator(
-                    color: Color(0xFFCC0000),
-                  ),
+                  child: CircularProgressIndicator(color: Color(0xFFCC0000)),
                 );
               }
 
@@ -111,150 +109,161 @@ class ChatScreen extends StatelessWidget {
               return RefreshIndicator(
                 onRefresh: () => controller.fetchAllConversations(),
                 child: ListView.builder(
-                itemCount: controller.filteredUsers.length,
-                padding: EdgeInsets.zero,
-                itemBuilder: (context, index) {
-                  final user = controller.filteredUsers[index];
-                  return InkWell(
-                    onTap: () {
-                      controller.openChat(user);
-                      Get.to(() => ChatDetailScreen());
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16.w,
-                        vertical: 12.h,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Color(0xFFF0F0F0),
-                            width: 1,
+                  itemCount: controller.filteredUsers.length,
+                  padding: EdgeInsets.zero,
+                  itemBuilder: (context, index) {
+                    final user = controller.filteredUsers[index];
+                    return InkWell(
+                      onTap: () {
+                        controller.openChat(user);
+                        Get.to(() => ChatDetailScreen());
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 12.h,
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Color(0xFFF0F0F0),
+                              width: 1,
+                            ),
                           ),
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          // Profile image
-                          Stack(
-                            children: [
-                              CircleAvatar(
-                                radius: 28.r,
-                                backgroundColor: Color(0xFFE0E0E0),
-                                child: Icon(
-                                  Icons.person,
-                                  color: Colors.white,
-                                  size: 28.sp,
+                        child: Row(
+                          children: [
+                            // Profile image
+                            Stack(
+                              children: [
+                                CircleAvatar(
+                                  radius: 28.r,
+                                  backgroundColor: Color(0xFFE0E0E0),
+                                  backgroundImage: user.profileImage.isNotEmpty
+                                      ? NetworkImage(
+                                          user.profileImage.startsWith('http')
+                                              ? user.profileImage
+                                              : 'https://6zpmb4x8-8009.inc1.devtunnels.ms${user.profileImage}',
+                                        )
+                                      : null,
+                                  child: user.profileImage.isEmpty
+                                      ? Icon(
+                                          Icons.person,
+                                          color: Colors.white,
+                                          size: 28.sp,
+                                        )
+                                      : null,
                                 ),
-                              ),
-                              if (user.isOnline)
-                                Positioned(
-                                  right: 0,
-                                  bottom: 0,
-                                  child: Container(
-                                    width: 14.w,
-                                    height: 14.h,
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFF4CAF50),
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: Colors.white,
-                                        width: 2,
+                                if (user.isOnline)
+                                  Positioned(
+                                    right: 0,
+                                    bottom: 0,
+                                    child: Container(
+                                      width: 14.w,
+                                      height: 14.h,
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFF4CAF50),
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: Colors.white,
+                                          width: 2,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                            ],
-                          ),
-                          SizedBox(width: 12.w),
-
-                          // Message content
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Row(
-                                        children: [
-                                          Flexible(
-                                            child: Text(
-                                              user.name,
-                                              style: TextStyle(
-                                                fontSize: 16.sp,
-                                                fontWeight: FontWeight.w600,
-                                                color: Colors.black,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                          if (user.isVerified) ...[
-                                            SizedBox(width: 4.w),
-                                            Icon(
-                                              Icons.verified,
-                                              color: Color(0xFF2196F3),
-                                              size: 16.sp,
-                                            ),
-                                          ],
-                                        ],
-                                      ),
-                                    ),
-                                    Text(
-                                      user.time,
-                                      style: TextStyle(
-                                        fontSize: 12.sp,
-                                        color: Color(0xFF9E9E9E),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 4.h),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        user.lastMessage,
-                                        style: TextStyle(
-                                          fontSize: 14.sp,
-                                          color: Color(0xFF757575),
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    if (user.unreadCount > 0)
-                                      Container(
-                                        margin: EdgeInsets.only(left: 8.w),
-                                        padding: EdgeInsets.symmetric(
-                                          horizontal: 8.w,
-                                          vertical: 2.h,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Color(0xFFFF5252),
-                                          borderRadius: BorderRadius.circular(10.r),
-                                        ),
-                                        child: Text(
-                                          '${user.unreadCount}',
-                                          style: TextStyle(
-                                            fontSize: 12.sp,
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ),
-                                  ],
-                                ),
                               ],
                             ),
-                          ),
-                        ],
+                            SizedBox(width: 12.w),
+
+                            // Message content
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Row(
+                                          children: [
+                                            Flexible(
+                                              child: Text(
+                                                user.name,
+                                                style: TextStyle(
+                                                  fontSize: 16.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.black,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                            if (user.isVerified) ...[
+                                              SizedBox(width: 4.w),
+                                              Icon(
+                                                Icons.verified,
+                                                color: Color(0xFF2196F3),
+                                                size: 16.sp,
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                      ),
+                                      Text(
+                                        user.time,
+                                        style: TextStyle(
+                                          fontSize: 12.sp,
+                                          color: Color(0xFF9E9E9E),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 4.h),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          user.lastMessage,
+                                          style: TextStyle(
+                                            fontSize: 14.sp,
+                                            color: Color(0xFF757575),
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      if (user.unreadCount > 0)
+                                        Container(
+                                          margin: EdgeInsets.only(left: 8.w),
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 8.w,
+                                            vertical: 2.h,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Color(0xFFFF5252),
+                                            borderRadius: BorderRadius.circular(
+                                              10.r,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            '${user.unreadCount}',
+                                            style: TextStyle(
+                                              fontSize: 12.sp,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
-            );
+                    );
+                  },
+                ),
+              );
             }),
           ),
         ],
