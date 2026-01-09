@@ -22,6 +22,7 @@ class Url {
       static String getAllConversation = "$baseUrl/message/conversations/";
       static String acceptdeclineConversation(int conversationId) => "$baseUrl/message/conversations/$conversationId/update-status/";
       static String getSpecificConversation(int conversationId) => "$baseUrl/message/messages/?conversation_id=$conversationId";
+      static String sendMessage ="$baseUrl/message/messages/";
 
 
 

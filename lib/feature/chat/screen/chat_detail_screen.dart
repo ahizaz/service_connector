@@ -100,6 +100,55 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     debugPrint('=================================');
   }
 
+  // Helper method to determine if path is a network URL or local file
+  Widget _buildImageWidget(String path) {
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      // Network image
+      return Image.network(
+        path,
+        width: 280.w,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            width: 280.w,
+            height: 200.h,
+            color: Color(0xFFF5F5F5),
+            child: Center(
+              child: CircularProgressIndicator(
+                value: loadingProgress.expectedTotalBytes != null
+                    ? loadingProgress.cumulativeBytesLoaded /
+                          loadingProgress.expectedTotalBytes!
+                    : null,
+              ),
+            ),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            width: 280.w,
+            height: 200.h,
+            color: Color(0xFFF5F5F5),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.broken_image, size: 50.sp, color: Colors.grey),
+                SizedBox(height: 8.h),
+                Text(
+                  'Failed to load image',
+                  style: TextStyle(color: Colors.grey, fontSize: 12.sp),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    } else {
+      // Local file
+      return Image.file(File(path), width: 280.w, fit: BoxFit.cover);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ChatController>();
@@ -642,11 +691,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             ClipRRect(
               borderRadius: BorderRadius.circular(12.r),
               child: message.filePath != null
-                  ? Image.file(
-                      File(message.filePath!),
-                      width: 280.w,
-                      fit: BoxFit.cover,
-                    )
+                  ? _buildImageWidget(message.filePath!)
                   : Container(
                       width: 280.w,
                       height: 200.h,
@@ -819,61 +864,81 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
   Widget _buildFileMessage(ChatMessage message) {
     final fileName = message.message;
+    final isNetworkFile =
+        message.filePath != null &&
+        (message.filePath!.startsWith('http://') ||
+            message.filePath!.startsWith('https://'));
+
     return Align(
       alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: EdgeInsets.only(bottom: 12.h),
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-        constraints: BoxConstraints(maxWidth: 280.w),
-        decoration: BoxDecoration(
-          color: message.isMe ? Color(0xFF6B4CE6) : Color(0xFFF5F5F5),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(16.r),
-            topRight: Radius.circular(16.r),
-            bottomLeft: message.isMe
-                ? Radius.circular(16.r)
-                : Radius.circular(4.r),
-            bottomRight: message.isMe
-                ? Radius.circular(4.r)
-                : Radius.circular(16.r),
+      child: InkWell(
+        onTap: () {
+          if (message.filePath != null) {
+            // TODO: Open/download file
+            Get.snackbar(
+              'File',
+              isNetworkFile
+                  ? 'Download from: ${message.filePath}'
+                  : 'Local file: ${message.filePath}',
+              snackPosition: SnackPosition.BOTTOM,
+              duration: Duration(seconds: 2),
+            );
+          }
+        },
+        child: Container(
+          margin: EdgeInsets.only(bottom: 12.h),
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+          constraints: BoxConstraints(maxWidth: 280.w),
+          decoration: BoxDecoration(
+            color: message.isMe ? Color(0xFF6B4CE6) : Color(0xFFF5F5F5),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(16.r),
+              topRight: Radius.circular(16.r),
+              bottomLeft: message.isMe
+                  ? Radius.circular(16.r)
+                  : Radius.circular(4.r),
+              bottomRight: message.isMe
+                  ? Radius.circular(4.r)
+                  : Radius.circular(16.r),
+            ),
           ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.insert_drive_file,
-              color: message.isMe ? Colors.white : Color(0xFF6B4CE6),
-              size: 28.sp,
-            ),
-            SizedBox(width: 8.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    fileName,
-                    style: TextStyle(
-                      color: message.isMe ? Colors.white : Colors.black,
-                      fontSize: 14.sp,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 6.h),
-                  Text(
-                    message.time,
-                    style: TextStyle(
-                      color: message.isMe
-                          ? Colors.white.withValues(alpha: .7)
-                          : Color(0xFF9E9E9E),
-                      fontSize: 11.sp,
-                    ),
-                  ),
-                ],
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                isNetworkFile ? Icons.cloud_download : Icons.insert_drive_file,
+                color: message.isMe ? Colors.white : Color(0xFF6B4CE6),
+                size: 28.sp,
               ),
-            ),
-          ],
+              SizedBox(width: 8.w),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      fileName,
+                      style: TextStyle(
+                        color: message.isMe ? Colors.white : Colors.black,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 6.h),
+                    Text(
+                      message.time,
+                      style: TextStyle(
+                        color: message.isMe
+                            ? Colors.white.withValues(alpha: .7)
+                            : Color(0xFF9E9E9E),
+                        fontSize: 11.sp,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

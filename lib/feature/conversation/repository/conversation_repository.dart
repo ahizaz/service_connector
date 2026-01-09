@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:service_connect/core/urls/urls.dart';
 import 'package:service_connect/feature/conversation/model/conversation_create_request_model.dart';
 import 'package:service_connect/feature/conversation/model/conversation_response_model.dart';
@@ -46,9 +48,10 @@ class ConversationRepository {
       } else {
         // Handle error response
         final Map<String, dynamic>? errorData = jsonDecode(response.body);
-        final errorMessage = errorData?['message'] ?? 
-                           errorData?['detail'] ?? 
-                           'Failed to fetch conversations';
+        final errorMessage =
+            errorData?['message'] ??
+            errorData?['detail'] ??
+            'Failed to fetch conversations';
         throw Exception(errorMessage);
       }
     } catch (e) {
@@ -101,9 +104,10 @@ class ConversationRepository {
       } else {
         // Handle error response
         final Map<String, dynamic>? errorData = jsonDecode(response.body);
-        final errorMessage = errorData?['message'] ?? 
-                           errorData?['detail'] ?? 
-                           'Failed to create conversation';
+        final errorMessage =
+            errorData?['message'] ??
+            errorData?['detail'] ??
+            'Failed to create conversation';
         throw Exception(errorMessage);
       }
     } catch (e) {
@@ -113,7 +117,10 @@ class ConversationRepository {
   }
 
   /// Accept or decline conversation
-  Future<void> updateConversationStatus(int conversationId, String action) async {
+  Future<void> updateConversationStatus(
+    int conversationId,
+    String action,
+  ) async {
     try {
       // Get access token
       final prefs = await SharedPreferences.getInstance();
@@ -155,9 +162,10 @@ class ConversationRepository {
       } else {
         // Handle error response
         final Map<String, dynamic>? errorData = jsonDecode(response.body);
-        final errorMessage = errorData?['message'] ?? 
-                           errorData?['detail'] ?? 
-                           'Failed to update conversation status';
+        final errorMessage =
+            errorData?['message'] ??
+            errorData?['detail'] ??
+            'Failed to update conversation status';
         throw Exception(errorMessage);
       }
     } catch (e) {
@@ -203,13 +211,123 @@ class ConversationRepository {
       } else {
         // Handle error response
         final Map<String, dynamic>? errorData = jsonDecode(response.body);
-        final errorMessage = errorData?['message'] ?? 
-                           errorData?['detail'] ?? 
-                           'Failed to fetch messages';
+        final errorMessage =
+            errorData?['message'] ??
+            errorData?['detail'] ??
+            'Failed to fetch messages';
         throw Exception(errorMessage);
       }
     } catch (e) {
       debugPrint('Error fetching messages: $e');
+      rethrow;
+    }
+  }
+
+  /// Send message with optional image and file attachments
+  Future<void> sendMessage({
+    required int conversationId,
+    String? messageText,
+    File? messageImage,
+    File? messageFile,
+  }) async {
+    try {
+      EasyLoading.show(status: 'Sending...');
+
+      // Get access token
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('accessToken');
+
+      if (token == null || token.isEmpty) {
+        EasyLoading.dismiss();
+        throw Exception('Authorization token not found. Please login again.');
+      }
+
+      debugPrint('=================================');
+      debugPrint('Sending message to conversation: $conversationId');
+      debugPrint('URL: ${Url.sendMessage}');
+      debugPrint('Bearer Token: $token');
+      debugPrint('Message Text: $messageText');
+      debugPrint('Has Image: ${messageImage != null}');
+      debugPrint('Has File: ${messageFile != null}');
+      debugPrint('=================================');
+
+      // Create multipart request
+      final request = http.MultipartRequest('POST', Uri.parse(Url.sendMessage));
+
+      // Add authorization header
+      request.headers['Authorization'] = 'Bearer $token';
+
+      // Add conversation ID
+      request.fields['conversation'] = conversationId.toString();
+
+      // Add message text if provided
+      if (messageText != null && messageText.isNotEmpty) {
+        request.fields['message_text'] = messageText;
+      }
+
+      // Add image if provided
+      if (messageImage != null) {
+        final imageStream = http.ByteStream(messageImage.openRead());
+        final imageLength = await messageImage.length();
+        final imageName = messageImage.path.split('/').last;
+
+        final multipartFile = http.MultipartFile(
+          'message_image',
+          imageStream,
+          imageLength,
+          filename: imageName,
+        );
+
+        request.files.add(multipartFile);
+        debugPrint('Added image: $imageName');
+      }
+
+      // Add file if provided
+      if (messageFile != null) {
+        final fileStream = http.ByteStream(messageFile.openRead());
+        final fileLength = await messageFile.length();
+        final fileName = messageFile.path.split('/').last;
+
+        final multipartFile = http.MultipartFile(
+          'message_file',
+          fileStream,
+          fileLength,
+          filename: fileName,
+        );
+
+        request.files.add(multipartFile);
+        debugPrint('Added file: $fileName');
+      }
+
+      debugPrint('Sending request...');
+
+      // Send request
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
+
+      debugPrint('=================================');
+      debugPrint('Response status: ${response.statusCode}');
+      debugPrint('Response body: ${response.body}');
+      debugPrint('=================================');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        EasyLoading.dismiss();
+        debugPrint('Message sent successfully');
+      } else {
+        EasyLoading.dismiss();
+        // Handle error response
+        final Map<String, dynamic>? errorData = response.body.isNotEmpty
+            ? jsonDecode(response.body)
+            : null;
+        final errorMessage =
+            errorData?['message'] ??
+            errorData?['detail'] ??
+            'Failed to send message';
+        throw Exception(errorMessage);
+      }
+    } catch (e) {
+      EasyLoading.dismiss();
+      debugPrint('Error sending message: $e');
       rethrow;
     }
   }
