@@ -9,8 +9,12 @@ import 'package:path_provider/path_provider.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../model/chat_message_model.dart';
+import '../model/websocket_message_model.dart';
 import 'package:service_connect/feature/conversation/repository/conversation_repository.dart';
 import 'package:service_connect/feature/conversation/model/conversation_list_response_model.dart';
+import 'package:service_connect/core/services/websocket_service.dart';
+import 'package:service_connect/core/auth/auth_service.dart';
+import 'dart:async';
 
 class ChatController extends GetxController {
   // Conversation repository
@@ -47,9 +51,21 @@ class ChatController extends GetxController {
   // Emoji picker
   final RxBool showEmojiPicker = false.obs;
 
+  // WebSocket service
+  final WebSocketService _webSocketService = WebSocketService();
+  final RxBool isWebSocketConnected = false.obs;
+  StreamSubscription? _webSocketMessageSubscription;
+  StreamSubscription? _webSocketConnectionSubscription;
+  String? _currentUserId;
+
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
+
+    // Get current user ID
+    final prefs = await SharedPreferences.getInstance();
+    _currentUserId = prefs.getString('userId') ?? '';
+
     // Load conversations from API instead of dummy data
     fetchAllConversations();
 
@@ -62,6 +78,125 @@ class ChatController extends GetxController {
     messageController.addListener(() {
       messageText.value = messageController.text;
     });
+
+    // Listen to WebSocket messages
+    _setupWebSocketListeners();
+  }
+
+  /// Setup WebSocket listeners
+  void _setupWebSocketListeners() {
+    // Listen to incoming messages
+    _webSocketMessageSubscription = _webSocketService.messageStream.listen((
+      data,
+    ) {
+      debugPrint('📩 WebSocket message received in controller: $data');
+      _handleWebSocketMessage(data);
+    });
+
+    // Listen to connection status
+    _webSocketConnectionSubscription = _webSocketService.connectionStatusStream
+        .listen((isConnected) {
+          debugPrint('🔌 WebSocket connection status: $isConnected');
+          isWebSocketConnected.value = isConnected;
+
+          if (isConnected) {
+            EasyLoading.showSuccess('Connected to live chat');
+          } else {
+            EasyLoading.showError('Disconnected from live chat');
+          }
+        });
+  }
+
+  /// Handle incoming WebSocket messages
+  void _handleWebSocketMessage(Map<String, dynamic> data) {
+    try {
+      // Parse WebSocket message
+      final wsMessage = WebSocketMessage.fromJson(data);
+
+      debugPrint('✅ Parsed message: ${wsMessage.messageText}');
+      debugPrint('   From: ${wsMessage.senderName} (${wsMessage.senderId})');
+
+      // Convert to ChatMessage and add to list
+      final chatMessage = wsMessage.toChatMessage(_currentUserId ?? '');
+
+      // Check if message already exists (to avoid duplicates)
+      final existingIndex = currentChatMessages.indexWhere(
+        (msg) => msg.id == chatMessage.id,
+      );
+
+      if (existingIndex == -1) {
+        // If this is our own message, check if we have a temporary optimistic message
+        if (chatMessage.isMe) {
+          // Find and remove any temporary message with matching content and type
+          final tempIndex = currentChatMessages.indexWhere(
+            (msg) => msg.isMe && 
+                     msg.id.startsWith('temp_') &&
+                     msg.type == chatMessage.type &&
+                     _messagesMatch(msg, chatMessage),
+          );
+          
+          if (tempIndex != -1) {
+            // Replace temporary message with real one
+            currentChatMessages[tempIndex] = chatMessage;
+            debugPrint('✅ Replaced temporary message with real message');
+            return;
+          }
+        }
+        
+        // Add new message
+        currentChatMessages.add(chatMessage);
+        debugPrint('✅ Message added to chat list');
+      } else {
+        debugPrint('⚠️ Duplicate message, skipping');
+      }
+    } catch (e) {
+      debugPrint('❌ Error handling WebSocket message: $e');
+    }
+  }
+
+  /// Check if two messages match (for replacing optimistic updates)
+  bool _messagesMatch(ChatMessage temp, ChatMessage real) {
+    // For text messages, compare text content
+    if (temp.type == MessageType.text && real.type == MessageType.text) {
+      return temp.message == real.message;
+    }
+    
+    // For image/file messages, compare file names or message text
+    if (temp.type == MessageType.image || temp.type == MessageType.file) {
+      return temp.message == real.message;
+    }
+    
+    // For voice messages
+    if (temp.type == MessageType.voice) {
+      return temp.message == real.message;
+    }
+    
+    return false;
+  }
+
+  /// Connect to WebSocket for a conversation
+  void connectToWebSocket(int conversationId) {
+    final token = AuthService.getToken();
+
+    if (token == null || token.isEmpty) {
+      debugPrint('❌ Cannot connect to WebSocket: No auth token');
+      EasyLoading.showError('Authentication required');
+      return;
+    }
+
+    final url =
+        'wss://6zpmb4x8-8009.inc1.devtunnels.ms/ws/chat/$conversationId/?token=$token';
+
+    debugPrint('🔌 Connecting to WebSocket: $url');
+    EasyLoading.show(status: 'Connecting to live chat...');
+
+    _webSocketService.connect(url);
+  }
+
+  /// Disconnect from WebSocket
+  void disconnectWebSocket() {
+    debugPrint('🔌 Disconnecting from WebSocket');
+    _webSocketService.disconnect();
   }
 
   /// Fetch all conversations from API
@@ -189,6 +324,12 @@ class ChatController extends GetxController {
     searchController.dispose();
     messageController.dispose();
     _audioRecorder.dispose();
+
+    // Dispose WebSocket resources
+    _webSocketMessageSubscription?.cancel();
+    _webSocketConnectionSubscription?.cancel();
+    _webSocketService.dispose();
+
     super.onClose();
   }
 
@@ -219,9 +360,16 @@ class ChatController extends GetxController {
   // Open chat with a specific user
   void openChat(ChatUser user) {
     currentChatUser.value = user;
+
+    // Disconnect from previous WebSocket if any
+    disconnectWebSocket();
+
     // Load messages if conversation ID exists
     if (user.conversationId != null) {
       fetchConversationMessages(user.conversationId!);
+
+      // Connect to WebSocket for live messaging
+      connectToWebSocket(user.conversationId!);
     } else {
       // No conversation yet, empty messages
       currentChatMessages.value = [];
@@ -348,9 +496,10 @@ class ChatController extends GetxController {
 
     final messageText = messageController.text.trim();
 
-    // Add message to UI immediately for better UX
+    // Add message to UI immediately for better UX (optimistic update)
+    final tempId = 'temp_${DateTime.now().millisecondsSinceEpoch}';
     final newMessage = ChatMessage(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: tempId,
       senderId: 'me',
       senderName: 'Me',
       message: messageText,
@@ -369,9 +518,12 @@ class ChatController extends GetxController {
         messageText: messageText,
       );
 
-      debugPrint('Message sent successfully to API');
+      debugPrint('✅ Message sent successfully to API');
+      debugPrint(
+        '📩 WebSocket will receive the message and update UI automatically',
+      );
     } catch (e) {
-      debugPrint('Error sending message: $e');
+      debugPrint('❌ Error sending message: $e');
       Get.snackbar(
         'Error',
         'Failed to send message: ${e.toString().replaceAll('Exception: ', '')}',
@@ -417,8 +569,9 @@ class ChatController extends GetxController {
 
   // Send voice message
   void _sendVoiceMessage(String audioPath, int durationInSeconds) {
+    final tempId = 'temp_${DateTime.now().millisecondsSinceEpoch}';
     final voiceMessage = ChatMessage(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: tempId,
       senderId: 'me',
       senderName: 'Me',
       message: 'Voice message',
@@ -520,9 +673,10 @@ class ChatController extends GetxController {
       return;
     }
 
-    // Add file message to UI immediately
+    // Add file message to UI immediately (optimistic update)
+    final tempId = 'temp_${DateTime.now().millisecondsSinceEpoch}';
     final fileMessage = ChatMessage(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: tempId,
       senderId: 'me',
       senderName: 'Me',
       message: fileName,
@@ -569,9 +723,10 @@ class ChatController extends GetxController {
       return;
     }
 
-    // Add image message to UI immediately
+    // Add image message to UI immediately (optimistic update)
+    final tempId = 'temp_${DateTime.now().millisecondsSinceEpoch}';
     final imageMessage = ChatMessage(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: tempId,
       senderId: 'me',
       senderName: 'Me',
       message: 'Image',
