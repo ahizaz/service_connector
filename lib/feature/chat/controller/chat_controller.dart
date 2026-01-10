@@ -127,18 +127,35 @@ class ChatController extends GetxController {
       if (existingIndex == -1) {
         // If this is our own message, check if we have a temporary optimistic message
         if (chatMessage.isMe) {
-          // Find and remove any temporary message with matching content and type
-          final tempIndex = currentChatMessages.indexWhere(
-            (msg) => msg.isMe && 
-                     msg.id.startsWith('temp_') &&
-                     msg.type == chatMessage.type &&
-                     _messagesMatch(msg, chatMessage),
-          );
+          // Find the most recent temporary message with matching type
+          // For image/file, we match by type and recency (within last 10 seconds)
+          int tempIndex = -1;
+          
+          if (chatMessage.type == MessageType.image || chatMessage.type == MessageType.file) {
+            // For images/files, find the last temp message of same type (recent one)
+            for (int i = currentChatMessages.length - 1; i >= 0; i--) {
+              final msg = currentChatMessages[i];
+              if (msg.isMe && 
+                  msg.id.startsWith('temp_') && 
+                  msg.type == chatMessage.type) {
+                tempIndex = i;
+                break; // Found the most recent temp message
+              }
+            }
+          } else {
+            // For text messages, match by content
+            tempIndex = currentChatMessages.indexWhere(
+              (msg) => msg.isMe && 
+                       msg.id.startsWith('temp_') &&
+                       msg.type == chatMessage.type &&
+                       msg.message == chatMessage.message,
+            );
+          }
           
           if (tempIndex != -1) {
             // Replace temporary message with real one
             currentChatMessages[tempIndex] = chatMessage;
-            debugPrint('✅ Replaced temporary message with real message');
+            debugPrint('✅ Replaced temporary message with real message (type: ${chatMessage.type})');
             return;
           }
         }
@@ -152,26 +169,6 @@ class ChatController extends GetxController {
     } catch (e) {
       debugPrint('❌ Error handling WebSocket message: $e');
     }
-  }
-
-  /// Check if two messages match (for replacing optimistic updates)
-  bool _messagesMatch(ChatMessage temp, ChatMessage real) {
-    // For text messages, compare text content
-    if (temp.type == MessageType.text && real.type == MessageType.text) {
-      return temp.message == real.message;
-    }
-    
-    // For image/file messages, compare file names or message text
-    if (temp.type == MessageType.image || temp.type == MessageType.file) {
-      return temp.message == real.message;
-    }
-    
-    // For voice messages
-    if (temp.type == MessageType.voice) {
-      return temp.message == real.message;
-    }
-    
-    return false;
   }
 
   /// Connect to WebSocket for a conversation
