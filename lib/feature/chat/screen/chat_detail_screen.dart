@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:service_connect/feature/offer/screen/create_offer_screen.dart';
 import '../controller/chat_controller.dart';
 import '../model/chat_message_model.dart';
 
@@ -98,6 +99,12 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       }
     }
     debugPrint('=================================');
+  }
+
+  // Helper method to check if the current user is a provider
+  Future<bool> _isProvider() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('is_service_provider') ?? false;
   }
 
   // Helper method to determine if path is a network URL or local file
@@ -209,21 +216,28 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           );
         }),
         actions: [
-          PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert, color: Colors.black),
-            onSelected: (value) {
-              if (value == 'offer') {
-                controller.sendOfferMessage();
-                Get.snackbar(
-                  'Offer',
-                  'Offer sent',
-                  snackPosition: SnackPosition.BOTTOM,
-                );
+          FutureBuilder<bool>(
+            future: _isProvider(),
+            builder: (context, snapshot) {
+              final isProvider = snapshot.data ?? false;
+
+              if (!isProvider) {
+                // Don't show menu button if not a provider
+                return SizedBox.shrink();
               }
+
+              return PopupMenuButton<String>(
+                icon: Icon(Icons.more_vert, color: Colors.black),
+                onSelected: (value) {
+                  if (value == 'offer') {
+                    Get.to(() => CreateOfferScreen());
+                  }
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(value: 'offer', child: Text('Create Offer')),
+                ],
+              );
             },
-            itemBuilder: (context) => [
-              PopupMenuItem(value: 'offer', child: Text('Offer')),
-            ],
           ),
         ],
       ),
@@ -424,11 +438,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                         ),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
-                        Icons.send,
-                        color: Colors.white,
-                        size: 20.sp,
-                      ),
+                      child: Icon(Icons.send, color: Colors.white, size: 20.sp),
                     ),
                   ),
                 ],
