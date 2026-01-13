@@ -7,11 +7,27 @@ import 'package:service_connect/core/common/widgets/custom_textField.dart';
 import 'package:service_connect/feature/offer/controller/create_offer_controller.dart';
 
 class CreateOfferScreen extends StatelessWidget {
-  const CreateOfferScreen({super.key});
+  final String receiverUserId;
+  final String conversationId;
+
+  const CreateOfferScreen({
+    super.key,
+    required this.receiverUserId,
+    required this.conversationId,
+  });
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(CreateOfferController());
+    
+    // Set receiver user ID in controller
+    controller.receiverUserId.value = receiverUserId;
+    
+    debugPrint('=================================');
+    debugPrint('CreateOfferScreen initialized');
+    debugPrint('Receiver User ID: $receiverUserId');
+    debugPrint('Conversation ID: $conversationId');
+    debugPrint('=================================');
 
     return Scaffold(
       backgroundColor: const Color(0xffF5F5F5),
@@ -289,7 +305,7 @@ class CreateOfferScreen extends StatelessWidget {
                     : const Color(0xffE0E0E0),
                 onTap: () {
                   if (controller.isFormValid.value) {
-                    controller.submitOffer();
+                    controller.submitOffer(conversationId);
                   }
                 },
               ),

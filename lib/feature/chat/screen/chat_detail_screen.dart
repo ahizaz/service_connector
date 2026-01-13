@@ -230,7 +230,28 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                 icon: Icon(Icons.more_vert, color: Colors.black),
                 onSelected: (value) {
                   if (value == 'offer') {
-                    Get.to(() => CreateOfferScreen());
+                    final controller = Get.find<ChatController>();
+                    final user = controller.currentChatUser.value;
+                    
+                    if (user != null && user.id.isNotEmpty) {
+                      debugPrint('=================================');
+                      debugPrint('Opening Create Offer Screen');
+                      debugPrint('Receiver User ID: ${user.id}');
+                      debugPrint('Conversation ID: ${user.conversationId}');
+                      debugPrint('=================================');
+                      
+                      Get.to(() => CreateOfferScreen(
+                        receiverUserId: user.id,
+                        conversationId: user.conversationId?.toString() ?? '',
+                      ));
+                    } else {
+                      debugPrint('❌ Error: User ID is empty or null');
+                      Get.snackbar(
+                        'Error',
+                        'Cannot create offer: User information is missing',
+                        snackPosition: SnackPosition.BOTTOM,
+                      );
+                    }
                   }
                 },
                 itemBuilder: (context) => [

@@ -1,4 +1,5 @@
 class CreateOfferModel {
+  final String receiverUserId;
   final int serviceCategory;
   final String serviceDescription;
   final String serviceCost;
@@ -7,6 +8,7 @@ class CreateOfferModel {
   final String urgencyType;
 
   CreateOfferModel({
+    required this.receiverUserId,
     required this.serviceCategory,
     required this.serviceDescription,
     required this.serviceCost,
@@ -17,6 +19,7 @@ class CreateOfferModel {
 
   Map<String, dynamic> toJson() {
     return {
+      'receiver_user_id': receiverUserId,
       'service_category': serviceCategory,
       'service_description': serviceDescription,
       'service_cost': serviceCost,
@@ -28,6 +31,7 @@ class CreateOfferModel {
 
   factory CreateOfferModel.fromJson(Map<String, dynamic> json) {
     return CreateOfferModel(
+      receiverUserId: json['receiver_user_id'] ?? '',
       serviceCategory: json['service_category'] ?? 0,
       serviceDescription: json['service_description'] ?? '',
       serviceCost: json['service_cost'] ?? '',
