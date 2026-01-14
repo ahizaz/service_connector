@@ -15,6 +15,9 @@ import 'package:service_connect/feature/conversation/model/conversation_list_res
 import 'package:service_connect/core/services/websocket_service.dart';
 import 'package:service_connect/core/auth/auth_service.dart';
 import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:service_connect/core/urls/urls.dart';
 
 class ChatController extends GetxController {
   // Conversation repository
@@ -406,6 +409,7 @@ class ChatController extends GetxController {
         // Determine message type and file path based on API response
         MessageType messageType = MessageType.text;
         String? filePath;
+        OfferDetails? offerDetails;
         String displayMessage = message.messageText ?? '';
 
         if (message.messageImage != null && message.messageImage!.isNotEmpty) {
@@ -423,6 +427,19 @@ class ChatController extends GetxController {
           messageType = MessageType.voice;
           filePath = message.messageVoice;
           displayMessage = 'Voice message';
+        } else if (message.quotationId != null) {
+          // This is an offer message
+          messageType = MessageType.offer;
+          offerDetails = OfferDetails(
+            title: 'New Offer',
+            workDetails: message.messageText ?? '',
+            slots: [],
+            quotationId: message.quotationId,
+            quotationStatus: message.quotationStatus,
+            acceptUrl: message.acceptUrl,
+            rejectUrl: message.rejectUrl,
+            termsConditions: message.termsConditions,
+          );
         }
 
         debugPrint('-----------------------------------');
@@ -435,6 +452,7 @@ class ChatController extends GetxController {
         debugPrint('  Is Me (RIGHT side): $isMe');
         debugPrint('  Message Type: $messageType');
         debugPrint('  File Path: $filePath');
+        debugPrint('  Quotation ID: ${message.quotationId}');
         debugPrint('-----------------------------------');
 
         return ChatMessage(
@@ -447,6 +465,7 @@ class ChatController extends GetxController {
           isRead: false, // You can add read status logic if needed
           type: messageType,
           filePath: filePath,
+          offerDetails: offerDetails,
         );
       }).toList();
 
@@ -976,5 +995,131 @@ class ChatController extends GetxController {
     searchController.clear();
     searchQuery.value = '';
     filterUsers();
+  }
+
+  // Update Offer Status (Accept/Decline)
+  Future<void> updateOfferStatus(int quotationId, String status) async {
+    try {
+      EasyLoading.show(status: 'Updating offer status...');
+      
+      final token = AuthService.getToken();
+      if (token == null || token.isEmpty) {
+        debugPrint('❌ Authentication token is missing');
+        EasyLoading.dismiss();
+        Get.snackbar(
+          'Authentication Error',
+          'Please login again',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.withOpacity(0.9),
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      debugPrint('=================================');
+      debugPrint('📤 UPDATING OFFER STATUS');
+      debugPrint('Quotation ID: $quotationId');
+      debugPrint('Status: $status');
+      debugPrint('API URL: ${Url.updateOfferStatus(quotationId)}');
+      debugPrint('=================================');
+
+      final response = await http.patch(
+        Uri.parse(Url.updateOfferStatus(quotationId)),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'quotation_status': status,
+        }),
+      );
+
+      debugPrint('=================================');
+      debugPrint('📥 API RESPONSE');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+      debugPrint('=================================');
+
+      EasyLoading.dismiss();
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint('✅ Offer status updated successfully');
+        
+        // Update the offer status in the message list
+        final messageIndex = currentChatMessages.indexWhere(
+          (msg) => msg.offerDetails?.quotationId == quotationId,
+        );
+        
+        if (messageIndex != -1) {
+          final message = currentChatMessages[messageIndex];
+          final updatedOffer = OfferDetails(
+            title: message.offerDetails!.title,
+            workDetails: message.offerDetails!.workDetails,
+            slots: message.offerDetails!.slots,
+            primaryCtaText: message.offerDetails!.primaryCtaText,
+            secondaryCtaText: message.offerDetails!.secondaryCtaText,
+            quotationId: message.offerDetails!.quotationId,
+            quotationStatus: status,
+            acceptUrl: message.offerDetails!.acceptUrl,
+            rejectUrl: message.offerDetails!.rejectUrl,
+            termsConditions: message.offerDetails!.termsConditions,
+          );
+          
+          currentChatMessages[messageIndex] = ChatMessage(
+            id: message.id,
+            senderId: message.senderId,
+            senderName: message.senderName,
+            message: message.message,
+            time: message.time,
+            isMe: message.isMe,
+            isRead: message.isRead,
+            type: message.type,
+            filePath: message.filePath,
+            duration: message.duration,
+            offerDetails: updatedOffer,
+          );
+          
+          debugPrint('✅ Updated offer status in UI');
+        }
+        
+        Get.snackbar(
+          'Success',
+          'Offer ${status == "accepted" ? "accepted" : "declined"} successfully',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.withOpacity(0.9),
+          colorText: Colors.white,
+        );
+      } else {
+        debugPrint('❌ API Error: Status ${response.statusCode}');
+        String message = 'Failed to update offer status';
+        try {
+          final Map<String, dynamic> resp = jsonDecode(response.body);
+          if (resp.containsKey('detail')) message = resp['detail'].toString();
+          if (resp.containsKey('message')) message = resp['message'].toString();
+          debugPrint('Error Message: $message');
+        } catch (_) {}
+
+        Get.snackbar(
+          'Error',
+          message,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.withOpacity(0.9),
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      EasyLoading.dismiss();
+      debugPrint('=================================');
+      debugPrint('❌ EXCEPTION IN UPDATE OFFER STATUS');
+      debugPrint('Error: $e');
+      debugPrint('=================================');
+      Get.snackbar(
+        'Error',
+        'Network error: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.9),
+        colorText: Colors.white,
+      );
+    }
   }
 }

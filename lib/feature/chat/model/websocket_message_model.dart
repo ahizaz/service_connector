@@ -9,6 +9,11 @@ class WebSocketMessage {
   final String? messageImage;
   final String? messageFile;
   final String createdAt;
+  final int? quotationId;
+  final String? quotationStatus;
+  final String? acceptUrl;
+  final String? rejectUrl;
+  final String? termsConditions;
 
   WebSocketMessage({
     required this.messageId,
@@ -18,6 +23,11 @@ class WebSocketMessage {
     this.messageImage,
     this.messageFile,
     required this.createdAt,
+    this.quotationId,
+    this.quotationStatus,
+    this.acceptUrl,
+    this.rejectUrl,
+    this.termsConditions,
   });
 
   factory WebSocketMessage.fromJson(Map<String, dynamic> json) {
@@ -29,6 +39,11 @@ class WebSocketMessage {
       messageImage: json['message_image'] as String?,
       messageFile: json['message_file'] as String?,
       createdAt: json['created_at'] as String,
+      quotationId: json['quotation_id'] as int?,
+      quotationStatus: json['quotation_status'] as String?,
+      acceptUrl: json['accept_url'] as String?,
+      rejectUrl: json['reject_url'] as String?,
+      termsConditions: json['terms_conditions'] as String?,
     );
   }
 
@@ -41,6 +56,11 @@ class WebSocketMessage {
       'message_image': messageImage,
       'message_file': messageFile,
       'created_at': createdAt,
+      'quotation_id': quotationId,
+      'quotation_status': quotationStatus,
+      'accept_url': acceptUrl,
+      'reject_url': rejectUrl,
+      'terms_conditions': termsConditions,
     };
   }
 
@@ -49,6 +69,7 @@ class WebSocketMessage {
     // Determine message type
     MessageType type = MessageType.text;
     String? filePath;
+    OfferDetails? offerDetails;
 
     if (messageImage != null && messageImage!.isNotEmpty) {
       type = MessageType.image;
@@ -56,18 +77,38 @@ class WebSocketMessage {
     } else if (messageFile != null && messageFile!.isNotEmpty) {
       type = MessageType.file;
       filePath = messageFile;
+    } else if (quotationId != null) {
+      // This is an offer message
+      type = MessageType.offer;
+      offerDetails = OfferDetails(
+        title: 'New Offer',
+        workDetails: messageText,
+        slots: [],
+        quotationId: quotationId,
+        quotationStatus: quotationStatus,
+        acceptUrl: acceptUrl,
+        rejectUrl: rejectUrl,
+        termsConditions: termsConditions,
+      );
+    }
+
+    // Always include terms & conditions in the message display if present
+    String displayMessage = messageText;
+    if (termsConditions != null && termsConditions!.isNotEmpty) {
+      displayMessage = '$messageText\n\nTerms & Conditions: $termsConditions';
     }
 
     return ChatMessage(
       id: messageId.toString(),
       senderId: senderId,
       senderName: senderName,
-      message: messageText,
+      message: displayMessage,
       time: _formatMessageTime(createdAt),
       isMe: senderId == currentUserId,
       isRead: true,
       type: type,
       filePath: filePath,
+      offerDetails: offerDetails,
     );
   }
 
@@ -80,7 +121,7 @@ class WebSocketMessage {
       final String period = hour >= 12 ? 'PM' : 'AM';
       final int displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
 
-      return '${displayHour}:${minute.toString().padLeft(2, '0')} $period';
+      return '$displayHour:${minute.toString().padLeft(2, '0')} $period';
     } catch (e) {
       return 'now';
     }

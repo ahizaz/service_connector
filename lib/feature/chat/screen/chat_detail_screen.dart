@@ -804,51 +804,127 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               }).toList(),
             ),
             SizedBox(height: 12.h),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(vertical: 12.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
+            // Show buttons only if offer is not yet accepted or declined
+            if (offer.quotationStatus == null || 
+                (offer.quotationStatus != 'accepted' && 
+                 offer.quotationStatus != 'declined'))
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
                       ),
-                      side: BorderSide(color: Color(0xFFE0E0E0)),
-                    ),
-                    onPressed: () {},
-                    child: Text(
-                      offer.secondaryCtaText,
-                      style: TextStyle(
-                        color: Colors.black87,
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w600,
+                      onPressed: () {
+                        if (offer.quotationId != null) {
+                          final controller = Get.find<ChatController>();
+                          controller.updateOfferStatus(
+                            offer.quotationId!,
+                            'declined',
+                          );
+                        } else {
+                          debugPrint('❌ Quotation ID is null');
+                          Get.snackbar(
+                            'Error',
+                            'Cannot decline offer: Invalid quotation ID',
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                        }
+                      },
+                      child: Text(
+                        offer.secondaryCtaText,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(width: 12.w),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFE53935),
-                      padding: EdgeInsets.symmetric(vertical: 12.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
                       ),
-                    ),
-                    onPressed: () {},
-                    child: Text(
-                      offer.primaryCtaText,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 13.sp,
-                        fontWeight: FontWeight.w600,
+                      onPressed: () {
+                        if (offer.quotationId != null) {
+                          final controller = Get.find<ChatController>();
+                          controller.updateOfferStatus(
+                            offer.quotationId!,
+                            'accepted',
+                          );
+                        } else {
+                          debugPrint('❌ Quotation ID is null');
+                          Get.snackbar(
+                            'Error',
+                            'Cannot accept offer: Invalid quotation ID',
+                            snackPosition: SnackPosition.BOTTOM,
+                          );
+                        }
+                      },
+                      child: Text(
+                        offer.primaryCtaText,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13.sp,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
+                ],
+              )
+            else
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
+                decoration: BoxDecoration(
+                  color: offer.quotationStatus == 'accepted' 
+                      ? Colors.green.withOpacity(0.1) 
+                      : Colors.red.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12.r),
+                  border: Border.all(
+                    color: offer.quotationStatus == 'accepted' 
+                        ? Colors.green 
+                        : Colors.red,
+                  ),
                 ),
-              ],
-            ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      offer.quotationStatus == 'accepted' 
+                          ? Icons.check_circle 
+                          : Icons.cancel,
+                      color: offer.quotationStatus == 'accepted' 
+                          ? Colors.green 
+                          : Colors.red,
+                      size: 20.sp,
+                    ),
+                    SizedBox(width: 8.w),
+                    Text(
+                      offer.quotationStatus == 'accepted' 
+                          ? 'Offer Accepted' 
+                          : 'Offer Declined',
+                      style: TextStyle(
+                        color: offer.quotationStatus == 'accepted' 
+                            ? Colors.green 
+                            : Colors.red,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       ),

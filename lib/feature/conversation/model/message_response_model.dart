@@ -82,6 +82,11 @@ class Message {
   final String? messageFile;
   final String? messageVoice;
   final String createdAt;
+  final int? quotationId;
+  final String? quotationStatus;
+  final String? acceptUrl;
+  final String? rejectUrl;
+  final String? termsConditions;
 
   Message({
     required this.messageId,
@@ -96,6 +101,11 @@ class Message {
     this.messageFile,
     this.messageVoice,
     required this.createdAt,
+    this.quotationId,
+    this.quotationStatus,
+    this.acceptUrl,
+    this.rejectUrl,
+    this.termsConditions,
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
@@ -112,6 +122,11 @@ class Message {
       messageFile: json['message_file'],
       messageVoice: json['message_voice'],
       createdAt: json['created_at'] ?? '',
+      quotationId: json['quotation_id'] as int?,
+      quotationStatus: json['quotation_status'] as String?,
+      acceptUrl: json['accept_url'] as String?,
+      rejectUrl: json['reject_url'] as String?,
+      termsConditions: json['terms_conditions'] as String?,
     );
   }
 
@@ -129,6 +144,11 @@ class Message {
       'message_file': messageFile,
       'message_voice': messageVoice,
       'created_at': createdAt,
+      'quotation_id': quotationId,
+      'quotation_status': quotationStatus,
+      'accept_url': acceptUrl,
+      'reject_url': rejectUrl,
+      'terms_conditions': termsConditions,
     };
   }
 }

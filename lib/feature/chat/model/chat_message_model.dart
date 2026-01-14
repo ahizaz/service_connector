@@ -70,6 +70,11 @@ class OfferDetails {
   final List<OfferSlot> slots;
   final String primaryCtaText;
   final String secondaryCtaText;
+  final int? quotationId;
+  final String? quotationStatus;
+  final String? acceptUrl;
+  final String? rejectUrl;
+  final String? termsConditions;
 
   OfferDetails({
     required this.title,
@@ -77,6 +82,11 @@ class OfferDetails {
     required this.slots,
     this.primaryCtaText = 'Accept Offer',
     this.secondaryCtaText = 'Cancel Offer',
+    this.quotationId,
+    this.quotationStatus,
+    this.acceptUrl,
+    this.rejectUrl,
+    this.termsConditions,
   });
 }
 
