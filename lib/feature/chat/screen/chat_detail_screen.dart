@@ -707,10 +707,14 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     final offer = message.offerDetails;
     if (offer == null) return SizedBox.shrink();
 
+    // Only show accept/decline buttons if the offer was sent by someone else (not me)
+    // Provider sends offer (isMe = true), Receiver gets offer (isMe = false)
+    final showButtons = !message.isMe;
+
     return Align(
-      alignment: Alignment.centerLeft,
+      alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        width: double.infinity,
+        width: message.isMe ? 300.w : double.infinity,
         margin: EdgeInsets.only(bottom: 12.h),
         padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
@@ -804,10 +808,13 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               }).toList(),
             ),
             SizedBox(height: 12.h),
-            // Show buttons only if offer is not yet accepted or declined
-            if (offer.quotationStatus == null || 
+            // Show buttons only if:
+            // 1. The offer was received (not sent by me) - showButtons
+            // 2. The offer is not yet accepted or declined
+            if (showButtons && 
+                (offer.quotationStatus == null || 
                 (offer.quotationStatus != 'accepted' && 
-                 offer.quotationStatus != 'declined'))
+                 offer.quotationStatus != 'declined')))
               Row(
                 children: [
                   Expanded(
@@ -883,7 +890,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   ),
                 ],
               )
-            else
+            // Show status only for receivers (who got the offer and already acted on it)
+            else if (showButtons)
               Container(
                 padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
                 decoration: BoxDecoration(
