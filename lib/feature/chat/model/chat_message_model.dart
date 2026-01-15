@@ -10,6 +10,7 @@ class ChatMessage {
   final String? filePath; // For voice or image files
   final int? duration; // For voice messages in seconds
   final OfferDetails? offerDetails;
+  final OrderDetails? orderDetails;
 
   ChatMessage({
     required this.id,
@@ -23,6 +24,7 @@ class ChatMessage {
     this.filePath,
     this.duration,
     this.offerDetails,
+    this.orderDetails,
   });
 }
 
@@ -32,6 +34,7 @@ enum MessageType {
   image,
   file,
   offer,
+  order,
 }
 
 class ChatUser {
@@ -101,5 +104,25 @@ class OfferSlot {
     required this.dayLabel,
     required this.timeLabel,
     this.isSelected = false,
+  });
+}
+
+class OrderDetails {
+  final int orderId;
+  final int quotationId;
+  final String orderStatus;
+  final String serviceTimeTaken;
+  final String serviceCost;
+  final String serviceTimeline;
+  final String? serviceDescription;
+
+  OrderDetails({
+    required this.orderId,
+    required this.quotationId,
+    required this.orderStatus,
+    required this.serviceTimeTaken,
+    required this.serviceCost,
+    required this.serviceTimeline,
+    this.serviceDescription,
   });
 }

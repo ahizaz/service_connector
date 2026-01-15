@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:service_connect/core/auth/auth_service.dart';
 import 'package:service_connect/core/urls/urls.dart';
+import 'package:service_connect/feature/chat/controller/chat_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CreateOrderController extends GetxController {
   final TextEditingController serviceTimeTakenController =
@@ -84,6 +86,19 @@ class CreateOrderController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint('✅ Order created successfully');
 
+        // Parse response to get order details
+        final responseData = jsonDecode(response.body);
+        final orderId = responseData['id'] ?? responseData['order_id'];
+        final orderStatus = responseData['order_status'] ?? 'pending';
+
+        // Send WebSocket notification to receiver
+        await _sendOrderNotification(
+          orderId: orderId,
+          quotationId: int.parse(quotationId),
+          orderStatus: orderStatus,
+          serviceTimeTaken: serviceTimeTaken,
+        );
+
         Get.snackbar(
           'Success',
           'Order created successfully',
@@ -123,6 +138,66 @@ class CreateOrderController extends GetxController {
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
+    }
+  }
+
+  // Send order notification through WebSocket
+  Future<void> _sendOrderNotification({
+    required int orderId,
+    required int quotationId,
+    required String orderStatus,
+    required String serviceTimeTaken,
+  }) async {
+    try {
+      debugPrint('=================================');
+      debugPrint('🔌 SENDING ORDER WEBSOCKET NOTIFICATION');
+      debugPrint('Order ID: $orderId');
+      debugPrint('Quotation ID: $quotationId');
+      debugPrint('Order Status: $orderStatus');
+      debugPrint('Service Time Taken: $serviceTimeTaken');
+      debugPrint('=================================');
+
+      // Get current user info
+      final prefs = await SharedPreferences.getInstance();
+      final senderId = prefs.getString('userId') ?? '';
+      final senderName = prefs.getString('userName') ?? 'Provider';
+
+      // Try to get ChatController instance if it exists
+      try {
+        final chatController = Get.find<ChatController>();
+        
+        if (chatController.isWebSocketConnected.value) {
+          // Prepare WebSocket message for order
+          final webSocketMessage = {
+            'type': 'order',
+            'message': 'New order created',
+            'order_details': {
+              'order_id': orderId,
+              'quotation_id': quotationId,
+              'order_status': orderStatus,
+              'service_time_taken': serviceTimeTaken,
+            },
+            'sender_id': senderId,
+            'sender_name': senderName,
+            'message_text': '📦 New Order #$orderId has been created',
+          };
+
+          debugPrint('📤 Sending WebSocket message: $webSocketMessage');
+          
+          // Send through WebSocket service
+          chatController.sendWebSocketMessage(webSocketMessage);
+          
+          debugPrint('✅ Order notification sent through WebSocket');
+        } else {
+          debugPrint('⚠️ WebSocket not connected, notification will be delivered through API polling');
+        }
+      } catch (e) {
+        debugPrint('⚠️ ChatController not found or WebSocket not available: $e');
+        debugPrint('✅ Order created via REST API, receiver will see it on refresh');
+      }
+    } catch (e) {
+      debugPrint('❌ Error sending order notification: $e');
+      // Don't throw error, order is already created successfully
     }
   }
 

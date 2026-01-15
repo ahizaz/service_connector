@@ -199,6 +199,21 @@ class ChatController extends GetxController {
     _webSocketService.disconnect();
   }
 
+  /// Send message through WebSocket
+  void sendWebSocketMessage(Map<String, dynamic> message) {
+    if (!isWebSocketConnected.value) {
+      debugPrint('❌ Cannot send WebSocket message: Not connected');
+      return;
+    }
+
+    try {
+      _webSocketService.sendMessage(message);
+      debugPrint('✅ WebSocket message sent successfully');
+    } catch (e) {
+      debugPrint('❌ Error sending WebSocket message: $e');
+    }
+  }
+
   /// Fetch all conversations from API
   Future<void> fetchAllConversations() async {
     try {
@@ -231,6 +246,10 @@ class ChatController extends GetxController {
             lastMessageDisplay = '🎤 Voice message';
           } else if (messageType == 'file') {
             lastMessageDisplay = '📎 File';
+          } else if (messageType == 'order') {
+            lastMessageDisplay = '📦 New Order';
+          } else if (messageType == 'offer') {
+            lastMessageDisplay = '💼 New Offer';
           } else {
             lastMessageDisplay = conversation.lastMessage!.messageText;
           }

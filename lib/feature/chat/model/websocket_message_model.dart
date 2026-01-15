@@ -14,6 +14,9 @@ class WebSocketMessage {
   final String? acceptUrl;
   final String? rejectUrl;
   final String? termsConditions;
+  final int? orderId;
+  final String? orderStatus;
+  final String? serviceTimeTaken;
 
   WebSocketMessage({
     required this.messageId,
@@ -28,6 +31,9 @@ class WebSocketMessage {
     this.acceptUrl,
     this.rejectUrl,
     this.termsConditions,
+    this.orderId,
+    this.orderStatus,
+    this.serviceTimeTaken,
   });
 
   factory WebSocketMessage.fromJson(Map<String, dynamic> json) {
@@ -44,6 +50,9 @@ class WebSocketMessage {
       acceptUrl: json['accept_url'] as String?,
       rejectUrl: json['reject_url'] as String?,
       termsConditions: json['terms_conditions'] as String?,
+      orderId: json['order_id'] as int?,
+      orderStatus: json['order_status'] as String?,
+      serviceTimeTaken: json['service_time_taken'] as String?,
     );
   }
 
@@ -61,6 +70,9 @@ class WebSocketMessage {
       'accept_url': acceptUrl,
       'reject_url': rejectUrl,
       'terms_conditions': termsConditions,
+      'order_id': orderId,
+      'order_status': orderStatus,
+      'service_time_taken': serviceTimeTaken,
     };
   }
 
@@ -70,6 +82,7 @@ class WebSocketMessage {
     MessageType type = MessageType.text;
     String? filePath;
     OfferDetails? offerDetails;
+    OrderDetails? orderDetails;
 
     if (messageImage != null && messageImage!.isNotEmpty) {
       type = MessageType.image;
@@ -77,6 +90,18 @@ class WebSocketMessage {
     } else if (messageFile != null && messageFile!.isNotEmpty) {
       type = MessageType.file;
       filePath = messageFile;
+    } else if (orderId != null) {
+      // This is an order message
+      type = MessageType.order;
+      orderDetails = OrderDetails(
+        orderId: orderId!,
+        quotationId: quotationId ?? 0,
+        orderStatus: orderStatus ?? 'pending',
+        serviceTimeTaken: serviceTimeTaken ?? '',
+        serviceCost: '', // Will be filled from quotation data
+        serviceTimeline: '', // Will be filled from quotation data
+        serviceDescription: messageText,
+      );
     } else if (quotationId != null) {
       // This is an offer message
       type = MessageType.offer;
@@ -109,6 +134,7 @@ class WebSocketMessage {
       type: type,
       filePath: filePath,
       offerDetails: offerDetails,
+      orderDetails: orderDetails,
     );
   }
 
