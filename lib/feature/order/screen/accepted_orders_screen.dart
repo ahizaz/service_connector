@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:service_connect/feature/order/controller/accepted_order_controller.dart';
+import 'package:service_connect/feature/order/screen/create_order_screen.dart';
 
 class AcceptedOrdersScreen extends StatelessWidget {
   final String receiverUserId;
@@ -285,8 +286,8 @@ class AcceptedOrdersScreen extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Navigate to order details page
-                      Get.toNamed('/order-details', arguments: order);
+                      // Navigate to create order page
+                      Get.to(() => CreateOrderScreen(acceptedOrder: order));
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,

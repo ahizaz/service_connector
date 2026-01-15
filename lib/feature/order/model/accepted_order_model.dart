@@ -20,10 +20,18 @@ class AcceptedOrderModel {
   });
 
   factory AcceptedOrderModel.fromJson(Map<String, dynamic> json) {
+    // Handle both flat and nested response structures
+    int categoryId = 0;
+    if (json['service_category'] is Map) {
+      categoryId = 0; // Will use category_name if available
+    } else {
+      categoryId = json['service_category'] ?? 0;
+    }
+
     return AcceptedOrderModel(
-      quotationId: json['quotation_id']?.toString() ?? '',
+      quotationId: (json['id'] ?? json['quotation_id'])?.toString() ?? '',
       receiverUserId: json['receiver_user_id']?.toString() ?? '',
-      serviceCategory: json['service_category'] ?? 0,
+      serviceCategory: categoryId,
       serviceCost: json['service_cost']?.toString() ?? '',
       serviceTimeline: json['service_timeline']?.toString() ?? '',
       createdAt: json['created_at']?.toString() ?? '',
