@@ -2,74 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:service_connect/feature/home/controller/home_controller.dart';
-import 'package:service_connect/feature/home/model/provider_detail_model.dart';
-import 'package:service_connect/feature/home/repository/provider_repositroy.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:service_connect/feature/home/controller/professional_details_controller.dart';
 
-class ProfessionalDetailsScreen extends StatefulWidget {
+class ProfessionalDetailsScreen extends StatelessWidget {
   final int professionalId;
 
   const ProfessionalDetailsScreen({super.key, required this.professionalId});
 
   @override
-  State<ProfessionalDetailsScreen> createState() => _ProfessionalDetailsScreenState();
-}
-
-class _ProfessionalDetailsScreenState extends State<ProfessionalDetailsScreen> {
-  final ProviderRepository _providerRepository = ProviderRepository();
-  ProviderDetailModel? providerDetail;
-  bool isLoading = true;
-  String? errorMessage;
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchProviderDetails();
-  }
-
-  Future<void> _fetchProviderDetails() async {
-    try {
-      debugPrint('=================================');
-      debugPrint('Starting to fetch provider details for ID: ${widget.professionalId}');
-      debugPrint('=================================');
-      
-      EasyLoading.show(status: 'Loading...');
-      
-      final details = await _providerRepository.getProviderDetails(widget.professionalId);
-      
-      debugPrint('=================================');
-      debugPrint('Provider details loaded successfully');
-      debugPrint('Provider Name: ${details.user.name}');
-      debugPrint('Service Title: ${details.serviceTitle}');
-      debugPrint('Rating: ${details.providerRating}');
-      debugPrint('=================================');
-      
-      setState(() {
-        providerDetail = details;
-        isLoading = false;
-      });
-      
-      EasyLoading.dismiss();
-    } catch (e) {
-      debugPrint('=================================');
-      debugPrint('Error loading provider details: $e');
-      debugPrint('=================================');
-      
-      setState(() {
-        errorMessage = e.toString();
-        isLoading = false;
-      });
-      
-      EasyLoading.dismiss();
-      EasyLoading.showError('Failed to load provider details');
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    // Show loading state
-    if (isLoading) {
+    final controller = Get.put(ProfessionalDetailsController());
+    
+    return Obx(() {
+      // Show loading state
+      if (controller.isLoading.value) {
       return Scaffold(
         backgroundColor: const Color(0xffF5F5F5),
         appBar: AppBar(
@@ -96,7 +42,7 @@ class _ProfessionalDetailsScreenState extends State<ProfessionalDetailsScreen> {
     }
 
     // Show error state
-    if (errorMessage != null || providerDetail == null) {
+    if (controller.errorMessage.value.isNotEmpty || controller.providerDetail.value == null) {
       return Scaffold(
         backgroundColor: const Color(0xffF5F5F5),
         appBar: AppBar(
@@ -133,7 +79,7 @@ class _ProfessionalDetailsScreenState extends State<ProfessionalDetailsScreen> {
               ),
               SizedBox(height: 8.h),
               ElevatedButton(
-                onPressed: _fetchProviderDetails,
+                onPressed: controller.retryFetch,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xffCC0000),
                 ),
@@ -145,7 +91,7 @@ class _ProfessionalDetailsScreenState extends State<ProfessionalDetailsScreen> {
       );
     }
 
-    final professional = providerDetail!;
+    final professional = controller.providerDetail.value!;
 
     return Scaffold(
       backgroundColor: const Color(0xffF5F5F5),
@@ -697,7 +643,7 @@ class _ProfessionalDetailsScreenState extends State<ProfessionalDetailsScreen> {
                   Get.toNamed(
                     '/chat-detail',
                     arguments: {
-                      'userId': widget.professionalId,
+                      'userId': professionalId,
                       'userName': professional.user.name,
                       'userType': professional.serviceCategory.categoryName,
                     },
@@ -736,6 +682,7 @@ class _ProfessionalDetailsScreenState extends State<ProfessionalDetailsScreen> {
         ),
       ),
     );
+    });
   }
 
   Widget _buildStatItem(
