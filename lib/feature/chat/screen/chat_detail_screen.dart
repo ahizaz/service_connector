@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:service_connect/feature/offer/screen/create_offer_screen.dart';
+import 'package:service_connect/feature/order/screen/accepted_orders_screen.dart';
 import '../controller/chat_controller.dart';
 import '../model/chat_message_model.dart';
 
@@ -173,46 +174,57 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           final user = controller.currentChatUser.value;
           if (user == null) return SizedBox();
 
-          return Row(
-            children: [
-              CircleAvatar(
-                radius: 20.r,
-                backgroundColor: Color(0xFFE0E0E0),
-                backgroundImage: user.profileImage.isNotEmpty
-                    ? NetworkImage(
-                        user.profileImage.startsWith('http')
-                            ? user.profileImage
-                            : 'https://6zpmb4x8-8009.inc1.devtunnels.ms${user.profileImage}',
-                      )
-                    : null,
-                child: user.profileImage.isEmpty
-                    ? Icon(Icons.person, color: Colors.white, size: 20.sp)
-                    : null,
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      user.name,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
+          return FutureBuilder<bool>(
+            future: _isProvider(),
+            builder: (context, snapshot) {
+              final isProvider = snapshot.data ?? false;
+              // Show service title only when receiver is viewing a provider
+              // Hide when provider is viewing a receiver
+              final shouldShowTitle = !isProvider && user.serviceTitle != null && user.serviceTitle!.isNotEmpty;
+
+              return Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20.r,
+                    backgroundColor: Color(0xFFE0E0E0),
+                    backgroundImage: user.profileImage.isNotEmpty
+                        ? NetworkImage(
+                            user.profileImage.startsWith('http')
+                                ? user.profileImage
+                                : 'https://6zpmb4x8-8009.inc1.devtunnels.ms${user.profileImage}',
+                          )
+                        : null,
+                    child: user.profileImage.isEmpty
+                        ? Icon(Icons.person, color: Colors.white, size: 20.sp)
+                        : null,
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user.name,
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        if (shouldShowTitle)
+                          Text(
+                            user.serviceTitle!,
+                            style: TextStyle(
+                              color: Color(0xFF9E9E9E),
+                              fontSize: 12.sp,
+                            ),
+                          ),
+                      ],
                     ),
-                    Text(
-                      'Plumber',
-                      style: TextStyle(
-                        color: Color(0xFF9E9E9E),
-                        fontSize: 12.sp,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+                  ),
+                ],
+              );
+            },
           );
         }),
         actions: [
@@ -252,10 +264,36 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                         snackPosition: SnackPosition.BOTTOM,
                       );
                     }
+                  } else if (value == 'order') {
+                    final controller = Get.find<ChatController>();
+                    final user = controller.currentChatUser.value;
+                    
+                    debugPrint('=================================');
+                    debugPrint('Create Order clicked');
+                    debugPrint('Receiver User ID: ${user?.id}');
+                    debugPrint('Conversation ID: ${user?.conversationId}');
+                    debugPrint('=================================');
+                    
+                    if (user != null && user.id.isNotEmpty) {
+                      // Navigate to Accepted Orders Screen
+                      Get.to(() => AcceptedOrdersScreen(
+                        receiverUserId: user.id,
+                      ));
+                    } else {
+                      debugPrint('❌ Error: User ID is empty or null');
+                      Get.snackbar(
+                        'Error',
+                        'Cannot load orders: User information is missing',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: Colors.red,
+                        colorText: Colors.white,
+                      );
+                    }
                   }
                 },
                 itemBuilder: (context) => [
                   PopupMenuItem(value: 'offer', child: Text('Create Offer')),
+                  PopupMenuItem(value: 'order', child: Text('Create Order')),
                 ],
               );
             },

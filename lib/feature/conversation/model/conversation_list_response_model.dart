@@ -63,12 +63,14 @@ class OtherPerson {
   final String name;
   final String email;
   final String? image;
+  final String? serviceTitle;
 
   OtherPerson({
     required this.id,
     required this.name,
     required this.email,
     this.image,
+    this.serviceTitle,
   });
 
   factory OtherPerson.fromJson(Map<String, dynamic> json) {
@@ -77,6 +79,7 @@ class OtherPerson {
       name: json['name'] ?? '',
       email: json['email'] ?? '',
       image: json['image'],
+      serviceTitle: json['service_title'],
     );
   }
 }

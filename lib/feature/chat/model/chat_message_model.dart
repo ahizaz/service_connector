@@ -47,6 +47,7 @@ class ChatUser {
   final String? conversationStatus;
   final String? lastMessageType;
   final String? lastMessageFilePath;
+  final String? serviceTitle;
 
   ChatUser({
     required this.id,
@@ -61,6 +62,7 @@ class ChatUser {
     this.conversationStatus,
     this.lastMessageType,
     this.lastMessageFilePath,
+    this.serviceTitle,
   });
 }
 

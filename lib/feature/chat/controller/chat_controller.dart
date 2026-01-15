@@ -251,6 +251,7 @@ class ChatController extends GetxController {
           conversationStatus: conversation.conversationStatus,
           lastMessageType: conversation.lastMessage?.messageType,
           lastMessageFilePath: conversation.lastMessage?.filePath,
+          serviceTitle: conversation.otherPerson.serviceTitle,
         );
       }).toList();
 

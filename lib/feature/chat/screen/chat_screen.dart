@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:service_connect/feature/chat/screen/chat_detail_screen.dart';
 import '../controller/chat_controller.dart';
 
@@ -186,24 +187,59 @@ class ChatScreen extends StatelessWidget {
                                         child: Row(
                                           children: [
                                             Flexible(
-                                              child: Text(
-                                                user.name,
-                                                style: TextStyle(
-                                                  fontSize: 16.sp,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Colors.black,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Flexible(
+                                                        child: Text(
+                                                          user.name,
+                                                          style: TextStyle(
+                                                            fontSize: 16.sp,
+                                                            fontWeight: FontWeight.w600,
+                                                            color: Colors.black,
+                                                          ),
+                                                          overflow: TextOverflow.ellipsis,
+                                                        ),
+                                                      ),
+                                                      if (user.isVerified) ...[
+                                                        SizedBox(width: 4.w),
+                                                        Icon(
+                                                          Icons.verified,
+                                                          color: Color(0xFF2196F3),
+                                                          size: 16.sp,
+                                                        ),
+                                                      ],
+                                                    ],
+                                                  ),
+                                                  // Show service title only for receivers viewing providers
+                                                  FutureBuilder<bool>(
+                                                    future: SharedPreferences.getInstance().then(
+                                                      (prefs) => prefs.getBool('is_service_provider') ?? false,
+                                                    ),
+                                                    builder: (context, snapshot) {
+                                                      final isProvider = snapshot.data ?? false;
+                                                      final shouldShowTitle = !isProvider && 
+                                                          user.serviceTitle != null && 
+                                                          user.serviceTitle!.isNotEmpty;
+                                                      
+                                                      if (shouldShowTitle) {
+                                                        return Text(
+                                                          user.serviceTitle!,
+                                                          style: TextStyle(
+                                                            fontSize: 12.sp,
+                                                            color: Color(0xFF9E9E9E),
+                                                          ),
+                                                          overflow: TextOverflow.ellipsis,
+                                                        );
+                                                      }
+                                                      return SizedBox.shrink();
+                                                    },
+                                                  ),
+                                                ],
                                               ),
                                             ),
-                                            if (user.isVerified) ...[
-                                              SizedBox(width: 4.w),
-                                              Icon(
-                                                Icons.verified,
-                                                color: Color(0xFF2196F3),
-                                                size: 16.sp,
-                                              ),
-                                            ],
                                           ],
                                         ),
                                       ),

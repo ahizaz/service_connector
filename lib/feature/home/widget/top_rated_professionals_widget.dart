@@ -57,6 +57,7 @@ class TopRatedProfessionalsWidget extends StatelessWidget {
         isVerified: false,
         conversationId: response.data.conversationId,
         conversationStatus: response.data.conversationStatus,
+        serviceTitle: response.data.messageSender.serviceTitle,
       );
       
       // Set the current chat user

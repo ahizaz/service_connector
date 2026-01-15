@@ -25,6 +25,7 @@ class Url {
       static String sendMessage ="$baseUrl/message/messages/";
       static String createOffer = "$baseUrl/offer/quotations/";
       static String updateOfferStatus(int quotationId) => "$baseUrl/offer/quotations/$quotationId/update-status/";
+      static String allacceptedOrder(String receiverUserId) => "$baseUrl/offer/quotations/accepted-for-order/?receiver_user_id=$receiverUserId";
       
 
 
