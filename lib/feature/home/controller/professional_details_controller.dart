@@ -11,12 +11,13 @@ class ProfessionalDetailsController extends GetxController {
   final RxBool isLoading = true.obs;
   final RxString errorMessage = ''.obs;
   
-  late int professionalId;
+  final int professionalId;
+
+  ProfessionalDetailsController({required this.professionalId});
 
   @override
   void onInit() {
     super.onInit();
-    professionalId = Get.arguments as int;
     _fetchProviderDetails();
   }
 

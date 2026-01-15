@@ -11,7 +11,7 @@ class ProfessionalDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(ProfessionalDetailsController());
+    final controller = Get.put(ProfessionalDetailsController(professionalId: professionalId));
     
     return Obx(() {
       // Show loading state

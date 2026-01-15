@@ -56,22 +56,43 @@ class ProviderDetailModel {
       serviceCategory: ServiceCategory.fromJson(json['service_category'] ?? {}),
       serviceTitle: json['service_title'] ?? '',
       providerDescription: json['provider_description'] ?? '',
-      providerExperience: json['provider_experience'] ?? 0,
-      providerDoneWork: json['provider_done_work'] ?? 0,
+      providerExperience: (json['provider_experience'] is int)
+          ? json['provider_experience']
+          : int.tryParse(json['provider_experience']?.toString() ?? '0') ?? 0,
+      providerDoneWork: (json['provider_done_work'] is int)
+          ? json['provider_done_work']
+          : int.tryParse(json['provider_done_work']?.toString() ?? '0') ?? 0,
       providerRating: json['provider_rating']?.toString() ?? '0.00',
-      providerServiceCharge: json['provider_service_charge']?.toString() ?? '0.00',
+      providerServiceCharge:
+          json['provider_service_charge']?.toString() ?? '0.00',
       providerLanguage: json['provider_language'] ?? '',
       providerLicenceNumber: json['provider_licence_number'] ?? '',
       providerCountry: json['provider_country'] ?? '',
       providerCity: json['provider_city'] ?? '',
       providerServiceArea: json['provider_service_area'] ?? '',
-      providerTotalHired: json['provider_total_hired'] ?? 0,
-      providerTotalEarnings: json['provider_total_earnings']?.toString() ?? '0.00',
-      providerAvailableBalance: json['provider_available_balance']?.toString() ?? '0.00',
+      providerTotalHired: (json['provider_total_hired'] is int)
+          ? json['provider_total_hired']
+          : int.tryParse(json['provider_total_hired']?.toString() ?? '0') ?? 0,
+      providerTotalEarnings:
+          json['provider_total_earnings']?.toString() ?? '0.00',
+      providerAvailableBalance:
+          json['provider_available_balance']?.toString() ?? '0.00',
       providerIsVerified: json['provider_is_verified'] ?? false,
-      keywords: (json['keywords'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
-      workImages: (json['work_images'] as List<dynamic>?)?.map((e) => WorkImage.fromJson(e)).toList() ?? [],
-      documents: (json['documents'] as List<dynamic>?)?.map((e) => Document.fromJson(e)).toList() ?? [],
+      keywords:
+          (json['keywords'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      workImages:
+          (json['work_images'] as List<dynamic>?)
+              ?.map((e) => WorkImage.fromJson(e))
+              .toList() ??
+          [],
+      documents:
+          (json['documents'] as List<dynamic>?)
+              ?.map((e) => Document.fromJson(e))
+              .toList() ??
+          [],
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'] ?? '',
     );
@@ -112,12 +133,7 @@ class User {
   final String email;
   final String? image;
 
-  User({
-    required this.id,
-    required this.name,
-    required this.email,
-    this.image,
-  });
+  User({required this.id, required this.name, required this.email, this.image});
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
@@ -129,12 +145,7 @@ class User {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'email': email,
-      'image': image,
-    };
+    return {'id': id, 'name': name, 'email': email, 'image': image};
   }
 }
 
@@ -171,11 +182,7 @@ class WorkImage {
   final String image;
   final String uploadedAt;
 
-  WorkImage({
-    required this.id,
-    required this.image,
-    required this.uploadedAt,
-  });
+  WorkImage({required this.id, required this.image, required this.uploadedAt});
 
   factory WorkImage.fromJson(Map<String, dynamic> json) {
     return WorkImage(
@@ -186,11 +193,7 @@ class WorkImage {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'image': image,
-      'uploaded_at': uploadedAt,
-    };
+    return {'id': id, 'image': image, 'uploaded_at': uploadedAt};
   }
 }
 
