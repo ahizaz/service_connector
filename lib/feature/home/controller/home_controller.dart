@@ -11,13 +11,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 class HomeController extends GetxController {
   late TextEditingController searchController;
   late FocusNode searchFocusNode;
-  final ProviderRepository providerRepository =  ProviderRepository();
-   final RxList<ProviderModel> allProviders = <ProviderModel>[].obs;
-     final RxBool isLoadingProviders = false.obs;
-  
+  final ProviderRepository providerRepository = ProviderRepository();
+  final RxList<ProviderModel> allProviders = <ProviderModel>[].obs;
+  final RxBool isLoadingProviders = false.obs;
+
   // Service provider mode
   final RxBool isServiceProvider = false.obs;
-  
+
   // Category controller for API data
   final CategoryController categoryController = Get.put(CategoryController());
 
@@ -31,7 +31,7 @@ class HomeController extends GetxController {
   final RxDouble totalEarning = 0.0.obs;
   final RxDouble providerRating = 0.0.obs;
   final RxInt successRate = 0.obs;
-  
+
   // Text data
   final String greetingText = "Hey, Glad You're Here";
   final RxString userName = "Johnson Mate".obs;
@@ -45,43 +45,57 @@ class HomeController extends GetxController {
       debugPrint('Failed to load userName from prefs: $e');
     }
   }
-  
+
   @override
   void onInit() {
     super.onInit();
     searchController = TextEditingController();
     searchFocusNode = FocusNode();
-    loadServiceProviderMode();
-    loadDashboardData();
-    _loadUserNameFromPrefs();
-    fetchAllProviders();
+    _initializeHomeData();
   }
+
+  // Initialize all home data
+  Future<void> _initializeHomeData() async {
+    try {
+      EasyLoading.show(status: 'Loading...');
+      await Future.wait([
+        loadServiceProviderMode(),
+        loadDashboardData(),
+        _loadUserNameFromPrefs(),
+        categoryController.fetchCategories(),
+        fetchAllProviders(),
+      ]);
+    } catch (e) {
+      debugPrint('Error initializing home data: $e');
+      EasyLoading.showError('Failed to load data');
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
+
   Future<void> fetchAllProviders() async {
     try {
-      // EasyLoading.show() loading indicator দেখাবে screen এ
-      // status: 'Loading...' message টা show করবে
-      EasyLoading.show(status: 'Loading...');
-      
       // isLoadingProviders true করে দিলাম, মানে loading শুরু হয়েছে
       isLoadingProviders.value = true;
-      
+      EasyLoading.show(status: 'Loading providers...');
+
       debugPrint('==========================================');
       debugPrint('Starting to fetch all providers from API');
       debugPrint('==========================================');
-      
+
       // providerRepository.getAllProviders() call করে API থেকে data নিচ্ছি
       // await মানে হলো এই line এ wait করবে যতক্ষণ না data আসে
-      final List<ProviderModel> providers = 
-          await providerRepository.getAllProviders();
-      
+      final List<ProviderModel> providers = await providerRepository
+          .getAllProviders();
+
       debugPrint('==========================================');
       debugPrint('Successfully fetched ${providers.length} providers');
       debugPrint('==========================================');
-      
+
       // allProviders list এ নতুন data assign করছি
       // .value দিয়ে RxList এর value change করা হয়
       allProviders.value = providers;
-      
+
       // যদি data না আসে তাহলে empty message দেখাচ্ছি
       if (providers.isEmpty) {
         debugPrint('No providers found in the response');
@@ -89,28 +103,23 @@ class HomeController extends GetxController {
         // প্রথম provider এর info print করছি check করার জন্য
         debugPrint('First provider: ${providers[0].userName}');
       }
-      
-      // EasyLoading.dismiss() loading indicator hide করবে
+
       EasyLoading.dismiss();
-      
     } catch (e) {
       // যদি কোনো error হয় তাহলে এখানে আসবে
       debugPrint('==========================================');
       debugPrint('Error in fetchAllProviders: $e');
       debugPrint('==========================================');
-      
-      // Loading dismiss করছি
+
       EasyLoading.dismiss();
-      
-      // Error message show করছি user কে
       EasyLoading.showError('Failed to load providers');
-      
     } finally {
       // finally block সবসময় execute হবে, error হোক বা না হোক
       // Loading state false করে দিচ্ছি
       isLoadingProviders.value = false;
     }
   }
+
   // Reload mode when screen is revisited
   void reloadMode() {
     loadServiceProviderMode();
@@ -118,11 +127,15 @@ class HomeController extends GetxController {
     loadDashboardData();
   }
 
+  // Reload all home data after login
+  Future<void> reloadHomeData() async {
+    await _initializeHomeData();
+  }
+
   /// Load provider dashboard data.
   /// Currently this sets static/sample values. Replace with API call as needed.
   Future<void> loadDashboardData() async {
     try {
-   
       availableWithdraw.value = 250.0;
       earningInMonth.value = 380.0;
       activeHire.value = 2;
@@ -136,12 +149,12 @@ class HomeController extends GetxController {
       debugPrint('Failed to load dashboard data: $e');
     }
   }
-  
+
   Future<void> loadServiceProviderMode() async {
     final prefs = await SharedPreferences.getInstance();
     isServiceProvider.value = prefs.getBool('is_service_provider') ?? false;
   }
-  
+
   // Categories
   final List<Map<String, String>> categories = [
     {'name': 'Plumber', 'icon': IconPath.plumber},
@@ -166,12 +179,13 @@ class HomeController extends GetxController {
       'reviews': 52,
       'image': 'assets/images/userpicreparing.png',
       'location': 'ID: EL2024303',
-      'overview': 'Consequat velit qui adipisicing sunt do reprehenderit ad laborum tempor ullamco exercitation. Ullamco tempor adipisicing et voluptate duis sit esse aliqua esse ex dolore esse. Consequat velit qui adipisicing et voluptate duis sit esse aliqua esse ex dolore esse.',
+      'overview':
+          'Consequat velit qui adipisicing sunt do reprehenderit ad laborum tempor ullamco exercitation. Ullamco tempor adipisicing et voluptate duis sit esse aliqua esse ex dolore esse. Consequat velit qui adipisicing et voluptate duis sit esse aliqua esse ex dolore esse.',
       'services': [
         'Pipe Installation',
         'Leak Repair',
         'Water Heater Installation',
-        'Bathroom Fittings'
+        'Bathroom Fittings',
       ],
       'workingDays': 'Monday - Saturday',
       'language': 'English, Hindi',
@@ -187,12 +201,13 @@ class HomeController extends GetxController {
       'reviews': 23,
       'image': 'assets/images/userpicreparing.png',
       'location': 'ID: EL2024304',
-      'overview': 'Expert in computer repair and washing machine services. Highly skilled technician with years of experience in electronics and appliance repair.',
+      'overview':
+          'Expert in computer repair and washing machine services. Highly skilled technician with years of experience in electronics and appliance repair.',
       'services': [
         'Computer Repair',
         'Washing Machine Repair',
         'Laptop Servicing',
-        'Hardware Installation'
+        'Hardware Installation',
       ],
       'workingDays': 'Monday - Friday',
       'language': 'English, Urdu',
@@ -208,12 +223,13 @@ class HomeController extends GetxController {
       'reviews': 47,
       'image': 'assets/images/userpicreparing.png',
       'location': 'ID: EL2024305',
-      'overview': 'Professional plumber with extensive experience in residential and commercial plumbing. Specialized in pipe installation and water systems.',
+      'overview':
+          'Professional plumber with extensive experience in residential and commercial plumbing. Specialized in pipe installation and water systems.',
       'services': [
         'Pipe Installation',
         'Sewer Line Maintenance',
         'Water Tank Cleaning',
-        'Emergency Repairs'
+        'Emergency Repairs',
       ],
       'workingDays': 'All Days',
       'language': 'English',
@@ -231,7 +247,7 @@ class HomeController extends GetxController {
       'experience': 5,
       'workDone': 280,
       'image': 'assets/images/userpicreparing.png',
-      'category': 'Repairing'
+      'category': 'Repairing',
     },
     {
       'name': 'Washing Machine...',
@@ -241,7 +257,7 @@ class HomeController extends GetxController {
       'experience': 5,
       'workDone': 280,
       'image': 'assets/images/userpicreparing.png',
-      'category': 'Repairing'
+      'category': 'Repairing',
     },
     {
       'name': 'Computer Repair',
@@ -251,7 +267,7 @@ class HomeController extends GetxController {
       'experience': 5,
       'workDone': 280,
       'image': 'assets/images/userpicreparing.png',
-      'category': 'Repairing'
+      'category': 'Repairing',
     },
     {
       'name': 'Pipe Installation',
@@ -261,7 +277,7 @@ class HomeController extends GetxController {
       'experience': 4,
       'workDone': 360,
       'image': 'assets/images/userpicreparing.png',
-      'category': 'Plumber'
+      'category': 'Plumber',
     },
     {
       'name': 'Bathroom Fittings',
@@ -271,7 +287,7 @@ class HomeController extends GetxController {
       'experience': 6,
       'workDone': 450,
       'image': 'assets/images/userpicreparing.png',
-      'category': 'Plumber'
+      'category': 'Plumber',
     },
     {
       'name': 'Washing Machine...',
@@ -281,7 +297,7 @@ class HomeController extends GetxController {
       'experience': 5,
       'workDone': 280,
       'image': 'assets/images/userpicreparing.png',
-      'category': 'Repairing'
+      'category': 'Repairing',
     },
   ];
 

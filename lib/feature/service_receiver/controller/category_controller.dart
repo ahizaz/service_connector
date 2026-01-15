@@ -6,21 +6,21 @@ import 'package:service_connect/feature/service_receiver/repository/category_rep
 
 class CategoryController extends GetxController {
   final CategoryRepository _repository = CategoryRepository();
-  
+
   final RxList<CategoryModel> categories = <CategoryModel>[].obs;
   final RxBool isLoading = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    fetchCategories();
+    // Don't auto-fetch here; let HomeController coordinate the loading
   }
 
   Future<void> fetchCategories() async {
     try {
       isLoading.value = true;
       EasyLoading.show(status: 'Loading categories...');
-      
+
       debugPrint('=================================');
       debugPrint('Starting to fetch categories...');
       debugPrint('=================================');
@@ -38,11 +38,10 @@ class CategoryController extends GetxController {
       debugPrint('=================================');
       debugPrint('Error in category controller: $e');
       debugPrint('=================================');
-      
+
       EasyLoading.dismiss();
-      isLoading.value = false;
-      
       EasyLoading.showError('Failed to load categories');
+      isLoading.value = false;
     }
   }
 

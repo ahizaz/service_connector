@@ -7,47 +7,49 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:service_connect/core/urls/urls.dart';
 import 'package:service_connect/core/auth/auth_service.dart';
 import 'package:service_connect/feature/bottom_navbar/screen/bottom_navbar.dart';
+import 'package:service_connect/feature/home/controller/home_controller.dart';
 
-class LoginController extends GetxController{
-    final emailController = TextEditingController();
+class LoginController extends GetxController {
+  final emailController = TextEditingController();
   final passwordController = TextEditingController();
-   var isPasswordVisible = false.obs;
-    var isloginEnabled = false.obs;
-    var rememberMe = false.obs;
-    
-     @override
+  var isPasswordVisible = false.obs;
+  var isloginEnabled = false.obs;
+  var rememberMe = false.obs;
+
+  @override
   void onInit() {
     super.onInit();
     emailController.addListener(_validateFields);
     passwordController.addListener(_validateFields);
     _loadSavedCredentials();
   }
-  
-    void togglePasswordVisibility() {
+
+  void togglePasswordVisibility() {
     isPasswordVisible.value = !isPasswordVisible.value;
   }
-  
+
   void toggleRememberMe(bool? value) {
     rememberMe.value = value ?? false;
   }
-  
-  void _validateFields(){
-    isloginEnabled.value = emailController.text.isNotEmpty && passwordController.text.isNotEmpty;
+
+  void _validateFields() {
+    isloginEnabled.value =
+        emailController.text.isNotEmpty && passwordController.text.isNotEmpty;
   }
-  
+
   Future<void> _loadSavedCredentials() async {
     final prefs = await SharedPreferences.getInstance();
     final savedEmail = prefs.getString('saved_email');
     final savedPassword = prefs.getString('saved_password');
     final isRemembered = prefs.getBool('remember_me') ?? false;
-    
+
     if (isRemembered && savedEmail != null && savedPassword != null) {
       emailController.text = savedEmail;
       passwordController.text = savedPassword;
       rememberMe.value = true;
     }
   }
-  
+
   Future<void> saveCredentials() async {
     final prefs = await SharedPreferences.getInstance();
     if (rememberMe.value) {
@@ -60,7 +62,7 @@ class LoginController extends GetxController{
       await prefs.setBool('remember_me', false);
     }
   }
-  
+
   Future<void> handleLogin() async {
     if (isloginEnabled.value) {
       EasyLoading.show(status: 'Logging in...');
@@ -88,7 +90,8 @@ class LoginController extends GetxController{
           if (map is Map && map['data'] != null && map['data'] is Map) {
             final data = map['data'] as Map;
             if (data['access'] != null) token = data['access'];
-            if (data['refresh'] != null && token == null) token = data['refresh'];
+            if (data['refresh'] != null && token == null)
+              token = data['refresh'];
             if (data['user'] != null && data['user'] is Map) {
               final user = data['user'] as Map;
               if (user['id'] != null) userId = user['id'].toString();
@@ -123,7 +126,17 @@ class LoginController extends GetxController{
           passwordController.clear();
 
           EasyLoading.dismiss();
+
+          // Navigate to bottom navbar
           Get.offAll(() => BottomNavbar());
+
+          // Reload home data after navigation to ensure categories and providers are loaded
+          try {
+            final homeController = Get.find<HomeController>();
+            await homeController.reloadHomeData();
+          } catch (e) {
+            debugPrint('Error reloading home data: $e');
+          }
         } else {
           EasyLoading.dismiss();
           Get.snackbar('Login failed', res.body);
@@ -135,20 +148,20 @@ class LoginController extends GetxController{
       }
     }
   }
-  
+
   // Check if logged-in user has a provider profile
   Future<void> _checkIfUserIsProvider(String? userId) async {
     if (userId == null) return;
-    
+
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('accessToken');
-      
+
       debugPrint('=================================');
       debugPrint('Checking if user is provider...');
       debugPrint('User ID: $userId');
       debugPrint('=================================');
-      
+
       // Call provider list API to check if this user has provider profile
       final response = await http.get(
         Uri.parse(Url.getAllproviders),
@@ -157,46 +170,45 @@ class LoginController extends GetxController{
           'Authorization': 'Bearer $token',
         },
       );
-      
+
       debugPrint('Provider check response: ${response.statusCode}');
-      
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         bool isProvider = false;
-        
+
         // Check if this user ID exists in providers list
         if (data['results'] != null && data['results'] is List) {
           final providers = data['results'] as List;
           for (var provider in providers) {
-            if (provider['user_id'] != null && provider['user_id'].toString() == userId) {
+            if (provider['user_id'] != null &&
+                provider['user_id'].toString() == userId) {
               isProvider = true;
               debugPrint('✅ User is a SERVICE PROVIDER');
               break;
             }
           }
         }
-        
+
         if (!isProvider) {
           debugPrint('❌ User is a SERVICE RECEIVER (Customer)');
         }
-        
+
         await prefs.setBool('is_service_provider', isProvider);
         debugPrint('Saved is_service_provider: $isProvider');
-        
       } else {
         debugPrint('Failed to check provider status, defaulting to receiver');
         await prefs.setBool('is_service_provider', false);
       }
-      
+
       debugPrint('=================================');
-      
     } catch (e) {
       debugPrint('Error checking provider status: $e');
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('is_service_provider', false);
     }
   }
-  
+
   void handleForgetPassword() {
     // Add navigation to forget password screen or show dialog
     Get.snackbar(
@@ -207,14 +219,12 @@ class LoginController extends GetxController{
     // You can navigate to forget password screen here
     // Get.to(() => ForgetPasswordScreen());
   }
-  
-    
+
   @override
-  void onClose(){
+  void onClose() {
     emailController.dispose();
     passwordController.dispose();
 
     super.onClose();
   }
-
 }
