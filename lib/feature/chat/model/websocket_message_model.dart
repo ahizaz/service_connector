@@ -2,34 +2,36 @@
 import 'chat_message_model.dart';
 
 class WebSocketMessage {
-  final int messageId;
-  final String senderId;
-  final String senderName;
+  final int? messageId;
+  final String? senderId;
+  final String? senderName;
   final String messageText;
   final String? messageImage;
   final String? messageFile;
-  final String createdAt;
+  final String? createdAt;
   final int? quotationId;
   final String? quotationStatus;
   final String? acceptUrl;
   final String? rejectUrl;
+  final String? paymentLink;
   final String? termsConditions;
   final int? orderId;
   final String? orderStatus;
   final String? serviceTimeTaken;
 
   WebSocketMessage({
-    required this.messageId,
-    required this.senderId,
-    required this.senderName,
+    this.messageId,
+    this.senderId,
+    this.senderName,
     required this.messageText,
     this.messageImage,
     this.messageFile,
-    required this.createdAt,
+    this.createdAt,
     this.quotationId,
     this.quotationStatus,
     this.acceptUrl,
     this.rejectUrl,
+    this.paymentLink,
     this.termsConditions,
     this.orderId,
     this.orderStatus,
@@ -38,17 +40,18 @@ class WebSocketMessage {
 
   factory WebSocketMessage.fromJson(Map<String, dynamic> json) {
     return WebSocketMessage(
-      messageId: json['message_id'] as int,
-      senderId: json['sender_id'] as String,
-      senderName: json['sender_name'] as String,
+      messageId: json['message_id'] as int?,
+      senderId: json['sender_id'] as String?,
+      senderName: json['sender_name'] as String?,
       messageText: json['message_text'] as String? ?? '',
       messageImage: json['message_image'] as String?,
       messageFile: json['message_file'] as String?,
-      createdAt: json['created_at'] as String,
+      createdAt: json['created_at'] as String?,
       quotationId: json['quotation_id'] as int?,
       quotationStatus: json['quotation_status'] as String?,
       acceptUrl: json['accept_url'] as String?,
       rejectUrl: json['reject_url'] as String?,
+      paymentLink: json['payment_link'] as String?,
       termsConditions: json['terms_conditions'] as String?,
       orderId: json['order_id'] as int?,
       orderStatus: json['order_status'] as String?,
@@ -69,6 +72,7 @@ class WebSocketMessage {
       'quotation_status': quotationStatus,
       'accept_url': acceptUrl,
       'reject_url': rejectUrl,
+      'payment_link': paymentLink,
       'terms_conditions': termsConditions,
       'order_id': orderId,
       'order_status': orderStatus,
@@ -113,6 +117,7 @@ class WebSocketMessage {
         quotationStatus: quotationStatus,
         acceptUrl: acceptUrl,
         rejectUrl: rejectUrl,
+        paymentLink: paymentLink,
         termsConditions: termsConditions,
       );
     }
@@ -124,9 +129,11 @@ class WebSocketMessage {
     }
 
     return ChatMessage(
-      id: messageId.toString(),
-      senderId: senderId,
-      senderName: senderName,
+      id:
+          messageId?.toString() ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
+      senderId: senderId ?? '',
+      senderName: senderName ?? 'Unknown',
       message: displayMessage,
       time: _formatMessageTime(createdAt),
       isMe: senderId == currentUserId,
@@ -139,7 +146,9 @@ class WebSocketMessage {
   }
 
   /// Format message timestamp to time (9:41 AM)
-  String _formatMessageTime(String timestamp) {
+  String _formatMessageTime(String? timestamp) {
+    if (timestamp == null) return 'now';
+
     try {
       final DateTime dateTime = DateTime.parse(timestamp);
       final int hour = dateTime.hour;
