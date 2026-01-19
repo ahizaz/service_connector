@@ -8,6 +8,7 @@ import 'package:record/record.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../model/chat_message_model.dart';
 import '../model/websocket_message_model.dart';
 import 'package:service_connect/feature/conversation/repository/conversation_repository.dart';
@@ -1227,25 +1228,91 @@ class ChatController extends GetxController {
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
             ),
-            onPressed: () {
+            onPressed: () async {
               Get.back();
               debugPrint('=================================');
               debugPrint('💳 Opening payment link: $paymentLink');
               debugPrint('=================================');
 
-              // Open payment link in browser
-              // TODO: Use url_launcher package
-              Get.snackbar(
-                'Payment Link',
-                'Opening payment gateway...',
-                snackPosition: SnackPosition.BOTTOM,
-                backgroundColor: Colors.green.withOpacity(0.9),
-                colorText: Colors.white,
-                duration: Duration(seconds: 2),
-              );
+              try {
+                final Uri url = Uri.parse(paymentLink);
 
-              // For now, just show the link (you can add url_launcher later)
-              debugPrint('Payment URL: $paymentLink');
+                // First try to check if URL can be launched
+                bool canLaunch = false;
+                try {
+                  canLaunch = await canLaunchUrl(url);
+                  debugPrint('✓ Can launch URL: $canLaunch');
+                } catch (e) {
+                  debugPrint('⚠️ canLaunchUrl check failed: $e');
+                  // Continue anyway - sometimes the check fails but launch works
+                  canLaunch = true;
+                }
+
+                if (canLaunch) {
+                  // Try to launch URL with external application mode
+                  final launched = await launchUrl(
+                    url,
+                    mode: LaunchMode.externalApplication,
+                  ).timeout(
+                    const Duration(seconds: 10),
+                    onTimeout: () {
+                      debugPrint('❌ URL launch timeout');
+                      return false;
+                    },
+                  );
+
+                  if (launched) {
+                    EasyLoading.showSuccess('Opening payment gateway...');
+                    debugPrint('✅ Payment link opened successfully');
+                  } else {
+                    debugPrint('❌ Failed to launch URL');
+                    EasyLoading.showError('Failed to open payment link');
+                  }
+                } else {
+                  debugPrint('❌ Cannot launch URL');
+                  EasyLoading.showError('No app available to handle this link');
+                }
+              } catch (e) {
+                debugPrint('❌ Error opening payment link: $e');
+                // Show error dialog with the payment link so user can copy it
+                Get.dialog(
+                  AlertDialog(
+                    title: Row(
+                      children: [
+                        Icon(Icons.error_outline, color: Colors.orange),
+                        SizedBox(width: 8),
+                        Text('Unable to Open Link'),
+                      ],
+                    ),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Please copy this link and open it in your browser:'),
+                        SizedBox(height: 12),
+                        Container(
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey[300]!),
+                          ),
+                          child: SelectableText(
+                            paymentLink,
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Get.back(),
+                        child: Text('Close'),
+                      ),
+                    ],
+                  ),
+                );
+              }
             },
           ),
         ],
