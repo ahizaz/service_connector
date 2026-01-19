@@ -218,7 +218,7 @@ class Document {
       documentFront: json['document_front'] ?? '',
       verificationId: json['verification_id']?.toString(),
       status: json['status'] ?? '',
-      uploadedAt: json['uploaded_at'] ?? '',
+      uploadedAt: json['uploaded_at'] ?? '',//just checking
     );
   }
 
