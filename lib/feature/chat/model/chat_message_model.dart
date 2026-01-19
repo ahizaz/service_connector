@@ -79,6 +79,7 @@ class OfferDetails {
   final String? quotationStatus;
   final String? acceptUrl;
   final String? rejectUrl;
+  final String? paymentLink;
   final String? termsConditions;
 
   OfferDetails({
@@ -91,6 +92,7 @@ class OfferDetails {
     this.quotationStatus,
     this.acceptUrl,
     this.rejectUrl,
+    this.paymentLink, 
     this.termsConditions,
   });
 }

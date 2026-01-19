@@ -113,64 +113,104 @@ class ChatController extends GetxController {
   /// Handle incoming WebSocket messages
   void _handleWebSocketMessage(Map<String, dynamic> data) {
     try {
+      debugPrint('=================================');
+      debugPrint('📩 WebSocket Data Received: $data');
+      debugPrint('=================================');
+
       // Parse WebSocket message
       final wsMessage = WebSocketMessage.fromJson(data);
 
       debugPrint('✅ Parsed message: ${wsMessage.messageText}');
       debugPrint('   From: ${wsMessage.senderName} (${wsMessage.senderId})');
 
-      // Convert to ChatMessage and add to list
-      final chatMessage = wsMessage.toChatMessage(_currentUserId ?? '');
+      // Check if this is a payment link message (offer accepted)
+      if (wsMessage.quotationStatus == 'accepted' &&
+          wsMessage.paymentLink != null &&
+          wsMessage.paymentLink!.isNotEmpty) {
+        debugPrint('=================================');
+        debugPrint('💳 PAYMENT LINK RECEIVED');
+        debugPrint('Quotation ID: ${wsMessage.quotationId}');
+        debugPrint('Payment Link: ${wsMessage.paymentLink}');
+        debugPrint('=================================');
 
-      // Check if message already exists (to avoid duplicates)
-      final existingIndex = currentChatMessages.indexWhere(
-        (msg) => msg.id == chatMessage.id,
-      );
+        EasyLoading.showSuccess('Offer accepted! Payment link received.');
 
-      if (existingIndex == -1) {
-        // If this is our own message, check if we have a temporary optimistic message
-        if (chatMessage.isMe) {
-          // Find the most recent temporary message with matching type
-          // For image/file, we match by type and recency (within last 10 seconds)
-          int tempIndex = -1;
-          
-          if (chatMessage.type == MessageType.image || chatMessage.type == MessageType.file) {
-            // For images/files, find the last temp message of same type (recent one)
-            for (int i = currentChatMessages.length - 1; i >= 0; i--) {
-              final msg = currentChatMessages[i];
-              if (msg.isMe && 
-                  msg.id.startsWith('temp_') && 
-                  msg.type == chatMessage.type) {
-                tempIndex = i;
-                break; // Found the most recent temp message
-              }
-            }
-          } else {
-            // For text messages, match by content
-            tempIndex = currentChatMessages.indexWhere(
-              (msg) => msg.isMe && 
-                       msg.id.startsWith('temp_') &&
-                       msg.type == chatMessage.type &&
-                       msg.message == chatMessage.message,
-            );
-          }
-          
-          if (tempIndex != -1) {
-            // Replace temporary message with real one
-            currentChatMessages[tempIndex] = chatMessage;
-            debugPrint('✅ Replaced temporary message with real message (type: ${chatMessage.type})');
-            return;
-          }
+        // Show payment dialog after a brief delay
+        Future.delayed(Duration(milliseconds: 500), () {
+          _showPaymentLinkDialog(
+            wsMessage.paymentLink!,
+            wsMessage.quotationId ?? 0,
+          );
+        });
+
+        // If this is just a status update without a proper message, don't add to chat
+        if (wsMessage.messageId == null) {
+          debugPrint('⚠️ Status update only, not adding to chat');
+          return;
         }
-        
-        // Add new message
-        currentChatMessages.add(chatMessage);
-        debugPrint('✅ Message added to chat list');
-      } else {
-        debugPrint('⚠️ Duplicate message, skipping');
       }
-    } catch (e) {
+
+      // Convert to ChatMessage and add to list (only if it has a valid message ID)
+      if (wsMessage.messageId != null) {
+        final chatMessage = wsMessage.toChatMessage(_currentUserId ?? '');
+
+        // Check if message already exists (to avoid duplicates)
+        final existingIndex = currentChatMessages.indexWhere(
+          (msg) => msg.id == chatMessage.id,
+        );
+
+        if (existingIndex == -1) {
+          // If this is our own message, check if we have a temporary optimistic message
+          if (chatMessage.isMe) {
+            // Find the most recent temporary message with matching type
+            // For image/file, we match by type and recency (within last 10 seconds)
+            int tempIndex = -1;
+
+            if (chatMessage.type == MessageType.image ||
+                chatMessage.type == MessageType.file) {
+              // For images/files, find the last temp message of same type (recent one)
+              for (int i = currentChatMessages.length - 1; i >= 0; i--) {
+                final msg = currentChatMessages[i];
+                if (msg.isMe &&
+                    msg.id.startsWith('temp_') &&
+                    msg.type == chatMessage.type) {
+                  tempIndex = i;
+                  break; // Found the most recent temp message
+                }
+              }
+            } else {
+              // For text messages, match by content
+              tempIndex = currentChatMessages.indexWhere(
+                (msg) =>
+                    msg.isMe &&
+                    msg.id.startsWith('temp_') &&
+                    msg.type == chatMessage.type &&
+                    msg.message == chatMessage.message,
+              );
+            }
+
+            if (tempIndex != -1) {
+              // Replace temporary message with real one
+              currentChatMessages[tempIndex] = chatMessage;
+              debugPrint(
+                '✅ Replaced temporary message with real message (type: ${chatMessage.type})',
+              );
+              return;
+            }
+          }
+
+          // Add new message
+          currentChatMessages.add(chatMessage);
+          debugPrint('✅ Message added to chat list');
+        } else {
+          debugPrint('⚠️ Duplicate message, skipping');
+        }
+      }
+    } catch (e, stackTrace) {
+      debugPrint('=================================');
       debugPrint('❌ Error handling WebSocket message: $e');
+      debugPrint('Stack trace: $stackTrace');
+      debugPrint('=================================');
     }
   }
 
@@ -1021,7 +1061,7 @@ class ChatController extends GetxController {
   Future<void> updateOfferStatus(int quotationId, String status) async {
     try {
       EasyLoading.show(status: 'Updating offer status...');
-      
+
       final token = AuthService.getToken();
       if (token == null || token.isEmpty) {
         debugPrint('❌ Authentication token is missing');
@@ -1049,9 +1089,7 @@ class ChatController extends GetxController {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
-        body: jsonEncode({
-          'quotation_status': status,
-        }),
+        body: jsonEncode({'quotation_status': status}),
       );
 
       debugPrint('=================================');
@@ -1064,12 +1102,12 @@ class ChatController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint('✅ Offer status updated successfully');
-        
+
         // Update the offer status in the message list
         final messageIndex = currentChatMessages.indexWhere(
           (msg) => msg.offerDetails?.quotationId == quotationId,
         );
-        
+
         if (messageIndex != -1) {
           final message = currentChatMessages[messageIndex];
           final updatedOffer = OfferDetails(
@@ -1082,9 +1120,10 @@ class ChatController extends GetxController {
             quotationStatus: status,
             acceptUrl: message.offerDetails!.acceptUrl,
             rejectUrl: message.offerDetails!.rejectUrl,
+            paymentLink: message.offerDetails!.paymentLink,
             termsConditions: message.offerDetails!.termsConditions,
           );
-          
+
           currentChatMessages[messageIndex] = ChatMessage(
             id: message.id,
             senderId: message.senderId,
@@ -1098,10 +1137,10 @@ class ChatController extends GetxController {
             duration: message.duration,
             offerDetails: updatedOffer,
           );
-          
+
           debugPrint('✅ Updated offer status in UI');
         }
-        
+
         Get.snackbar(
           'Success',
           'Offer ${status == "accepted" ? "accepted" : "declined"} successfully',
@@ -1141,5 +1180,77 @@ class ChatController extends GetxController {
         colorText: Colors.white,
       );
     }
+  }
+
+  /// Show payment link dialog
+  void _showPaymentLinkDialog(String paymentLink, int quotationId) {
+    Get.dialog(
+      AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.payment, color: Colors.green),
+            SizedBox(width: 8),
+            Text('Payment Required'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Your offer has been accepted! Please proceed to payment.',
+              style: TextStyle(fontSize: 14),
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Quotation ID: #$quotationId',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back();
+              debugPrint('❌ Payment cancelled by user');
+            },
+            child: Text('Later', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton.icon(
+            icon: Icon(Icons.open_in_browser, size: 18),
+            label: Text('Proceed to Payment'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () {
+              Get.back();
+              debugPrint('=================================');
+              debugPrint('💳 Opening payment link: $paymentLink');
+              debugPrint('=================================');
+
+              // Open payment link in browser
+              // TODO: Use url_launcher package
+              Get.snackbar(
+                'Payment Link',
+                'Opening payment gateway...',
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: Colors.green.withOpacity(0.9),
+                colorText: Colors.white,
+                duration: Duration(seconds: 2),
+              );
+
+              // For now, just show the link (you can add url_launcher later)
+              debugPrint('Payment URL: $paymentLink');
+            },
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    );
   }
 }
