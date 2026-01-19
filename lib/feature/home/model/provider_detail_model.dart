@@ -228,7 +228,7 @@ class Document {
       'document_front': documentFront,
       'verification_id': verificationId,
       'status': status,
-      'uploaded_at': uploadedAt,
+      'uploaded_at': uploadedAt,//
     };
   }
 }
