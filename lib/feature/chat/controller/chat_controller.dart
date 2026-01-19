@@ -125,13 +125,18 @@ class ChatController extends GetxController {
       debugPrint('   From: ${wsMessage.senderName} (${wsMessage.senderId})');
 
       // Check if this is a payment link message (offer accepted)
+      // Only show payment link to the service receiver (the one who accepted the offer)
       if (wsMessage.quotationStatus == 'accepted' &&
           wsMessage.paymentLink != null &&
-          wsMessage.paymentLink!.isNotEmpty) {
+          wsMessage.paymentLink!.isNotEmpty &&
+          wsMessage.senderId == _currentUserId) {
         debugPrint('=================================');
         debugPrint('💳 PAYMENT LINK RECEIVED');
         debugPrint('Quotation ID: ${wsMessage.quotationId}');
         debugPrint('Payment Link: ${wsMessage.paymentLink}');
+        debugPrint('Sender ID: ${wsMessage.senderId}');
+        debugPrint('Current User ID: $_currentUserId');
+        debugPrint('You accepted the offer - showing payment dialog');
         debugPrint('=================================');
 
         EasyLoading.showSuccess('Offer accepted! Payment link received.');
@@ -149,6 +154,17 @@ class ChatController extends GetxController {
           debugPrint('⚠️ Status update only, not adding to chat');
           return;
         }
+      } else if (wsMessage.quotationStatus == 'accepted' &&
+          wsMessage.paymentLink != null &&
+          wsMessage.paymentLink!.isNotEmpty &&
+          wsMessage.senderId != _currentUserId) {
+        debugPrint('=================================');
+        debugPrint('✅ OFFER ACCEPTED CONFIRMATION');
+        debugPrint('Service receiver accepted your offer');
+        debugPrint('Sender ID: ${wsMessage.senderId}');
+        debugPrint('Current User ID: $_currentUserId');
+        debugPrint('Not showing payment link to service provider');
+        debugPrint('=================================');
       }
 
       // Convert to ChatMessage and add to list (only if it has a valid message ID)
