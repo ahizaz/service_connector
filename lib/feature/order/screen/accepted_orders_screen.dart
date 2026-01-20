@@ -61,7 +61,7 @@ class AcceptedOrdersScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 16.h),
                 Text(
-                  'No accepted orders found',
+                  'No paid orders found',
                   style: GoogleFonts.roboto(
                     color: Colors.grey[600],
                     fontSize: 16.sp,
@@ -70,7 +70,7 @@ class AcceptedOrdersScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 8.h),
                 Text(
-                  'Orders will appear here once accepted',
+                  'Paid orders will appear here',
                   style: GoogleFonts.roboto(
                     color: Colors.grey[400],
                     fontSize: 14.sp,

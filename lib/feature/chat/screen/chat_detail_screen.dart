@@ -1272,6 +1272,82 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               ),
             ),
             SizedBox(height: 12.h),
+            
+            // Action Buttons (Complete/Cancel)
+            if (order.completeUrl != null || order.cancelUrl != null) ...[
+              Row(
+                children: [
+                  if (order.completeUrl != null)
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          final controller = Get.find<ChatController>();
+                          controller.updateOrderStatus(order.completeUrl!, 'completed');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Color(0xFF4CAF50),
+                          elevation: 0,
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.check_circle_outline, size: 20.sp),
+                            SizedBox(width: 6.w),
+                            Text(
+                              'Complete',
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  if (order.completeUrl != null && order.cancelUrl != null)
+                    SizedBox(width: 12.w),
+                  if (order.cancelUrl != null)
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          final controller = Get.find<ChatController>();
+                          controller.updateOrderStatus(order.cancelUrl!, 'cancelled');
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white.withOpacity(0.3),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.cancel_outlined, size: 20.sp),
+                            SizedBox(width: 6.w),
+                            Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              SizedBox(height: 12.h),
+            ],
+            
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

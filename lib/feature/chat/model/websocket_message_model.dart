@@ -18,6 +18,8 @@ class WebSocketMessage {
   final int? orderId;
   final String? orderStatus;
   final String? serviceTimeTaken;
+  final String? completeUrl;
+  final String? cancelUrl;
 
   WebSocketMessage({
     this.messageId,
@@ -36,6 +38,8 @@ class WebSocketMessage {
     this.orderId,
     this.orderStatus,
     this.serviceTimeTaken,
+    this.completeUrl,
+    this.cancelUrl,
   });
 
   factory WebSocketMessage.fromJson(Map<String, dynamic> json) {
@@ -56,6 +60,8 @@ class WebSocketMessage {
       orderId: json['order_id'] as int?,
       orderStatus: json['order_status'] as String?,
       serviceTimeTaken: json['service_time_taken'] as String?,
+      completeUrl: json['complete_url'] as String?,
+      cancelUrl: json['cancel_url'] as String?,
     );
   }
 
@@ -77,6 +83,8 @@ class WebSocketMessage {
       'order_id': orderId,
       'order_status': orderStatus,
       'service_time_taken': serviceTimeTaken,
+      'complete_url': completeUrl,
+      'cancel_url': cancelUrl,
     };
   }
 
@@ -105,6 +113,8 @@ class WebSocketMessage {
         serviceCost: '', // Will be filled from quotation data
         serviceTimeline: '', // Will be filled from quotation data
         serviceDescription: messageText,
+        completeUrl: completeUrl,
+        cancelUrl: cancelUrl,
       );
     } else if (quotationId != null) {
       // This is an offer message

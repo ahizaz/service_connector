@@ -117,6 +117,8 @@ class OrderDetails {
   final String serviceCost;
   final String serviceTimeline;
   final String? serviceDescription;
+  final String? completeUrl;
+  final String? cancelUrl;
 
   OrderDetails({
     required this.orderId,
@@ -126,5 +128,7 @@ class OrderDetails {
     required this.serviceCost,
     required this.serviceTimeline,
     this.serviceDescription,
+    this.completeUrl,
+    this.cancelUrl,
   });
 }

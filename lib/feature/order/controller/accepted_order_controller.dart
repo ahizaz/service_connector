@@ -67,16 +67,21 @@ class AcceptedOrderController extends GetxController {
         
         debugPrint('✅ Successfully fetched ${jsonData.length} accepted orders');
         
+        // Filter only paid orders
         acceptedOrders.value = jsonData
             .map((json) => AcceptedOrderModel.fromJson(json))
+            .where((order) => order.paymentStatus.toLowerCase() == 'paid')
             .toList();
 
         debugPrint('=================================');
-        debugPrint('📋 ACCEPTED ORDERS LIST');
+        debugPrint('📋 PAID ACCEPTED ORDERS LIST (Filtered)');
+        debugPrint('Total Orders Fetched: ${jsonData.length}');
+        debugPrint('Paid Orders: ${acceptedOrders.length}');
         for (var order in acceptedOrders) {
           debugPrint('Quotation ID: ${order.quotationId}');
           debugPrint('Service Category: ${order.serviceCategory} (${order.getCategoryName()})');
           debugPrint('Cost: \$${order.serviceCost}');
+          debugPrint('Payment Status: ${order.paymentStatus}');
           debugPrint('Timeline: ${order.serviceTimeline}');
           debugPrint('Created: ${order.createdAt}');
           debugPrint('---');
@@ -86,7 +91,7 @@ class AcceptedOrderController extends GetxController {
         if (acceptedOrders.isEmpty) {
           Get.snackbar(
             'Info',
-            'No accepted orders found',
+            'No paid accepted orders found',
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: Colors.blue,
             colorText: Colors.white,

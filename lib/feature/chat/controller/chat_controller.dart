@@ -1585,4 +1585,96 @@ class ChatController extends GetxController {
       barrierDismissible: false,
     );
   }
+
+  // Update Order Status (Complete/Cancel)
+  Future<void> updateOrderStatus(String statusUrl, String action) async {
+    try {
+      EasyLoading.show(status: 'Updating order status...');
+
+      final token = AuthService.getToken();
+      if (token == null || token.isEmpty) {
+        debugPrint('❌ Authentication token is missing');
+        EasyLoading.dismiss();
+        Get.snackbar(
+          'Authentication Error',
+          'Please login again',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.withOpacity(0.9),
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      debugPrint('=================================');
+      debugPrint('📤 UPDATING ORDER STATUS');
+      debugPrint('Action: $action');
+      debugPrint('API URL: $statusUrl');
+      debugPrint('=================================');
+
+      final response = await http.patch(
+        Uri.parse(statusUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({'order_status': action}),
+      );
+
+      debugPrint('=================================');
+      debugPrint('📥 API RESPONSE');
+      debugPrint('Status Code: ${response.statusCode}');
+      debugPrint('Response Body: ${response.body}');
+      debugPrint('=================================');
+
+      EasyLoading.dismiss();
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint('✅ Order status updated successfully');
+
+        Get.snackbar(
+          'Success',
+          'Order ${action == "completed" ? "completed" : "cancelled"} successfully',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.withOpacity(0.9),
+          colorText: Colors.white,
+        );
+
+        // Refresh messages to get updated order status
+        final user = currentChatUser.value;
+        if (user != null && user.conversationId != null) {
+          await fetchConversationMessages(user.conversationId!);
+        }
+      } else {
+        debugPrint('❌ API Error: Status ${response.statusCode}');
+        String message = 'Failed to update order status';
+        try {
+          final Map<String, dynamic> resp = jsonDecode(response.body);
+          if (resp.containsKey('detail')) message = resp['detail'].toString();
+          if (resp.containsKey('message')) message = resp['message'].toString();
+          debugPrint('Error Message: $message');
+        } catch (_) {}
+
+        Get.snackbar(
+          'Error',
+          message,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.withOpacity(0.9),
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
+      EasyLoading.dismiss();
+      debugPrint('=================================');
+      debugPrint('❌ EXCEPTION IN UPDATE ORDER STATUS');
+      debugPrint('Error: $e');
+      debugPrint('=================================');
+      Get.snackbar(
+        'Error',
+        'Network error: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.9),
+        colorText: Colors.white,
+      );
+    }
+  }
 }

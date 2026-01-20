@@ -3,6 +3,7 @@ class AcceptedOrderModel {
   final String receiverUserId;
   final int serviceCategory;
   final String serviceCost;
+  final String paymentStatus;
   final String serviceTimeline;
   final String createdAt;
   final String? termsConditions;
@@ -13,6 +14,7 @@ class AcceptedOrderModel {
     required this.receiverUserId,
     required this.serviceCategory,
     required this.serviceCost,
+    required this.paymentStatus,
     required this.serviceTimeline,
     required this.createdAt,
     this.termsConditions,
@@ -33,6 +35,7 @@ class AcceptedOrderModel {
       receiverUserId: json['receiver_user_id']?.toString() ?? '',
       serviceCategory: categoryId,
       serviceCost: json['service_cost']?.toString() ?? '',
+      paymentStatus: json['payment_status']?.toString() ?? 'pending',
       serviceTimeline: json['service_timeline']?.toString() ?? '',
       createdAt: json['created_at']?.toString() ?? '',
       termsConditions: json['terms_conditions']?.toString(),
@@ -46,6 +49,7 @@ class AcceptedOrderModel {
       'receiver_user_id': receiverUserId,
       'service_category': serviceCategory,
       'service_cost': serviceCost,
+      'payment_status': paymentStatus,
       'service_timeline': serviceTimeline,
       'created_at': createdAt,
       'terms_conditions': termsConditions,
