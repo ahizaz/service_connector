@@ -19,17 +19,17 @@ class CreateOfferController extends GetxController {
   final RxString receiverUserId = ''.obs;
 
   final List<String> serviceCategories = [
+    'Plumbing',
+    'Roofing',
+    'Painting',
     'Cleaning',
+    'Windows',
     'Concrete',
-    'Electrical',
     'Handyperson',
     'HVAC',
     'Landscaping',
-    'Painting',
-    'Plumbing',
     'Remodeling',
-    'Roofing',
-    'Windows',
+    'Electrical',
   ];
 
   final List<String> urgencyTypes = ['normal', 'urgent', 'asap'];

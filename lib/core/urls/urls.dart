@@ -27,6 +27,8 @@ class Url {
       static String updateOfferStatus(int quotationId) => "$baseUrl/offer/quotations/$quotationId/update-status/";
       static String allacceptedOrder(String receiverUserId) => "$baseUrl/offer/quotations/accepted-for-order/?receiver_user_id=$receiverUserId";
       static String createOrder = "$baseUrl/offer/orders/";
+      static String getAllofferlist = "$baseUrl/offer/quotations/";
+      static String cancelquotebyReceiver(int quotationId) => "$baseUrl/offer/quotations/$quotationId/cancel/";
       
 
 

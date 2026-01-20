@@ -180,7 +180,10 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               final isProvider = snapshot.data ?? false;
               // Show service title only when receiver is viewing a provider
               // Hide when provider is viewing a receiver
-              final shouldShowTitle = !isProvider && user.serviceTitle != null && user.serviceTitle!.isNotEmpty;
+              final shouldShowTitle =
+                  !isProvider &&
+                  user.serviceTitle != null &&
+                  user.serviceTitle!.isNotEmpty;
 
               return Row(
                 children: [
@@ -233,29 +236,28 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             builder: (context, snapshot) {
               final isProvider = snapshot.data ?? false;
 
-              if (!isProvider) {
-                // Don't show menu button if not a provider
-                return SizedBox.shrink();
-              }
-
+              // Show menu button for both provider and receiver with different options
               return PopupMenuButton<String>(
                 icon: Icon(Icons.more_vert, color: Colors.black),
                 onSelected: (value) {
+                  final controller = Get.find<ChatController>();
+                  final user = controller.currentChatUser.value;
+
                   if (value == 'offer') {
-                    final controller = Get.find<ChatController>();
-                    final user = controller.currentChatUser.value;
-                    
+                    // Create Offer (Provider only)
                     if (user != null && user.id.isNotEmpty) {
                       debugPrint('=================================');
                       debugPrint('Opening Create Offer Screen');
                       debugPrint('Receiver User ID: ${user.id}');
                       debugPrint('Conversation ID: ${user.conversationId}');
                       debugPrint('=================================');
-                      
-                      Get.to(() => CreateOfferScreen(
-                        receiverUserId: user.id,
-                        conversationId: user.conversationId?.toString() ?? '',
-                      ));
+
+                      Get.to(
+                        () => CreateOfferScreen(
+                          receiverUserId: user.id,
+                          conversationId: user.conversationId?.toString() ?? '',
+                        ),
+                      );
                     } else {
                       debugPrint('❌ Error: User ID is empty or null');
                       Get.snackbar(
@@ -265,20 +267,18 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                       );
                     }
                   } else if (value == 'order') {
-                    final controller = Get.find<ChatController>();
-                    final user = controller.currentChatUser.value;
-                    
+                    // Create Order (Provider only)
                     debugPrint('=================================');
                     debugPrint('Create Order clicked');
                     debugPrint('Receiver User ID: ${user?.id}');
                     debugPrint('Conversation ID: ${user?.conversationId}');
                     debugPrint('=================================');
-                    
+
                     if (user != null && user.id.isNotEmpty) {
                       // Navigate to Accepted Orders Screen
-                      Get.to(() => AcceptedOrdersScreen(
-                        receiverUserId: user.id,
-                      ));
+                      Get.to(
+                        () => AcceptedOrdersScreen(receiverUserId: user.id),
+                      );
                     } else {
                       debugPrint('❌ Error: User ID is empty or null');
                       Get.snackbar(
@@ -289,12 +289,38 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                         colorText: Colors.white,
                       );
                     }
+                  } else if (value == 'cancel_offer') {
+                    // Navigate to Offer List Screen
+                    debugPrint('=================================');
+                    debugPrint('Navigating to Offer List Screen');
+                    debugPrint('=================================');
+                    
+                    Get.toNamed('/offer-list');
                   }
                 },
-                itemBuilder: (context) => [
-                  PopupMenuItem(value: 'offer', child: Text('Create Offer')),
-                  PopupMenuItem(value: 'order', child: Text('Create Order')),
-                ],
+                itemBuilder: (context) {
+                  // Show different menu items based on user type
+                  if (isProvider) {
+                    return [
+                      PopupMenuItem(
+                        value: 'offer',
+                        child: Text('Create Offer'),
+                      ),
+                      PopupMenuItem(
+                        value: 'order',
+                        child: Text('Create Order'),
+                      ),
+                    ];
+                  } else {
+                    // Service Receiver menu items
+                    return [
+                      PopupMenuItem(
+                        value: 'cancel_offer',
+                        child: Text('Cancel Offer'),
+                      ),
+                    ];
+                  }
+                },
               );
             },
           ),
@@ -774,13 +800,57 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              offer.title,
-              style: TextStyle(
-                fontSize: 16.sp,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    offer.title,
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+                // Show 3-dot menu for service receiver only
+                if (showButtons &&
+                    offer.quotationStatus?.toLowerCase().trim() != 'accepted' &&
+                    offer.quotationStatus?.toLowerCase().trim() != 'declined')
+                  PopupMenuButton<String>(
+                    icon: Icon(
+                      Icons.more_vert,
+                      color: Color(0xFF757575),
+                      size: 20.sp,
+                    ),
+                    padding: EdgeInsets.zero,
+                    onSelected: (value) {
+                      if (value == 'cancel' && offer.quotationId != null) {
+                        final controller = Get.find<ChatController>();
+                        controller.cancelOffer(offer.quotationId!);
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      PopupMenuItem(
+                        value: 'cancel',
+                        child: Row(
+                          children: [
+                            Icon(Icons.cancel, color: Colors.red, size: 18.sp),
+                            SizedBox(width: 8.w),
+                            Text(
+                              'Cancel Offer',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 14.sp,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+              ],
             ),
             SizedBox(height: 8.h),
             Text(
@@ -853,128 +923,143 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             // Show buttons only if:
             // 1. The offer was received (not sent by me) - showButtons
             // 2. The offer is not yet accepted or declined
-            if (showButtons && 
-                (offer.quotationStatus == null || 
-                (offer.quotationStatus != 'accepted' && 
-                 offer.quotationStatus != 'declined')))
-              Row(
-                children: [
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        padding: EdgeInsets.symmetric(vertical: 12.h),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
+            // Use case-insensitive comparison
+            Builder(
+              builder: (context) {
+                final offerStatus = offer.quotationStatus?.toLowerCase().trim();
+                if (showButtons &&
+                    (offerStatus == null ||
+                        (offerStatus != 'accepted' &&
+                            offerStatus != 'declined'))) {
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            padding: EdgeInsets.symmetric(vertical: 12.h),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                          ),
+                          onPressed: () {
+                            if (offer.quotationId != null) {
+                              final controller = Get.find<ChatController>();
+                              controller.updateOfferStatus(
+                                offer.quotationId!,
+                                'declined',
+                              );
+                            } else {
+                              debugPrint('❌ Quotation ID is null');
+                              Get.snackbar(
+                                'Error',
+                                'Cannot decline offer: Invalid quotation ID',
+                                snackPosition: SnackPosition.BOTTOM,
+                              );
+                            }
+                          },
+                          child: Text(
+                            offer.secondaryCtaText,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ),
-                      onPressed: () {
-                        if (offer.quotationId != null) {
-                          final controller = Get.find<ChatController>();
-                          controller.updateOfferStatus(
-                            offer.quotationId!,
-                            'declined',
-                          );
-                        } else {
-                          debugPrint('❌ Quotation ID is null');
-                          Get.snackbar(
-                            'Error',
-                            'Cannot decline offer: Invalid quotation ID',
-                            snackPosition: SnackPosition.BOTTOM,
-                          );
-                        }
-                      },
-                      child: Text(
-                        offer.secondaryCtaText,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w600,
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            padding: EdgeInsets.symmetric(vertical: 12.h),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                          ),
+                          onPressed: () {
+                            if (offer.quotationId != null) {
+                              final controller = Get.find<ChatController>();
+                              controller.updateOfferStatus(
+                                offer.quotationId!,
+                                'accepted',
+                              );
+                            } else {
+                              debugPrint('❌ Quotation ID is null');
+                              Get.snackbar(
+                                'Error',
+                                'Cannot accept offer: Invalid quotation ID',
+                                snackPosition: SnackPosition.BOTTOM,
+                              );
+                            }
+                          },
+                          child: Text(
+                            offer.primaryCtaText,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 13.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        padding: EdgeInsets.symmetric(vertical: 12.h),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
+                    ],
+                  );
+                }
+                // Show status ALWAYS if offer has been accepted, declined, or canceled
+                // This ensures the status persists even after navigation
+                // Use case-insensitive comparison to handle any API variations
+                if (showButtons && offer.quotationStatus != null) {
+                  final normalizedStatus = offer.quotationStatus!
+                      .toLowerCase()
+                      .trim();
+                  if (normalizedStatus == 'accepted' ||
+                      normalizedStatus == 'declined' ||
+                      normalizedStatus == 'canceled') {
+                    final statusColor = normalizedStatus == 'accepted'
+                        ? Colors.green
+                        : Colors.red;
+                    final statusIcon = normalizedStatus == 'accepted'
+                        ? Icons.check_circle
+                        : Icons.cancel;
+                    final statusText = normalizedStatus == 'accepted'
+                        ? 'Offer Accepted'
+                        : normalizedStatus == 'canceled'
+                        ? 'Offer Canceled'
+                        : 'Offer Declined';
+
+                    return Container(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 12.h,
+                        horizontal: 16.w,
                       ),
-                      onPressed: () {
-                        if (offer.quotationId != null) {
-                          final controller = Get.find<ChatController>();
-                          controller.updateOfferStatus(
-                            offer.quotationId!,
-                            'accepted',
-                          );
-                        } else {
-                          debugPrint('❌ Quotation ID is null');
-                          Get.snackbar(
-                            'Error',
-                            'Cannot accept offer: Invalid quotation ID',
-                            snackPosition: SnackPosition.BOTTOM,
-                          );
-                        }
-                      },
-                      child: Text(
-                        offer.primaryCtaText,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      decoration: BoxDecoration(
+                        color: statusColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12.r),
+                        border: Border.all(color: statusColor),
                       ),
-                    ),
-                  ),
-                ],
-              )
-            // Show status only for receivers (who got the offer and already acted on it)
-            else if (showButtons)
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
-                decoration: BoxDecoration(
-                  color: offer.quotationStatus == 'accepted' 
-                      ? Colors.green.withOpacity(0.1) 
-                      : Colors.red.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12.r),
-                  border: Border.all(
-                    color: offer.quotationStatus == 'accepted' 
-                        ? Colors.green 
-                        : Colors.red,
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      offer.quotationStatus == 'accepted' 
-                          ? Icons.check_circle 
-                          : Icons.cancel,
-                      color: offer.quotationStatus == 'accepted' 
-                          ? Colors.green 
-                          : Colors.red,
-                      size: 20.sp,
-                    ),
-                    SizedBox(width: 8.w),
-                    Text(
-                      offer.quotationStatus == 'accepted' 
-                          ? 'Offer Accepted' 
-                          : 'Offer Declined',
-                      style: TextStyle(
-                        color: offer.quotationStatus == 'accepted' 
-                            ? Colors.green 
-                            : Colors.red,
-                        fontSize: 14.sp,
-                        fontWeight: FontWeight.w600,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(statusIcon, color: statusColor, size: 20.sp),
+                          SizedBox(width: 8.w),
+                          Text(
+                            statusText,
+                            style: TextStyle(
+                              color: statusColor,
+                              fontSize: 14.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-              ),
+                    );
+                  }
+                }
+                return SizedBox.shrink();
+              },
+            ),
           ],
         ),
       ),

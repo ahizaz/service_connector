@@ -149,9 +149,51 @@ class ChatController extends GetxController {
           );
         });
 
-        // If this is just a status update without a proper message, don't add to chat
+        // If this is just a status update without a proper message, update existing offer if found
         if (wsMessage.messageId == null) {
-          debugPrint('⚠️ Status update only, not adding to chat');
+          debugPrint('⚠️ Status update only, checking if we need to update existing offer');
+          
+          // Try to update existing offer message if quotation ID matches
+          if (wsMessage.quotationId != null && wsMessage.quotationStatus != null) {
+            final offerIndex = currentChatMessages.indexWhere(
+              (msg) => msg.offerDetails?.quotationId == wsMessage.quotationId,
+            );
+
+            if (offerIndex != -1) {
+              final existingMessage = currentChatMessages[offerIndex];
+              // Normalize status to lowercase for consistency
+              final normalizedStatus = wsMessage.quotationStatus?.toLowerCase().trim();
+              final updatedOffer = OfferDetails(
+                title: existingMessage.offerDetails!.title,
+                workDetails: existingMessage.offerDetails!.workDetails,
+                slots: existingMessage.offerDetails!.slots,
+                primaryCtaText: existingMessage.offerDetails!.primaryCtaText,
+                secondaryCtaText: existingMessage.offerDetails!.secondaryCtaText,
+                quotationId: existingMessage.offerDetails!.quotationId,
+                quotationStatus: normalizedStatus,
+                acceptUrl: existingMessage.offerDetails!.acceptUrl,
+                rejectUrl: existingMessage.offerDetails!.rejectUrl,
+                paymentLink: wsMessage.paymentLink ?? existingMessage.offerDetails!.paymentLink,
+                termsConditions: existingMessage.offerDetails!.termsConditions,
+              );
+
+              currentChatMessages[offerIndex] = ChatMessage(
+                id: existingMessage.id,
+                senderId: existingMessage.senderId,
+                senderName: existingMessage.senderName,
+                message: existingMessage.message,
+                time: existingMessage.time,
+                isMe: existingMessage.isMe,
+                isRead: existingMessage.isRead,
+                type: existingMessage.type,
+                filePath: existingMessage.filePath,
+                duration: existingMessage.duration,
+                offerDetails: updatedOffer,
+              );
+
+              debugPrint('✅ Updated existing offer status via WebSocket to: ${wsMessage.quotationStatus}');
+            }
+          }
           return;
         }
       } else if (wsMessage.quotationStatus == 'accepted' &&
@@ -220,6 +262,47 @@ class ChatController extends GetxController {
           currentChatMessages.add(chatMessage);
           debugPrint('✅ Message added to chat list');
         } else {
+          // If it's a duplicate message but has status update, update the existing message
+          if (wsMessage.quotationId != null && 
+              wsMessage.quotationStatus != null &&
+              chatMessage.offerDetails != null) {
+            final existingMessage = currentChatMessages[existingIndex];
+            // Update offer status if it exists
+            if (existingMessage.offerDetails?.quotationId == wsMessage.quotationId) {
+              // Normalize status to lowercase for consistency
+              final normalizedStatus = wsMessage.quotationStatus?.toLowerCase().trim();
+              final updatedOffer = OfferDetails(
+                title: existingMessage.offerDetails!.title,
+                workDetails: existingMessage.offerDetails!.workDetails,
+                slots: existingMessage.offerDetails!.slots,
+                primaryCtaText: existingMessage.offerDetails!.primaryCtaText,
+                secondaryCtaText: existingMessage.offerDetails!.secondaryCtaText,
+                quotationId: existingMessage.offerDetails!.quotationId,
+                quotationStatus: normalizedStatus,
+                acceptUrl: existingMessage.offerDetails!.acceptUrl,
+                rejectUrl: existingMessage.offerDetails!.rejectUrl,
+                paymentLink: wsMessage.paymentLink ?? existingMessage.offerDetails!.paymentLink,
+                termsConditions: existingMessage.offerDetails!.termsConditions,
+              );
+
+              currentChatMessages[existingIndex] = ChatMessage(
+                id: existingMessage.id,
+                senderId: existingMessage.senderId,
+                senderName: existingMessage.senderName,
+                message: existingMessage.message,
+                time: existingMessage.time,
+                isMe: existingMessage.isMe,
+                isRead: existingMessage.isRead,
+                type: existingMessage.type,
+                filePath: existingMessage.filePath,
+                duration: existingMessage.duration,
+                offerDetails: updatedOffer,
+              );
+
+              debugPrint('✅ Updated existing offer status to: ${wsMessage.quotationStatus}');
+              return;
+            }
+          }
           debugPrint('⚠️ Duplicate message, skipping');
         }
       }
@@ -507,16 +590,28 @@ class ChatController extends GetxController {
         } else if (message.quotationId != null) {
           // This is an offer message
           messageType = MessageType.offer;
+          
+          // Normalize quotation status to lowercase for consistent comparison
+          final normalizedStatus = message.quotationStatus?.toLowerCase().trim();
+          
+          debugPrint('📋 OFFER MESSAGE - ID: ${message.quotationId}');
+          debugPrint('   Raw Quotation Status from API: "${message.quotationStatus}"');
+          debugPrint('   Normalized Status: "$normalizedStatus"');
+          debugPrint('   Is Accepted: ${normalizedStatus == "accepted"}');
+          debugPrint('   Is Declined: ${normalizedStatus == "declined"}');
+          
           offerDetails = OfferDetails(
             title: 'New Offer',
             workDetails: message.messageText ?? '',
             slots: [],
             quotationId: message.quotationId,
-            quotationStatus: message.quotationStatus,
+            quotationStatus: normalizedStatus, // Store normalized (lowercase) status
             acceptUrl: message.acceptUrl,
             rejectUrl: message.rejectUrl,
             termsConditions: message.termsConditions,
           );
+          
+          debugPrint('   ✅ Offer Details created with status: "${offerDetails.quotationStatus}"');
         }
 
         debugPrint('-----------------------------------');
@@ -1074,6 +1169,121 @@ class ChatController extends GetxController {
     filterUsers();
   }
 
+  // Cancel Offer (for service receiver)
+  Future<void> cancelOffer(int quotationId) async {
+    try {
+      EasyLoading.show(status: 'Canceling offer...');
+
+      final token = AuthService.getToken();
+      if (token == null || token.isEmpty) {
+        debugPrint('❌ Authentication token is missing');
+        EasyLoading.dismiss();
+        Get.snackbar(
+          'Authentication Error',
+          'Please login again',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.withOpacity(0.9),
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      debugPrint('=================================');
+      debugPrint('📤 CANCELING OFFER');
+      debugPrint('Quotation ID: $quotationId');
+      debugPrint('API URL: \${Url.cancelquotebyReceiver(quotationId)}');
+      debugPrint('=================================');
+
+      final response = await http.post(
+        Uri.parse(Url.cancelquotebyReceiver(quotationId)),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      debugPrint('=================================');
+      debugPrint('📥 API RESPONSE');
+      debugPrint('Status Code: \${response.statusCode}');
+      debugPrint('Response Body: \${response.body}');
+      debugPrint('=================================');
+
+      EasyLoading.dismiss();
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        debugPrint('✅ Offer canceled successfully in API');
+
+        // Update the offer status to 'canceled' in the message list
+        final messageIndex = currentChatMessages.indexWhere(
+          (msg) => msg.offerDetails?.quotationId == quotationId,
+        );
+
+        if (messageIndex != -1) {
+          final message = currentChatMessages[messageIndex];
+          final updatedOffer = OfferDetails(
+            title: message.offerDetails!.title,
+            workDetails: message.offerDetails!.workDetails,
+            slots: message.offerDetails!.slots,
+            primaryCtaText: message.offerDetails!.primaryCtaText,
+            secondaryCtaText: message.offerDetails!.secondaryCtaText,
+            quotationId: message.offerDetails!.quotationId,
+            quotationStatus: 'canceled', // Set status to canceled
+            acceptUrl: message.offerDetails!.acceptUrl,
+            rejectUrl: message.offerDetails!.rejectUrl,
+            paymentLink: message.offerDetails!.paymentLink,
+            termsConditions: message.offerDetails!.termsConditions,
+          );
+
+          currentChatMessages[messageIndex] = ChatMessage(
+            id: message.id,
+            senderId: message.senderId,
+            senderName: message.senderName,
+            message: message.message,
+            time: message.time,
+            isMe: message.isMe,
+            isRead: message.isRead,
+            type: message.type,
+            filePath: message.filePath,
+            duration: message.duration,
+            offerDetails: updatedOffer,
+          );
+
+          debugPrint('✅ Updated offer status to canceled in UI');
+        }
+
+        Get.snackbar(
+          'Success',
+          'Offer canceled successfully',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green.withOpacity(0.9),
+          colorText: Colors.white,
+          duration: Duration(seconds: 2),
+        );
+      } else {
+        debugPrint('❌ Failed to cancel offer: \${response.statusCode}');
+        Get.snackbar(
+          'Error',
+          'Failed to cancel offer. Please try again.',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red.withOpacity(0.9),
+          colorText: Colors.white,
+          duration: Duration(seconds: 3),
+        );
+      }
+    } catch (e) {
+      EasyLoading.dismiss();
+      debugPrint('❌ Error canceling offer: $e');
+      Get.snackbar(
+        'Error',
+        'Failed to cancel offer: \${e.toString().replaceAll(\'Exception: \', \'\')}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red.withOpacity(0.9),
+        colorText: Colors.white,
+        duration: Duration(seconds: 3),
+      );
+    }
+  }
+
   // Update Offer Status (Accept/Decline)
   Future<void> updateOfferStatus(int quotationId, String status) async {
     try {
@@ -1118,15 +1328,17 @@ class ChatController extends GetxController {
       EasyLoading.dismiss();
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        debugPrint('✅ Offer status updated successfully');
+        debugPrint('✅ Offer status updated successfully in API');
 
-        // Update the offer status in the message list
+          // Update the offer status in the message list
         final messageIndex = currentChatMessages.indexWhere(
           (msg) => msg.offerDetails?.quotationId == quotationId,
         );
 
         if (messageIndex != -1) {
           final message = currentChatMessages[messageIndex];
+          // Normalize status to lowercase for consistency
+          final normalizedStatus = status.toLowerCase().trim();
           final updatedOffer = OfferDetails(
             title: message.offerDetails!.title,
             workDetails: message.offerDetails!.workDetails,
@@ -1134,7 +1346,7 @@ class ChatController extends GetxController {
             primaryCtaText: message.offerDetails!.primaryCtaText,
             secondaryCtaText: message.offerDetails!.secondaryCtaText,
             quotationId: message.offerDetails!.quotationId,
-            quotationStatus: status,
+            quotationStatus: normalizedStatus, // Store normalized status
             acceptUrl: message.offerDetails!.acceptUrl,
             rejectUrl: message.offerDetails!.rejectUrl,
             paymentLink: message.offerDetails!.paymentLink,
