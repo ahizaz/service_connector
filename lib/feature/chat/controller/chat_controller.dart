@@ -151,10 +151,13 @@ class ChatController extends GetxController {
 
         // If this is just a status update without a proper message, update existing offer if found
         if (wsMessage.messageId == null) {
-          debugPrint('⚠️ Status update only, checking if we need to update existing offer');
-          
+          debugPrint(
+            '⚠️ Status update only, checking if we need to update existing offer',
+          );
+
           // Try to update existing offer message if quotation ID matches
-          if (wsMessage.quotationId != null && wsMessage.quotationStatus != null) {
+          if (wsMessage.quotationId != null &&
+              wsMessage.quotationStatus != null) {
             final offerIndex = currentChatMessages.indexWhere(
               (msg) => msg.offerDetails?.quotationId == wsMessage.quotationId,
             );
@@ -162,18 +165,23 @@ class ChatController extends GetxController {
             if (offerIndex != -1) {
               final existingMessage = currentChatMessages[offerIndex];
               // Normalize status to lowercase for consistency
-              final normalizedStatus = wsMessage.quotationStatus?.toLowerCase().trim();
+              final normalizedStatus = wsMessage.quotationStatus
+                  ?.toLowerCase()
+                  .trim();
               final updatedOffer = OfferDetails(
                 title: existingMessage.offerDetails!.title,
                 workDetails: existingMessage.offerDetails!.workDetails,
                 slots: existingMessage.offerDetails!.slots,
                 primaryCtaText: existingMessage.offerDetails!.primaryCtaText,
-                secondaryCtaText: existingMessage.offerDetails!.secondaryCtaText,
+                secondaryCtaText:
+                    existingMessage.offerDetails!.secondaryCtaText,
                 quotationId: existingMessage.offerDetails!.quotationId,
                 quotationStatus: normalizedStatus,
                 acceptUrl: existingMessage.offerDetails!.acceptUrl,
                 rejectUrl: existingMessage.offerDetails!.rejectUrl,
-                paymentLink: wsMessage.paymentLink ?? existingMessage.offerDetails!.paymentLink,
+                paymentLink:
+                    wsMessage.paymentLink ??
+                    existingMessage.offerDetails!.paymentLink,
                 termsConditions: existingMessage.offerDetails!.termsConditions,
               );
 
@@ -191,7 +199,9 @@ class ChatController extends GetxController {
                 offerDetails: updatedOffer,
               );
 
-              debugPrint('✅ Updated existing offer status via WebSocket to: ${wsMessage.quotationStatus}');
+              debugPrint(
+                '✅ Updated existing offer status via WebSocket to: ${wsMessage.quotationStatus}',
+              );
             }
           }
           return;
@@ -263,25 +273,31 @@ class ChatController extends GetxController {
           debugPrint('✅ Message added to chat list');
         } else {
           // If it's a duplicate message but has status update, update the existing message
-          if (wsMessage.quotationId != null && 
+          if (wsMessage.quotationId != null &&
               wsMessage.quotationStatus != null &&
               chatMessage.offerDetails != null) {
             final existingMessage = currentChatMessages[existingIndex];
             // Update offer status if it exists
-            if (existingMessage.offerDetails?.quotationId == wsMessage.quotationId) {
+            if (existingMessage.offerDetails?.quotationId ==
+                wsMessage.quotationId) {
               // Normalize status to lowercase for consistency
-              final normalizedStatus = wsMessage.quotationStatus?.toLowerCase().trim();
+              final normalizedStatus = wsMessage.quotationStatus
+                  ?.toLowerCase()
+                  .trim();
               final updatedOffer = OfferDetails(
                 title: existingMessage.offerDetails!.title,
                 workDetails: existingMessage.offerDetails!.workDetails,
                 slots: existingMessage.offerDetails!.slots,
                 primaryCtaText: existingMessage.offerDetails!.primaryCtaText,
-                secondaryCtaText: existingMessage.offerDetails!.secondaryCtaText,
+                secondaryCtaText:
+                    existingMessage.offerDetails!.secondaryCtaText,
                 quotationId: existingMessage.offerDetails!.quotationId,
                 quotationStatus: normalizedStatus,
                 acceptUrl: existingMessage.offerDetails!.acceptUrl,
                 rejectUrl: existingMessage.offerDetails!.rejectUrl,
-                paymentLink: wsMessage.paymentLink ?? existingMessage.offerDetails!.paymentLink,
+                paymentLink:
+                    wsMessage.paymentLink ??
+                    existingMessage.offerDetails!.paymentLink,
                 termsConditions: existingMessage.offerDetails!.termsConditions,
               );
 
@@ -299,7 +315,9 @@ class ChatController extends GetxController {
                 offerDetails: updatedOffer,
               );
 
-              debugPrint('✅ Updated existing offer status to: ${wsMessage.quotationStatus}');
+              debugPrint(
+                '✅ Updated existing offer status to: ${wsMessage.quotationStatus}',
+              );
               return;
             }
           }
@@ -590,28 +608,35 @@ class ChatController extends GetxController {
         } else if (message.quotationId != null) {
           // This is an offer message
           messageType = MessageType.offer;
-          
+
           // Normalize quotation status to lowercase for consistent comparison
-          final normalizedStatus = message.quotationStatus?.toLowerCase().trim();
-          
+          final normalizedStatus = message.quotationStatus
+              ?.toLowerCase()
+              .trim();
+
           debugPrint('📋 OFFER MESSAGE - ID: ${message.quotationId}');
-          debugPrint('   Raw Quotation Status from API: "${message.quotationStatus}"');
+          debugPrint(
+            '   Raw Quotation Status from API: "${message.quotationStatus}"',
+          );
           debugPrint('   Normalized Status: "$normalizedStatus"');
           debugPrint('   Is Accepted: ${normalizedStatus == "accepted"}');
           debugPrint('   Is Declined: ${normalizedStatus == "declined"}');
-          
+
           offerDetails = OfferDetails(
             title: 'New Offer',
             workDetails: message.messageText ?? '',
             slots: [],
             quotationId: message.quotationId,
-            quotationStatus: normalizedStatus, // Store normalized (lowercase) status
+            quotationStatus:
+                normalizedStatus, // Store normalized (lowercase) status
             acceptUrl: message.acceptUrl,
             rejectUrl: message.rejectUrl,
             termsConditions: message.termsConditions,
           );
-          
-          debugPrint('   ✅ Offer Details created with status: "${offerDetails.quotationStatus}"');
+
+          debugPrint(
+            '   ✅ Offer Details created with status: "${offerDetails.quotationStatus}"',
+          );
         }
 
         debugPrint('-----------------------------------');
@@ -1170,7 +1195,7 @@ class ChatController extends GetxController {
   }
 
   // Cancel Offer (for service receiver)
-  Future<void> cancelOffer(int quotationId) async {
+  Future<void> cancelOffer(int quotationId, String cancellationReason) async {
     try {
       EasyLoading.show(status: 'Canceling offer...');
 
@@ -1191,8 +1216,16 @@ class ChatController extends GetxController {
       debugPrint('=================================');
       debugPrint('📤 CANCELING OFFER');
       debugPrint('Quotation ID: $quotationId');
-      debugPrint('API URL: \${Url.cancelquotebyReceiver(quotationId)}');
+      debugPrint('Cancellation Reason: $cancellationReason');
+      debugPrint('API URL: ${Url.cancelquotebyReceiver(quotationId)}');
+      debugPrint('Authorization: Bearer $token');
       debugPrint('=================================');
+
+      final requestBody = json.encode({
+        'cancellation_reason': cancellationReason,
+      });
+
+      debugPrint('📦 Request Body: $requestBody');
 
       final response = await http.post(
         Uri.parse(Url.cancelquotebyReceiver(quotationId)),
@@ -1200,6 +1233,7 @@ class ChatController extends GetxController {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
+        body: requestBody,
       );
 
       debugPrint('=================================');
@@ -1330,7 +1364,7 @@ class ChatController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         debugPrint('✅ Offer status updated successfully in API');
 
-          // Update the offer status in the message list
+        // Update the offer status in the message list
         final messageIndex = currentChatMessages.indexWhere(
           (msg) => msg.offerDetails?.quotationId == quotationId,
         );
@@ -1478,16 +1512,17 @@ class ChatController extends GetxController {
 
                 if (canLaunch) {
                   // Try to launch URL with external application mode
-                  final launched = await launchUrl(
-                    url,
-                    mode: LaunchMode.externalApplication,
-                  ).timeout(
-                    const Duration(seconds: 10),
-                    onTimeout: () {
-                      debugPrint('❌ URL launch timeout');
-                      return false;
-                    },
-                  );
+                  final launched =
+                      await launchUrl(
+                        url,
+                        mode: LaunchMode.externalApplication,
+                      ).timeout(
+                        const Duration(seconds: 10),
+                        onTimeout: () {
+                          debugPrint('❌ URL launch timeout');
+                          return false;
+                        },
+                      );
 
                   if (launched) {
                     EasyLoading.showSuccess('Opening payment gateway...');
@@ -1516,7 +1551,9 @@ class ChatController extends GetxController {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Please copy this link and open it in your browser:'),
+                        Text(
+                          'Please copy this link and open it in your browser:',
+                        ),
                         SizedBox(height: 12),
                         Container(
                           padding: EdgeInsets.all(12),

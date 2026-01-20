@@ -93,4 +93,5 @@ class OfferModel {
   }
 
   bool get isAccepted => quotationStatus.toLowerCase() == 'accepted';
+  bool get isPaid => paymentStatus.toLowerCase() == 'paid';
 }

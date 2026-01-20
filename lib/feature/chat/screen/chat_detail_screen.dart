@@ -6,6 +6,7 @@ import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:service_connect/feature/offer/screen/create_offer_screen.dart';
 import 'package:service_connect/feature/order/screen/accepted_orders_screen.dart';
+import 'package:service_connect/feature/offer/widgets/cancel_offer_dialog.dart';
 import '../controller/chat_controller.dart';
 import '../model/chat_message_model.dart';
 
@@ -294,7 +295,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                     debugPrint('=================================');
                     debugPrint('Navigating to Offer List Screen');
                     debugPrint('=================================');
-                    
+
                     Get.toNamed('/offer-list');
                   }
                 },
@@ -826,8 +827,18 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                     padding: EdgeInsets.zero,
                     onSelected: (value) {
                       if (value == 'cancel' && offer.quotationId != null) {
-                        final controller = Get.find<ChatController>();
-                        controller.cancelOffer(offer.quotationId!);
+                        Get.dialog(
+                          CancelOfferDialog(
+                            quotationId: offer.quotationId!,
+                            onConfirm: (reason) {
+                              final controller = Get.find<ChatController>();
+                              controller.cancelOffer(
+                                offer.quotationId!,
+                                reason,
+                              );
+                            },
+                          ),
+                        );
                       }
                     },
                     itemBuilder: (context) => [

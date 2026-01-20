@@ -3,7 +3,8 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:service_connect/feature/offer/controller/offer_list_controller.dart';
 import 'package:service_connect/feature/offer/model/offer_list_model.dart';
-
+import 'package:service_connect/feature/offer/widgets/cancel_offer_dialog.dart';
+import 'package:service_connect/feature/chat/controller/chat_controller.dart';
 
 class OfferListScreen extends StatelessWidget {
   const OfferListScreen({super.key});
@@ -17,10 +18,7 @@ class OfferListScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Accepted Offers',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: Color(0xFF6C63FF),
         elevation: 0,
@@ -29,23 +27,17 @@ class OfferListScreen extends StatelessWidget {
       body: Obx(() {
         if (controller.isLoading.value && controller.acceptedOffers.isEmpty) {
           return Center(
-            child: CircularProgressIndicator(
-              color: Color(0xFF6C63FF),
-            ),
+            child: CircularProgressIndicator(color: Color(0xFF6C63FF)),
           );
         }
 
-        if (controller.errorMessage.value.isNotEmpty && 
+        if (controller.errorMessage.value.isNotEmpty &&
             controller.acceptedOffers.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 64,
-                  color: Colors.red,
-                ),
+                Icon(Icons.error_outline, size: 64, color: Colors.red),
                 SizedBox(height: 16),
                 Text(
                   'Error loading offers',
@@ -61,9 +53,7 @@ class OfferListScreen extends StatelessWidget {
                   child: Text(
                     controller.errorMessage.value,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                    ),
+                    style: TextStyle(color: Colors.grey[600]),
                   ),
                 ),
                 SizedBox(height: 24),
@@ -87,11 +77,7 @@ class OfferListScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.inbox_outlined,
-                  size: 80,
-                  color: Colors.grey[400],
-                ),
+                Icon(Icons.inbox_outlined, size: 80, color: Colors.grey[400]),
                 SizedBox(height: 16),
                 Text(
                   'No Accepted Offers',
@@ -104,9 +90,7 @@ class OfferListScreen extends StatelessWidget {
                 SizedBox(height: 8),
                 Text(
                   'You don\'t have any accepted offers yet',
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(color: Colors.grey[600]),
                 ),
               ],
             ),
@@ -164,9 +148,7 @@ class OfferCard extends StatelessWidget {
     return Card(
       elevation: 2,
       margin: EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: () {
@@ -230,7 +212,9 @@ class OfferCard extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: getStatusColor(offer.quotationStatus).withOpacity(0.1),
+                      color: getStatusColor(
+                        offer.quotationStatus,
+                      ).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: getStatusColor(offer.quotationStatus),
@@ -248,14 +232,14 @@ class OfferCard extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               SizedBox(height: 16),
-              
+
               // Divider
               Divider(height: 1, color: Colors.grey[300]),
-              
+
               SizedBox(height: 16),
-              
+
               // Details
               Row(
                 children: [
@@ -276,9 +260,9 @@ class OfferCard extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               SizedBox(height: 12),
-              
+
               Row(
                 children: [
                   Expanded(
@@ -298,22 +282,57 @@ class OfferCard extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               SizedBox(height: 12),
-              
+
               _DetailItem(
                 icon: Icons.payment,
                 label: 'Payment Status',
                 value: offer.paymentStatus.toUpperCase(),
                 valueColor: getStatusColor(offer.paymentStatus),
               ),
-              
+
               SizedBox(height: 12),
-              
+
               _DetailItem(
                 icon: Icons.access_time,
                 label: 'Created',
                 value: formatDate(offer.createdAt),
+              ),
+
+              SizedBox(height: 16),
+
+              // Cancel Offer Button
+              SizedBox(
+                width: double.infinity,
+                height: 45,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Get.dialog(
+                      CancelOfferDialog(
+                        quotationId: offer.id,
+                        onConfirm: (reason) {
+                          final chatController = Get.find<ChatController>();
+                          chatController.cancelOffer(offer.id, reason);
+                        },
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    'Cancel Offer',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
@@ -340,11 +359,7 @@ class _DetailItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(
-          icon,
-          size: 16,
-          color: Colors.grey[600],
-        ),
+        Icon(icon, size: 16, color: Colors.grey[600]),
         SizedBox(width: 8),
         Expanded(
           child: Column(
@@ -352,10 +367,7 @@ class _DetailItem extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 11, color: Colors.grey[600]),
               ),
               SizedBox(height: 2),
               Text(
