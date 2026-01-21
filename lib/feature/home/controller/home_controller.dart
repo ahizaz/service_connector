@@ -136,17 +136,58 @@ class HomeController extends GetxController {
   /// Currently this sets static/sample values. Replace with API call as needed.
   Future<void> loadDashboardData() async {
     try {
-      availableWithdraw.value = 250.0;
-      earningInMonth.value = 380.0;
-      activeHire.value = 2;
-      cancelHire.value = 5;
-      // Sample header/profile values (replace with API values)
-      totalHire.value = 23;
-      totalEarning.value = 82012.0;
-      providerRating.value = 4.8;
-      successRate.value = 96;
+      debugPrint('=================================');
+      debugPrint('Loading dashboard data from API...');
+      debugPrint('=================================');
+      
+      EasyLoading.show(status: 'Loading dashboard...');
+      
+      final earningsData = await providerRepository.getEarnings();
+      
+      debugPrint('=================================');
+      debugPrint('Earnings Data Received:');
+      debugPrint('Total Earnings: ${earningsData.totalEarnings}');
+      debugPrint('Available Balance: ${earningsData.availableBalance}');
+      debugPrint('Last Month Earnings: ${earningsData.lastMonthEarnings}');
+      debugPrint('Active Hires: ${earningsData.activeHires}');
+      debugPrint('Cancelled Works: ${earningsData.cancelledWorks}');
+      debugPrint('Total Hired: ${earningsData.totalHired}');
+      debugPrint('=================================');
+      
+      availableWithdraw.value = double.tryParse(earningsData.availableBalance) ?? 0.0;
+      earningInMonth.value = double.tryParse(earningsData.lastMonthEarnings) ?? 0.0;
+      activeHire.value = earningsData.activeHires;
+      cancelHire.value = earningsData.cancelledWorks;
+      
+      // Sample header/profile values
+      totalHire.value = earningsData.totalHired;
+      totalEarning.value = double.tryParse(earningsData.totalEarnings) ?? 0.0;
+      // Rating and success rate might come from different endpoint
+      providerRating.value = 4.8; // Keep as default for now
+      successRate.value = 96; // Keep as default for now
+      
+      EasyLoading.dismiss();
+      
+      debugPrint('=================================');
+      debugPrint('Dashboard data loaded successfully');
+      debugPrint('=================================');
     } catch (e) {
+      debugPrint('=================================');
       debugPrint('Failed to load dashboard data: $e');
+      debugPrint('=================================');
+      
+      EasyLoading.dismiss();
+      EasyLoading.showError('Failed to load dashboard data');
+      
+      // Set default values on error
+      availableWithdraw.value = 0.0;
+      earningInMonth.value = 0.0;
+      activeHire.value = 0;
+      cancelHire.value = 0;
+      totalHire.value = 0;
+      totalEarning.value = 0.0;
+      providerRating.value = 0.0;
+      successRate.value = 0;
     }
   }
 

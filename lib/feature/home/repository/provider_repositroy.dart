@@ -4,7 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:service_connect/core/urls/urls.dart';
 import 'package:service_connect/feature/home/model/provider_model.dart';
 import 'package:service_connect/feature/home/model/provider_detail_model.dart';
-
+import 'package:service_connect/feature/home/model/earnings_model.dart';
+import 'package:service_connect/feature/home/model/hiring_list_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProviderRepository {
@@ -99,6 +100,85 @@ class ProviderRepository {
     } catch (e) {
       debugPrint('Error fetching provider details: $e');
       throw Exception('Error fetching provider details: $e');
+    }
+  }
+
+  // Get provider earnings/dashboard data
+  Future<EarningsModel> getEarnings() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('accessToken');
+
+      debugPrint('=================================');
+      debugPrint('Fetching provider earnings...');
+      debugPrint('URL: ${Url.getEarnings}');
+      debugPrint('Token: $token');
+      debugPrint('=================================');
+
+      final response = await http.get(
+        Uri.parse(Url.getEarnings),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      debugPrint('=================================');
+      debugPrint('Response status: ${response.statusCode}');
+      debugPrint('Response body: ${response.body}');
+      debugPrint('=================================');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        debugPrint('Earnings data fetched successfully');
+        return EarningsModel.fromJson(data);
+      } else {
+        debugPrint('Failed to load earnings data');
+        throw Exception('Failed to load earnings data');
+      }
+    } catch (e) {
+      debugPrint('Error fetching earnings: $e');
+      throw Exception('Error fetching earnings: $e');
+    }
+  }
+
+  // Get provider hiring list
+  Future<List<HiringListModel>> getHiringList() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('accessToken');
+
+      debugPrint('=================================');
+      debugPrint('Fetching hiring list...');
+      debugPrint('URL: ${Url.getHiringList}');
+      debugPrint('Token: $token');
+      debugPrint('=================================');
+
+      final response = await http.get(
+        Uri.parse(Url.getHiringList),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      debugPrint('=================================');
+      debugPrint('Response status: ${response.statusCode}');
+      debugPrint('Response body: ${response.body}');
+      debugPrint('=================================');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final List<dynamic> data = jsonDecode(response.body);
+        debugPrint('Hiring list fetched successfully');
+        debugPrint('Total hiring records: ${data.length}');
+        return data.map((json) => HiringListModel.fromJson(json)).toList();
+      } else {
+        debugPrint('Failed to load hiring list');
+        throw Exception('Failed to load hiring list');
+      }
+    } catch (e) {
+      debugPrint('Error fetching hiring list: $e');
+      throw Exception('Error fetching hiring list: $e');
     }
   }
 }

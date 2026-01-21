@@ -1,128 +1,97 @@
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:service_connect/feature/home/repository/provider_repositroy.dart';
+import 'package:service_connect/feature/home/model/hiring_list_model.dart';
 
 class HireController extends GetxController {
+  final ProviderRepository _providerRepository = ProviderRepository();
+
   // Observable for selected tab
   var selectedTab = 0.obs;
-  
+
+  // Loading state
+  final RxBool isLoading = false.obs;
+
+  // Hiring list data from API
+  final RxList<HiringListModel> allHiringList = <HiringListModel>[].obs;
+
+  // Filtered lists based on order status
+  List<HiringListModel> get activeOrders =>
+      allHiringList.where((order) => order.isActive).toList();
+
+  List<HiringListModel> get completedOrders =>
+      allHiringList.where((order) => order.isCompleted).toList();
+
+  List<HiringListModel> get cancelledOrders =>
+      allHiringList.where((order) => order.isCancelled).toList();
+
   // Total statistics
-  final int totalHire = 23;
-  final double totalSpend = 2012.00;
-  
-  // All orders
-  final List<Map<String, dynamic>> allOrders = [
-    {
-      'title': 'Pipe Plumbing',
-      'subtitle': 'Pipe Plumbing',
-      'professional': 'Abdur Rahman - Plumber',
-      'description': 'As an AC service technician, I specialize in the installation, maintenance, and repair of air c...',
-      'fullDescription': 'As an AC service technician, I specialize in the installation, maintenance, and repair of air conditioning systems. My work involves diagnosing issues, performing routine check-ups, and ensuring optimal performance of cooling units. I also provide recommendations for energy efficiency and help customers understand how to operate their systems effectively. My goal is to ensure that every client enjoys a comfortable indoor environment.',
-      'price': 215.00,
-      'date': '09/January',
-      'time': '10:00 AM',
-      'status': 'Active',
-      'image': 'assets/images/userpicreparing.png',
-    },
-    {
-      'title': 'Electricity mechanic',
-      'subtitle': 'Electricity mechanic',
-      'professional': 'Abdur Rahman - Electrician',
-      'description': 'As an AC service technician, I specialize in the installation, maintenance, and repair of air c...',
-      'fullDescription': 'As an AC service technician, I specialize in the installation, maintenance, and repair of air conditioning systems. My work involves diagnosing issues, performing routine check-ups, and ensuring optimal performance of cooling units. I also provide recommendations for energy efficiency and help customers understand how to operate their systems effectively. My goal is to ensure that every client enjoys a comfortable indoor environment.',
-      'price': 526.00,
-      'date': '09/March',
-      'time': '12:00 AM',
-      'status': 'Active',
-      'image': 'assets/images/userpicreparing.png',
-    },
-    {
-      'title': 'HVAC Specialist',
-      'subtitle': 'HVAC Specialist',
-      'professional': 'Abdur Rahman - HVAC Technician',
-      'description': 'As an HVAC specialist, I focus on the integration of heating, ventilation, and air co...',
-      'fullDescription': 'As an HVAC specialist, I focus on the integration of heating, ventilation, and air conditioning systems to create optimal indoor environments. My expertise includes system design, installation, and maintenance, ensuring energy efficiency and comfort for residential and commercial clients.',
-      'price': 320.00,
-      'date': '09/March',
-      'time': '12:00 AM',
-      'status': 'Active',
-      'image': 'assets/images/userpicreparing.png',
-    },
-    {
-      'title': 'Bathroom Fittings',
-      'subtitle': 'Bathroom Fittings',
-      'professional': 'Abdur Rahman - Plumber',
-      'description': 'And Balcony Plumber',
-      'fullDescription': 'As an AC service technician, I specialize in the installation, maintenance, and repair of air conditioning systems. My work involves diagnosing issues, performing routine check-ups, and ensuring optimal performance of cooling units. I also provide recommendations for energy efficiency and help customers understand how to operate their systems effectively. My goal is to ensure that every client enjoys a comfortable indoor environment.',
-      'price': 215.00,
-      'date': '09/January',
-      'time': '10:00 AM',
-      'status': 'Active',
-      'image': 'assets/images/userpicreparing.png',
-    },
-  ];
-  
-  // Active orders
-  List<Map<String, dynamic>> get activeOrders => 
-      allOrders.where((order) => order['status'] == 'Active').toList();
-  
-  // Completed orders
-  final List<Map<String, dynamic>> completedOrders = [
-    {
-      'title': 'Pipe Plumbing',
-      'subtitle': 'Pipe Plumbing',
-      'professional': 'Abdur Rahman - Plumber',
-      'description': 'As an AC service technician, I specialize in the installation, maintenance, and repair of air c...',
-      'fullDescription': 'As an AC service technician, I specialize in the installation, maintenance, and repair of air conditioning systems. My work involves diagnosing issues, performing routine check-ups, and ensuring optimal performance of cooling units. I also provide recommendations for energy efficiency and help customers understand how to operate their systems effectively. My goal is to ensure that every client enjoys a comfortable indoor environment.',
-      'price': 215.00,
-      'date': '09/January',
-      'time': '10:00 AM',
-      'status': 'Complete',
-      'image': 'assets/images/userpicreparing.png',
-    },
-    {
-      'title': 'Electricity mechanic',
-      'subtitle': 'Electricity mechanic',
-      'professional': 'Abdur Rahman - Electrician',
-      'description': 'As an AC service technician, I specialize in the installation, maintenance, and repair of air c...',
-      'fullDescription': 'As an AC service technician, I specialize in the installation, maintenance, and repair of air conditioning systems. My work involves diagnosing issues, performing routine check-ups, and ensuring optimal performance of cooling units. I also provide recommendations for energy efficiency and help customers understand how to operate their systems effectively. My goal is to ensure that every client enjoys a comfortable indoor environment.',
-      'price': 526.00,
-      'date': '09/March',
-      'time': '12:00 AM',
-      'status': 'Complete',
-      'image': 'assets/images/userpicreparing.png',
-    },
-    {
-      'title': 'HVAC Specialist',
-      'subtitle': 'HVAC Specialist',
-      'professional': 'Abdur Rahman - HVAC Technician',
-      'description': 'As an HVAC specialist, I focus on the integration of heating, ventilation, and air co...',
-      'fullDescription': 'As an HVAC specialist, I focus on the integration of heating, ventilation, and air conditioning systems to create optimal indoor environments. My expertise includes system design, installation, and maintenance, ensuring energy efficiency and comfort for residential and commercial clients.',
-      'price': 320.00,
-      'date': '09/March',
-      'time': '12:00 AM',
-      'status': 'Complete',
-      'image': 'assets/images/userpicreparing.png',
-    },
-  ];
-  
-  // Cancelled orders
-  final List<Map<String, dynamic>> cancelledOrders = [];
-  
+  int get totalHire => allHiringList.length;
+  double get totalSpend {
+    double total = 0.0;
+    for (var order in allHiringList) {
+      total += double.tryParse(order.serviceCost) ?? 0.0;
+    }
+    return total;
+  }
+
   @override
   void onInit() {
     super.onInit();
-    // We no longer rely on a TabController; selected tab is managed by `selectedTab`.
+    fetchHiringList();
   }
 
   @override
   void onClose() {
     super.onClose();
   }
-  
+
+  /// Fetch hiring list from API
+  Future<void> fetchHiringList() async {
+    try {
+      isLoading.value = true;
+      EasyLoading.show(status: 'Loading hiring list...');
+
+      debugPrint('=================================');
+      debugPrint('HireController: Starting to fetch hiring list');
+      debugPrint('=================================');
+
+      final hiringList = await _providerRepository.getHiringList();
+
+      debugPrint('=================================');
+      debugPrint('HireController: Hiring list fetched successfully');
+      debugPrint('Total records: ${hiringList.length}');
+      debugPrint('Active orders: ${hiringList.where((o) => o.isActive).length}');
+      debugPrint('Completed orders: ${hiringList.where((o) => o.isCompleted).length}');
+      debugPrint('Cancelled orders: ${hiringList.where((o) => o.isCancelled).length}');
+      debugPrint('=================================');
+
+      allHiringList.value = hiringList;
+
+      EasyLoading.dismiss();
+    } catch (e) {
+      debugPrint('=================================');
+      debugPrint('HireController: Error fetching hiring list: $e');
+      debugPrint('=================================');
+
+      EasyLoading.dismiss();
+      EasyLoading.showError('Failed to load hiring list');
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Refresh hiring list
+  Future<void> refreshHiringList() async {
+    await fetchHiringList();
+  }
+
   // Get orders based on selected tab
-  List<Map<String, dynamic>> getOrdersByTab(int index) {
+  List<HiringListModel> getOrdersByTab(int index) {
     switch (index) {
       case 0: // All
-        return [...activeOrders, ...completedOrders, ...cancelledOrders];
+        return allHiringList;
       case 1: // Active
         return activeOrders;
       case 2: // Complete
@@ -130,7 +99,7 @@ class HireController extends GetxController {
       case 3: // Cancelled
         return cancelledOrders;
       default:
-        return allOrders;
+        return allHiringList;
     }
   }
 }

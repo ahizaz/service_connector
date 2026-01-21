@@ -1238,8 +1238,8 @@ class ChatController extends GetxController {
 
       debugPrint('=================================');
       debugPrint('📥 API RESPONSE');
-      debugPrint('Status Code: \${response.statusCode}');
-      debugPrint('Response Body: \${response.body}');
+      debugPrint("Status Code: ${response.statusCode}");
+      debugPrint("Response Body: ${response.body}");
       debugPrint('=================================');
 
       EasyLoading.dismiss();
@@ -1293,8 +1293,38 @@ class ChatController extends GetxController {
           colorText: Colors.white,
           duration: Duration(seconds: 2),
         );
+      } else if (response.statusCode == 400) {
+        // Handle 400 errors - offer already converted to order or already canceled
+        String errorMessage = 'Failed to cancel offer. Please try again.';
+        
+        try {
+          final errorBody = json.decode(response.body);
+          final errorText = errorBody['error']?.toString() ?? errorBody['message']?.toString() ?? '';
+          
+          if (errorText.toLowerCase().contains('order already created')) {
+            errorMessage = 'This offer has been converted to an order. Please use order cancellation instead.';
+            debugPrint("⚠️ Offer already converted to order");
+          } else if (errorText.toLowerCase().contains('already cancel')) {
+            errorMessage = 'This offer has already been cancelled.';
+            debugPrint("⚠️ Offer already cancelled");
+          } else if (errorText.isNotEmpty) {
+            errorMessage = errorText;
+          }
+        } catch (e) {
+          debugPrint("⚠️ Could not parse error response: $e");
+        }
+        
+        debugPrint("❌ Failed to cancel offer: ${response.statusCode} - $errorMessage");
+        Get.snackbar(
+          'Cannot Cancel Offer',
+          errorMessage,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.orange.withOpacity(0.9),
+          colorText: Colors.white,
+          duration: Duration(seconds: 4),
+        );
       } else {
-        debugPrint('❌ Failed to cancel offer: \${response.statusCode}');
+        debugPrint("❌ Failed to cancel offer: ${response.statusCode}");
         Get.snackbar(
           'Error',
           'Failed to cancel offer. Please try again.',
@@ -1309,7 +1339,7 @@ class ChatController extends GetxController {
       debugPrint('❌ Error canceling offer: $e');
       Get.snackbar(
         'Error',
-        'Failed to cancel offer: \${e.toString().replaceAll(\'Exception: \', \'\')}',
+        "Failed to cancel offer: ${e.toString().replaceAll('Exception: ', '')}",
         snackPosition: SnackPosition.BOTTOM,
         backgroundColor: Colors.red.withOpacity(0.9),
         colorText: Colors.white,

@@ -12,6 +12,11 @@ class OfferListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(OfferListController());
+    
+    // Reload offers when screen is opened to get latest status
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.refreshOffers();
+    });
 
     return Scaffold(
       backgroundColor: Colors.grey[100],

@@ -54,9 +54,9 @@ class OfferListController extends GetxController {
 
         allOffers.value = offerListResponse.results;
         
-        // Filter only accepted offers with PAID payment status
+        // Filter only accepted offers with PAID payment status and NOT canceled
         acceptedOffers.value = offerListResponse.results
-            .where((offer) => offer.isAccepted && offer.isPaid)
+            .where((offer) => offer.isAccepted && offer.isPaid && !offer.isCanceled)
             .toList();
 
         debugPrint('✅ Total offers: ${allOffers.length}');
