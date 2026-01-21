@@ -1,10 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:get/get.dart';
+import 'package:service_connect/feature/order/controller/all_orders_controller.dart';
 import '../screen/recent_orders_screen.dart';
 
-class RecentOrdersWidget extends StatelessWidget {
+class RecentOrdersWidget extends StatefulWidget {
   const RecentOrdersWidget({super.key});
+
+  @override
+  State<RecentOrdersWidget> createState() => _RecentOrdersWidgetState();
+}
+
+class _RecentOrdersWidgetState extends State<RecentOrdersWidget> {
+  final AllOrdersController controller = Get.put(AllOrdersController());
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch orders when widget loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.fetchAllOrders();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +40,7 @@ class RecentOrdersWidget extends StatelessWidget {
               )),
               GestureDetector(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => RecentOrdersScreen()),
-                  );
+                  Get.to(() => RecentOrdersScreen());
                 },
                 child: Text(
                   "View All",
@@ -39,21 +54,53 @@ class RecentOrdersWidget extends StatelessWidget {
           ),
         ),
         SizedBox(height: 16.h),
-        ListView.builder(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-          padding: EdgeInsets.symmetric(horizontal: 20.w),
-          itemCount: 3,
-          itemBuilder: (context, index) {
-            return _OrderCard(
-              serviceName: index == 0 ? "AC Repair Service" : index == 1 ? "Plumbing Service" : "Electrical Work",
-              clientName: index == 0 ? "John Doe" : index == 1 ? "Jane Smith" : "Mike Johnson",
-              price: index == 0 ? 150 : index == 1 ? 80 : 120,
-              status: index == 0 ? "In Progress" : index == 1 ? "Pending" : "Completed",
-              date: index == 0 ? "Today, 2:30 PM" : index == 1 ? "Tomorrow, 10:00 AM" : "Yesterday",
+        Obx(() {
+          if (controller.isLoading.value && controller.allOrders.isEmpty) {
+            return SizedBox(
+              height: 200.h,
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: Color(0xffCC0000),
+                ),
+              ),
             );
-          },
-        ),
+          }
+
+          if (controller.allOrders.isEmpty) {
+            return SizedBox(
+              height: 200.h,
+              child: Center(
+                child: Text(
+                  'No orders available',
+                  style: GoogleFonts.roboto(
+                    fontSize: 14.sp,
+                    color: Color(0xff999999),
+                  ),
+                ),
+              ),
+            );
+          }
+
+          final recentOrders = controller.getRecentOrders();
+
+          return ListView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            padding: EdgeInsets.symmetric(horizontal: 20.w),
+            itemCount: recentOrders.length,
+            itemBuilder: (context, index) {
+              final order = recentOrders[index];
+              return _OrderCard(
+                serviceName: order.categoryName,
+                clientName: order.receiverName,
+                price: double.parse(order.serviceCost).toInt(),
+                status: order.displayStatus,
+                date: order.formattedDate,
+                statusColor: order.getStatusColor(),
+              );
+            },
+          );
+        }),
         SizedBox(height: 20.h),
       ],
     );
@@ -66,16 +113,19 @@ class _OrderCard extends StatelessWidget {
   final int price;
   final String status;
   final String date;
+  final Color statusColor;
 
-  const _OrderCard({required this.serviceName, required this.clientName, required this.price, required this.status, required this.date});
+  const _OrderCard({
+    required this.serviceName,
+    required this.clientName,
+    required this.price,
+    required this.status,
+    required this.date,
+    required this.statusColor,
+  });
 
   @override
   Widget build(BuildContext context) {
-    Color statusColor = status == "Completed" 
-        ? Color(0xff4CAF50) 
-        : status == "In Progress" 
-            ? Color(0xffFF9800) 
-            : Color(0xff2196F3);
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
       padding: EdgeInsets.all(16.w),
@@ -97,14 +147,18 @@ class _OrderCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                serviceName,
-                style: GoogleFonts.roboto(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xff313131),
+              Expanded(
+                child: Text(
+                  serviceName,
+                  style: GoogleFonts.roboto(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xff313131),
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
+              SizedBox(width: 8.w),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
                 decoration: BoxDecoration(
@@ -127,11 +181,14 @@ class _OrderCard extends StatelessWidget {
             children: [
               Icon(Icons.person_outline, size: 16.sp, color: Color(0xff737373)),
               SizedBox(width: 4.w),
-              Text(
-                clientName,
-                style: GoogleFonts.roboto(
-                  fontSize: 14.sp,
-                  color: Color(0xff737373),
+              Expanded(
+                child: Text(
+                  clientName,
+                  style: GoogleFonts.roboto(
+                    fontSize: 14.sp,
+                    color: Color(0xff737373),
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],

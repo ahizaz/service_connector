@@ -31,7 +31,8 @@ class Url {
       static String cancelquotebyReceiver(int quotationId) => "$baseUrl/offer/quotations/$quotationId/cancel/";
       static String getEarnings ="$baseUrl/offer/provider-dashboard/earnings/";
       static String getHiringList ="$baseUrl/offer/provider-dashboard/hiring-list/";
-      
+      static String getAllorder ="$baseUrl/offer/orders/";
+
       
 
 
