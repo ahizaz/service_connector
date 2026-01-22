@@ -6,6 +6,7 @@ import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:service_connect/feature/offer/screen/create_offer_screen.dart';
 import 'package:service_connect/feature/order/screen/accepted_orders_screen.dart';
+import 'package:service_connect/feature/order/screen/completed_order_screen.dart';
 import 'package:service_connect/feature/offer/widgets/cancel_offer_dialog.dart';
 import '../controller/chat_controller.dart';
 import '../model/chat_message_model.dart';
@@ -298,12 +299,12 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
                     Get.toNamed('/offer-list');
                   } else if (value == 'give_review') {
-                    // Give Review (Receiver only) - TODO: Implement later
+                    // Navigate to Completed Orders Screen
                     debugPrint('=================================');
-                    debugPrint('Give Review clicked');
-                    debugPrint('Provider User ID: ${user?.id}');
+                    debugPrint('Navigating to Completed Orders Screen');
                     debugPrint('=================================');
-                    // Functionality will be implemented later
+                    
+                    Get.to(() => CompletedOrderScreen());
                   }
                 },
                 itemBuilder: (context) {
