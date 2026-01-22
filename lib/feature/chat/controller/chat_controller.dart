@@ -12,7 +12,6 @@ import 'package:url_launcher/url_launcher.dart';
 import '../model/chat_message_model.dart';
 import '../model/websocket_message_model.dart';
 import 'package:service_connect/feature/conversation/repository/conversation_repository.dart';
-import 'package:service_connect/feature/conversation/model/conversation_list_response_model.dart';
 import 'package:service_connect/core/services/websocket_service.dart';
 import 'package:service_connect/core/auth/auth_service.dart';
 import 'dart:async';

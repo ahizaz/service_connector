@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:service_connect/core/urls/urls.dart';
 import 'package:service_connect/feature/service_receiver/models/category_model.dart';

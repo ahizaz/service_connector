@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:service_connect/feature/home/controller/home_controller.dart';
 import 'package:service_connect/feature/home/widget/home_header_widget.dart';
 import 'package:service_connect/feature/home/widget/categories_list_widget.dart';

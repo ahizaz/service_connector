@@ -297,6 +297,13 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                     debugPrint('=================================');
 
                     Get.toNamed('/offer-list');
+                  } else if (value == 'give_review') {
+                    // Give Review (Receiver only) - TODO: Implement later
+                    debugPrint('=================================');
+                    debugPrint('Give Review clicked');
+                    debugPrint('Provider User ID: ${user?.id}');
+                    debugPrint('=================================');
+                    // Functionality will be implemented later
                   }
                 },
                 itemBuilder: (context) {
@@ -318,6 +325,10 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                       PopupMenuItem(
                         value: 'cancel_offer',
                         child: Text('Cancel Offer'),
+                      ),
+                      PopupMenuItem(
+                        value: 'give_review',
+                        child: Text('Give Review'),
                       ),
                     ];
                   }
@@ -1399,6 +1410,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       ],
     );
   }
+
 }
 
 class _AttachmentOption extends StatelessWidget {

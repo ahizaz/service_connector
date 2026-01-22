@@ -6,7 +6,6 @@ import 'package:pinput/pinput.dart';
 import 'package:service_connect/core/common/styles/global_text_style.dart';
 import 'package:service_connect/core/common/widgets/custom_button.dart';
 import 'package:service_connect/feature/authentication/forgot_password/controller/forget_controller.dart';
-import 'package:service_connect/feature/authentication/reset_password/screen/reset_password.dart';
 
 class ForgetVerification extends StatelessWidget {
   ForgetVerification({super.key});
