@@ -32,6 +32,8 @@ class Url {
       static String getEarnings ="$baseUrl/offer/provider-dashboard/earnings/";
       static String getHiringList ="$baseUrl/offer/provider-dashboard/hiring-list/";
       static String getAllorder ="$baseUrl/offer/orders/";
+      static String receiverReview = "$baseUrl/offer/reviews/";
+      static String receiveAllReviewByProivder ="$baseUrl/offer/reviews/by-provider-user/?provider_user_id=f1c293c2-e906-4d73-81c9-ca3335987023";
 
       
 

@@ -58,16 +58,23 @@ class HomeController extends GetxController {
   Future<void> _initializeHomeData() async {
     try {
       EasyLoading.show(status: 'Loading...');
+      
+      // Load data in parallel but don't let one failure stop others
       await Future.wait([
         loadServiceProviderMode(),
-        loadDashboardData(),
         _loadUserNameFromPrefs(),
         categoryController.fetchCategories(),
         fetchAllProviders(),
-      ]);
+      ], eagerError: false);
+      
+      // Load dashboard data separately - it might fail if no provider profile exists
+      await loadDashboardData().catchError((e) {
+        debugPrint('Dashboard data failed to load, continuing anyway: $e');
+      });
+      
     } catch (e) {
       debugPrint('Error initializing home data: $e');
-      EasyLoading.showError('Failed to load data');
+      // Don't show error to user - individual functions handle their own errors
     } finally {
       EasyLoading.dismiss();
     }
@@ -177,7 +184,9 @@ class HomeController extends GetxController {
       debugPrint('=================================');
       
       EasyLoading.dismiss();
-      EasyLoading.showError('Failed to load dashboard data');
+      
+      // Don't show error dialog - just set default values
+      // This can happen if user hasn't created provider profile yet
       
       // Set default values on error
       availableWithdraw.value = 0.0;

@@ -18,7 +18,8 @@ class AllOrdersResponse {
       count: json['count'] ?? 0,
       next: json['next'],
       previous: json['previous'],
-      results: (json['results'] as List<dynamic>?)
+      results:
+          (json['results'] as List<dynamic>?)
               ?.map((e) => OrderModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
@@ -41,6 +42,7 @@ class OrderModel {
   final String providerName;
   final String receiverName;
   final String? receiverImage;
+  final String? providerUserUuid;
   final String categoryName;
   final String serviceCost;
   final String providerAmount;
@@ -55,6 +57,7 @@ class OrderModel {
     required this.providerName,
     required this.receiverName,
     this.receiverImage,
+    this.providerUserUuid,
     required this.categoryName,
     required this.serviceCost,
     required this.providerAmount,
@@ -65,12 +68,45 @@ class OrderModel {
   });
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
+    // Debug: Print all available fields
+    debugPrint('=================================');
+    debugPrint('OrderModel fromJson - All fields:');
+    debugPrint('JSON Keys: ${json.keys.toList()}');
+    json.forEach((key, value) {
+      if (key.toLowerCase().contains('provider') &&
+          key.toLowerCase().contains('user')) {
+        debugPrint('$key: $value');
+      }
+    });
+    debugPrint('provider_user_uuid: ${json['provider_user_uuid']}');
+    debugPrint('provider_user_id: ${json['provider_user_id']}');
+    debugPrint('provider_uuid: ${json['provider_uuid']}');
+    debugPrint('provider_id: ${json['provider_id']}');
+    debugPrint('quotation: ${json['quotation']}');
+    debugPrint('=================================');
+
+    // Try multiple possible field names for provider user UUID
+    // Check nested quotation object if exists
+    String? providerUuid;
+    if (json['quotation'] != null && json['quotation'] is Map) {
+      providerUuid = json['quotation']['provider_user_id']?.toString();
+      debugPrint('Found provider_user_id in quotation: $providerUuid');
+    }
+
+    // Fallback to direct fields
+    providerUuid ??=
+        json['provider_user_uuid'] ??
+        json['provider_user_id']?.toString() ??
+        json['provider_uuid'] ??
+        json['provider_id']?.toString();
+
     return OrderModel(
       orderId: json['order_id'] ?? 0,
       quotationId: json['quotation_id'] ?? 0,
       providerName: json['provider_name'] ?? '',
       receiverName: json['receiver_name'] ?? '',
       receiverImage: json['receiver_image'],
+      providerUserUuid: providerUuid,
       categoryName: json['category_name'] ?? '',
       serviceCost: json['service_cost']?.toString() ?? '0.00',
       providerAmount: json['provider_amount']?.toString() ?? '0.00',
@@ -88,6 +124,7 @@ class OrderModel {
       'provider_name': providerName,
       'receiver_name': receiverName,
       'receiver_image': receiverImage,
+      'provider_user_uuid': providerUserUuid,
       'category_name': categoryName,
       'service_cost': serviceCost,
       'provider_amount': providerAmount,

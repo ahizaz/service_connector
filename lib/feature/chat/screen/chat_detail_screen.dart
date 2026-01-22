@@ -299,12 +299,16 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
 
                     Get.toNamed('/offer-list');
                   } else if (value == 'give_review') {
-                    // Navigate to Completed Orders Screen
+                    // Navigate to Completed Orders Screen with provider filter
                     debugPrint('=================================');
                     debugPrint('Navigating to Completed Orders Screen');
+                    debugPrint('Provider User ID: ${user?.id}');
+                    debugPrint('Provider Name: ${user?.name}');
                     debugPrint('=================================');
-                    
-                    Get.to(() => CompletedOrderScreen());
+
+                    Get.to(
+                      () => CompletedOrderScreen(providerUserId: user?.id),
+                    );
                   }
                 },
                 itemBuilder: (context) {
@@ -1284,7 +1288,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               ),
             ),
             SizedBox(height: 12.h),
-            
+
             // Action Buttons (Complete/Cancel)
             if (order.completeUrl != null || order.cancelUrl != null) ...[
               Row(
@@ -1294,7 +1298,10 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                       child: ElevatedButton(
                         onPressed: () {
                           final controller = Get.find<ChatController>();
-                          controller.updateOrderStatus(order.completeUrl!, 'completed');
+                          controller.updateOrderStatus(
+                            order.completeUrl!,
+                            'completed',
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
@@ -1328,7 +1335,10 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                       child: ElevatedButton(
                         onPressed: () {
                           final controller = Get.find<ChatController>();
-                          controller.updateOrderStatus(order.cancelUrl!, 'cancelled');
+                          controller.updateOrderStatus(
+                            order.cancelUrl!,
+                            'cancelled',
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white.withOpacity(0.3),
@@ -1359,7 +1369,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
               ),
               SizedBox(height: 12.h),
             ],
-            
+
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -1411,7 +1421,6 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       ],
     );
   }
-
 }
 
 class _AttachmentOption extends StatelessWidget {

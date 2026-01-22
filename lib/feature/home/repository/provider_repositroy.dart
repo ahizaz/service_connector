@@ -132,6 +132,17 @@ class ProviderRepository {
         final Map<String, dynamic> data = jsonDecode(response.body);
         debugPrint('Earnings data fetched successfully');
         return EarningsModel.fromJson(data);
+      } else if (response.statusCode == 404) {
+        // Provider profile not found - return default empty values
+        debugPrint('Provider profile not found (404). Returning default values.');
+        return EarningsModel(
+          totalEarnings: '0.00',
+          availableBalance: '0.00',
+          lastMonthEarnings: '0.00',
+          activeHires: 0,
+          cancelledWorks: 0,
+          totalHired: 0,
+        );
       } else {
         debugPrint('Failed to load earnings data');
         throw Exception('Failed to load earnings data');
