@@ -12,31 +12,35 @@ class Url {
   // Dynamic submit document URL based on provider ID
   static String submitDocument(int providerId) =>
       "$baseUrl/provider/providers/$providerId/submit-document/";
-      static String uploadWorkImage(int providerId)=>"$baseUrl/provider/providers/$providerId/upload-work-image/";
-      static const String getAllcatagories = "$baseUrl/provider/categories/";
-      static const String getAllproviders = "$baseUrl/provider/providers/";
-      
-      // Dynamic provider details URL based on provider ID
-      static String getProviderDetails(int providerId) => "$baseUrl/provider/providers/$providerId/";
-      static String createConversation= "$baseUrl/message/conversations/";
-      static String getAllConversation = "$baseUrl/message/conversations/";
-      static String acceptdeclineConversation(int conversationId) => "$baseUrl/message/conversations/$conversationId/update-status/";
-      static String getSpecificConversation(int conversationId) => "$baseUrl/message/messages/?conversation_id=$conversationId";
-      static String sendMessage ="$baseUrl/message/messages/";
-      static String createOffer = "$baseUrl/offer/quotations/";
-      static String updateOfferStatus(int quotationId) => "$baseUrl/offer/quotations/$quotationId/update-status/";
-      static String allacceptedOrder(String receiverUserId) => "$baseUrl/offer/quotations/accepted-for-order/?receiver_user_id=$receiverUserId";
-      static String createOrder = "$baseUrl/offer/orders/";
-      static String getAllofferlist = "$baseUrl/offer/quotations/";
-      static String cancelquotebyReceiver(int quotationId) => "$baseUrl/offer/quotations/$quotationId/cancel/";
-      static String getEarnings ="$baseUrl/offer/provider-dashboard/earnings/";
-      static String getHiringList ="$baseUrl/offer/provider-dashboard/hiring-list/";
-      static String getAllorder ="$baseUrl/offer/orders/";
-      static String receiverReview = "$baseUrl/offer/reviews/";
-      static String receiveAllReviewByProivder ="$baseUrl/offer/reviews/by-provider-user/?provider_user_id=f1c293c2-e906-4d73-81c9-ca3335987023";
+  static String uploadWorkImage(int providerId) =>
+      "$baseUrl/provider/providers/$providerId/upload-work-image/";
+  static const String getAllcatagories = "$baseUrl/provider/categories/";
+  static const String getAllproviders = "$baseUrl/provider/providers/";
 
-      
-
-
-
+  // Dynamic provider details URL based on provider ID
+  static String getProviderDetails(int providerId) =>
+      "$baseUrl/provider/providers/$providerId/";
+  static String createConversation = "$baseUrl/message/conversations/";
+  static String getAllConversation = "$baseUrl/message/conversations/";
+  static String acceptdeclineConversation(int conversationId) =>
+      "$baseUrl/message/conversations/$conversationId/update-status/";
+  static String getSpecificConversation(int conversationId) =>
+      "$baseUrl/message/messages/?conversation_id=$conversationId";
+  static String sendMessage = "$baseUrl/message/messages/";
+  static String createOffer = "$baseUrl/offer/quotations/";
+  static String updateOfferStatus(int quotationId) =>
+      "$baseUrl/offer/quotations/$quotationId/update-status/";
+  static String allacceptedOrder(String receiverUserId) =>
+      "$baseUrl/offer/quotations/accepted-for-order/?receiver_user_id=$receiverUserId";
+  static String createOrder = "$baseUrl/offer/orders/";
+  static String getAllofferlist = "$baseUrl/offer/quotations/";
+  static String cancelquotebyReceiver(int quotationId) =>
+      "$baseUrl/offer/quotations/$quotationId/cancel/";
+  static String getEarnings = "$baseUrl/offer/provider-dashboard/earnings/";
+  static String getHiringList =
+      "$baseUrl/offer/provider-dashboard/hiring-list/";
+  static String getAllorder = "$baseUrl/offer/orders/";
+  static String receiverReview = "$baseUrl/offer/reviews/";
+  static String getProviderReviews(String providerUserId) =>
+      "$baseUrl/offer/reviews/by-provider-user/?provider_user_id=$providerUserId";
 }
