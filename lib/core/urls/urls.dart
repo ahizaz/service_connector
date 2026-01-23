@@ -43,4 +43,5 @@ class Url {
   static String receiverReview = "$baseUrl/offer/reviews/";
   static String getProviderReviews(String providerUserId) =>
       "$baseUrl/offer/reviews/by-provider-user/?provider_user_id=$providerUserId";
+   static String providerBankdetails = "$baseUrl/provider/bank-details/";   
 }

@@ -12,6 +12,7 @@ import 'package:service_connect/feature/authentication/login/screen/login_screen
 import 'package:service_connect/feature/home/controller/home_controller.dart';
 import 'package:service_connect/feature/profile/screen/terms_and_conditions_screen.dart';
 import 'package:service_connect/feature/profile/screen/about_screen.dart';
+import 'package:service_connect/feature/profile/screen/bank_details_screen.dart';
 
 class ProfileController extends GetxController {
   final RxString userName = 'Brooklyn Simmons'.obs;
@@ -370,7 +371,7 @@ class ProfileController extends GetxController {
   }
 
   // Profile menu items
-  final List<Map<String, dynamic>> menuItems = [
+  List<Map<String, dynamic>> get menuItems => [
     {
       'title': 'Account',
       'icon': Icons.person_outline,
@@ -380,6 +381,11 @@ class ProfileController extends GetxController {
       'title': 'Connect with stripe',
       'icon': Icons.account_balance_wallet_outlined,
       'onTap': () => Get.toNamed('/pay-account'),
+    },
+    {
+      'title': 'Bank Details',
+      'icon': Icons.account_balance_outlined,
+      'onTap': () => _navigateToBankDetails(),
     },
     // (Removed 'Saved' menu item)
     {
@@ -393,4 +399,16 @@ class ProfileController extends GetxController {
       'onTap': () => Get.to(() => const AboutScreen()),
     },
   ];
+
+  // Navigate to bank details with service provider check
+  void _navigateToBankDetails() {
+    if (!isServiceProvider.value) {
+      EasyLoading.showError(
+        'You are not eligible. Only service providers can access bank details.',
+        duration: const Duration(seconds: 3),
+      );
+      return;
+    }
+    Get.to(() => const BankDetailsScreen());
+  }
 }
