@@ -454,7 +454,7 @@ class ChatController extends GetxController {
         'Error',
         'Failed to load conversations: ${e.toString().replaceAll('Exception: ', '')}',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.9),
+        backgroundColor: Colors.red.withValues(alpha: .9),
         colorText: Colors.white,
         duration: Duration(seconds: 3),
       );
@@ -490,7 +490,7 @@ class ChatController extends GetxController {
       final String period = hour >= 12 ? 'PM' : 'AM';
       final int displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
 
-      return '${displayHour}:${minute.toString().padLeft(2, '0')} $period';
+      return '$displayHour:${minute.toString().padLeft(2, '0')} $period';
     } catch (e) {
       return 'now';
     }
@@ -676,7 +676,7 @@ class ChatController extends GetxController {
         'Error',
         'Failed to load messages: ${e.toString().replaceAll('Exception: ', '')}',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.9),
+        backgroundColor: Colors.red.withValues(alpha: .9),
         colorText: Colors.white,
         duration: Duration(seconds: 3),
       );
@@ -700,7 +700,7 @@ class ChatController extends GetxController {
         'Error',
         'No active conversation',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.9),
+        backgroundColor: Colors.red.withValues(alpha: .9),
         colorText: Colors.white,
       );
       return;
@@ -740,7 +740,7 @@ class ChatController extends GetxController {
         'Error',
         'Failed to send message: ${e.toString().replaceAll('Exception: ', '')}',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.9),
+        backgroundColor: Colors.red.withValues(alpha: .9),
         colorText: Colors.white,
         duration: Duration(seconds: 3),
       );
@@ -879,7 +879,7 @@ class ChatController extends GetxController {
         'Error',
         'No active conversation',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.9),
+        backgroundColor: Colors.red.withValues(alpha: .9),
         colorText: Colors.white,
       );
       return;
@@ -914,7 +914,7 @@ class ChatController extends GetxController {
         'Error',
         'Failed to send file: ${e.toString().replaceAll('Exception: ', '')}',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.9),
+        backgroundColor: Colors.red.withValues(alpha: .9),
         colorText: Colors.white,
         duration: Duration(seconds: 3),
       );
@@ -929,7 +929,7 @@ class ChatController extends GetxController {
         'Error',
         'No active conversation',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.9),
+        backgroundColor: Colors.red.withValues(alpha: .9),
         colorText: Colors.white,
       );
       return;
@@ -964,7 +964,7 @@ class ChatController extends GetxController {
         'Error',
         'Failed to send image: ${e.toString().replaceAll('Exception: ', '')}',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.9),
+        backgroundColor: Colors.red.withValues(alpha: .9),
         colorText: Colors.white,
         duration: Duration(seconds: 3),
       );
@@ -1050,7 +1050,7 @@ class ChatController extends GetxController {
         'Success',
         'Conversation ${action}ed successfully',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.green.withOpacity(0.9),
+        backgroundColor: Colors.green.withValues(alpha: .9),
         colorText: Colors.white,
         duration: Duration(seconds: 2),
       );
@@ -1062,7 +1062,7 @@ class ChatController extends GetxController {
         'Error',
         e.toString().replaceAll('Exception: ', ''),
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.9),
+        backgroundColor: Colors.red.withValues(alpha: .9),
         colorText: Colors.white,
         duration: Duration(seconds: 3),
       );
@@ -1164,7 +1164,7 @@ class ChatController extends GetxController {
                           ),
                           elevation: 0,
                         ),
-                        child: Text(
+                        child: const Text(
                           'Accept',
                           style: TextStyle(
                             color: Colors.white,
@@ -1206,7 +1206,7 @@ class ChatController extends GetxController {
           'Authentication Error',
           'Please login again',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.withOpacity(0.9),
+          backgroundColor: Colors.red.withValues(alpha: .9),
           colorText: Colors.white,
         );
         return;
@@ -1288,7 +1288,7 @@ class ChatController extends GetxController {
           'Success',
           'Offer canceled successfully',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green.withOpacity(0.9),
+          backgroundColor: Colors.green.withValues(alpha: .9),
           colorText: Colors.white,
           duration: Duration(seconds: 2),
         );
@@ -1318,7 +1318,7 @@ class ChatController extends GetxController {
           'Cannot Cancel Offer',
           errorMessage,
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.orange.withOpacity(0.9),
+          backgroundColor: Colors.orange.withValues(alpha: .9),
           colorText: Colors.white,
           duration: Duration(seconds: 4),
         );
@@ -1328,7 +1328,7 @@ class ChatController extends GetxController {
           'Error',
           'Failed to cancel offer. Please try again.',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.withOpacity(0.9),
+          backgroundColor: Colors.red.withValues(alpha: .9),
           colorText: Colors.white,
           duration: Duration(seconds: 3),
         );
@@ -1340,7 +1340,7 @@ class ChatController extends GetxController {
         'Error',
         "Failed to cancel offer: ${e.toString().replaceAll('Exception: ', '')}",
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.9),
+        backgroundColor: Colors.red.withValues(alpha: .9),
         colorText: Colors.white,
         duration: Duration(seconds: 3),
       );
@@ -1360,7 +1360,7 @@ class ChatController extends GetxController {
           'Authentication Error',
           'Please login again',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.withOpacity(0.9),
+          backgroundColor: Colors.red.withValues(alpha: .9),
           colorText: Colors.white,
         );
         return;
@@ -1437,7 +1437,7 @@ class ChatController extends GetxController {
           'Success',
           'Offer ${status == "accepted" ? "accepted" : "declined"} successfully',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green.withOpacity(0.9),
+          backgroundColor: Colors.green.withValues(alpha: .9),
           colorText: Colors.white,
         );
       } else {
@@ -1454,7 +1454,7 @@ class ChatController extends GetxController {
           'Error',
           message,
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.withOpacity(0.9),
+          backgroundColor: Colors.red.withValues(alpha: .9),
           colorText: Colors.white,
         );
       }
@@ -1468,7 +1468,7 @@ class ChatController extends GetxController {
         'Error',
         'Network error: ${e.toString()}',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.9),
+        backgroundColor: Colors.red.withValues(alpha: .9),
         colorText: Colors.white,
       );
     }
@@ -1628,7 +1628,7 @@ class ChatController extends GetxController {
           'Authentication Error',
           'Please login again',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.withOpacity(0.9),
+          backgroundColor: Colors.red.withValues(alpha: .9),
           colorText: Colors.white,
         );
         return;
@@ -1664,7 +1664,7 @@ class ChatController extends GetxController {
           'Success',
           'Order ${action == "completed" ? "completed" : "cancelled"} successfully',
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.green.withOpacity(0.9),
+          backgroundColor: Colors.green.withValues(alpha: .9),
           colorText: Colors.white,
         );
 
@@ -1687,7 +1687,7 @@ class ChatController extends GetxController {
           'Error',
           message,
           snackPosition: SnackPosition.BOTTOM,
-          backgroundColor: Colors.red.withOpacity(0.9),
+          backgroundColor: Colors.red.withValues(alpha: .9),
           colorText: Colors.white,
         );
       }
@@ -1701,7 +1701,7 @@ class ChatController extends GetxController {
         'Error',
         'Network error: ${e.toString()}',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red.withOpacity(0.9),
+        backgroundColor: Colors.red.withValues(alpha: .9),
         colorText: Colors.white,
       );
     }
