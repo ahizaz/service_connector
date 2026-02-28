@@ -15,7 +15,7 @@ class Url {
   static String uploadWorkImage(int providerId) =>
       "$baseUrl/provider/providers/$providerId/upload-work-image/";
   static const String getAllcatagories = "$baseUrl/provider/categories/";
-  static const String getAllproviders = "$baseUrl/provider/providers/";
+  static const String getAllproviders = "$baseUrl/provider/providers/";//
 
   // Dynamic provider details URL based on provider ID
   static String getProviderDetails(int providerId) =>
