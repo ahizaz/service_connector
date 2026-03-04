@@ -21,9 +21,9 @@ class Url {
   static String uploadWorkImage(int providerId) =>
       '$baseUrl/provider/providers/$providerId/upload-work-image/';
   static String get getAllcatagories => '$baseUrl/provider/categories/';
-  static String get getAllproviders => '$baseUrl/provider/providers/';
+  static String get getAllproviders => '$baseUrl/provider/providers/';//
 
-  // Dynamic provider details URL based on provider ID
+  // Dynamic provider details URL based on provider ID//
   static String getProviderDetails(int providerId) =>
       '$baseUrl/provider/providers/$providerId/';
   static String get createConversation => '$baseUrl/message/conversations/';
