@@ -683,13 +683,6 @@ class ChatController extends GetxController {
     }
   }
 
-  // Load chat messages for a specific user (OLD - DUMMY DATA)
-  // This method is replaced by fetchConversationMessages
-  void _loadChatMessages(String userId) {
-    // This is now handled by fetchConversationMessages
-    currentChatMessages.value = [];
-  }
-
   // Send text message
   Future<void> sendMessage() async {
     if (messageController.text.trim().isEmpty) return;
